@@ -1,0 +1,138 @@
+cmake_minimum_required(VERSION 3.21)
+
+project ("Flower")
+
+set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
+set(SDL_STATIC ON)
+
+include("CMake/VulkanCompileShaders.cmake")
+include(FetchContent)
+
+FetchContent_Declare(
+  glm
+  GIT_REPOSITORY https://github.com/g-truc/glm.git
+  GIT_TAG        1.0.1
+)
+
+FetchContent_Declare(
+  json
+  GIT_REPOSITORY https://github.com/nlohmann/json.git
+  GIT_TAG        v3.12.0
+)
+
+FetchContent_Declare(
+  sdl
+  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git 
+  GIT_TAG        release-3.4.4
+)
+
+FetchContent_MakeAvailable(sdl glm json)
+
+add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
+add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
+
+# Third Party Sources
+set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
+
+set(SrcImgui "Source/ThirdParty/imgui/imgui_demo.cpp" "Source/ThirdParty/imgui/imgui_tables.cpp" 
+             "Source/ThirdParty/imgui/imgui_draw.cpp" "Source/ThirdParty/imgui/imgui_widgets.cpp" 
+             "Source/ThirdParty/imgui/imgui.cpp" "Source/ThirdParty/imgui/backends/imgui_impl_sdl3.cpp")
+
+# Modules Sources
+set(SrcApplication "Source/Runtime/Application/Application.cpp")
+
+set(SrcService "Source/Runtime/Service/Service.cpp")
+
+set(SrcLog "Source/Runtime/Log/Log.cpp")
+
+set(SrcWindow "Source/Runtime/Window/Window.cpp")
+
+set(SrcRender "Source/Runtime/Graphics/Render/Utility.cpp" "Source/Runtime/Graphics/Render/RenderEngine.cpp")
+
+set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor.cpp" "Source/Runtime/World/SceneView.cpp")
+
+set(SrcInput "Source/Runtime/Input/InputManager.cpp" "Source/Runtime/World/Actor.cpp" "Source/Runtime/World/SceneView.cpp")
+
+set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp" "Source/Runtime/Engine/Tickable.cpp")
+
+set(SrcAssets "Source/Runtime/Assets/Entity/EntityTemplate/EntityTemplateCompiler.cpp" "Source/Runtime/Assets/Entity/ComponentTemplate/EntityComponentTemplateLibrary.cpp")
+
+set(SrcConfig "Source/Runtime/Config/ConfigManager.cpp")
+
+set(SrcBlackboard "Source/Runtime/Blackboard/Blackboard.cpp")
+
+set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskPool.cpp")
+
+set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
+    ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcAssets} ${SrcConfig} ${SrcBlackboard} ${SrcAsync}
+    "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
+
+if(WIN32)
+    set(Sources WIN32 ${Sources} "Source/Runtime/Platform/Windows/WindowsPlatform.cpp")
+endif()
+if(CMAKE_HOST_SYSTEM MATCHES Linux)
+  set(Sources ${Sources} "Source/Runtime/Platform/Linux/LinuxPlatform.cpp")
+endif()
+
+# Game
+
+add_executable(Game ${Sources})
+
+target_link_libraries(Game SDL3::SDL3-static glm-header-only nlohmann_json)
+
+target_include_directories(Game PRIVATE "Source/Runtime")
+target_include_directories(Game PRIVATE "Source/ThirdParty")
+
+set_property(TARGET Game PROPERTY CXX_STANDARD 23)
+
+target_compile_options(Game PRIVATE
+#   GCC / Clang
+    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Release>>:-fno-exceptions>
+#   MSVC
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/EHs _HAS_EXCEPTIONS=0->
+)
+
+# Editor
+
+set(EditorSources ${EditorSources}) 
+
+add_executable(Editor ${Sources} ${EditorSources})
+
+target_link_libraries(Editor SDL3::SDL3-static glm-header-only nlohmann_json)
+
+target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
+
+target_include_directories(Editor PRIVATE "Source/ThirdParty")
+
+target_compile_definitions(Editor PUBLIC EDITOR)
+
+set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
+
+# Address Sanitizer Builds
+
+add_executable(EditorASAN ${Sources} ${EditorSources})
+
+target_link_libraries(EditorASAN SDL3::SDL3-static glm-header-only nlohmann_json)
+
+target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
+
+target_include_directories(EditorASAN PRIVATE "Source/ThirdParty")
+
+target_compile_definitions(EditorASAN PUBLIC EDITOR)
+
+set_property(TARGET EditorASAN PROPERTY CXX_STANDARD 23)
+
+if(MSVC)
+  message(STATUS "ASAN: Detected MSVC")
+  target_compile_options(EditorASAN PUBLIC "/MTd" "/fsanitize=address" "/Zi" "/sdl" "/permissive-") 
+  target_link_options(EditorASAN PUBLIC "/INCREMENTAL:NO")
+  target_link_options(EditorASAN PUBLIC "/subsystem:console")
+else()
+  message(STATUS "ASAN: Detected GNU or LLVM")
+  target_compile_options(EditorASAN PUBLIC "-fsanitize=address") 
+  target_link_options(EditorASAN PUBLIC "-fsanitize=address")
+endif()
+#set(CMAKE_EXE_LINKER_FLAGS "/subsystem:console ${CMAKE_EXE_LINKER_FLAGS} /subsystem:console")
+
+# Shaders
+add_shaders(Shaders "Shaders/FullscreenTriangle/FullscreenTriangle.vert" "Shaders/FullscreenTriangle/FullscreenTriangle.frag")
