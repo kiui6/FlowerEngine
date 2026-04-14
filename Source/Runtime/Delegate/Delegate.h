@@ -10,6 +10,8 @@ class Delegate
 {
 protected:
     std::shared_ptr<DelegateInstance<RetValType(ArgTypes...)>>instance;
+
+    std::mutex mtx;
 public:
 
     template <typename UserClass>
@@ -51,6 +53,7 @@ public:
 
     inline RetValType Execute(ArgTypes... Params)
     {
+        std::lock_guard lock(mtx);
         return instance->Execute(Params...);
     }
 };

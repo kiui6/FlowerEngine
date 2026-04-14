@@ -16,17 +16,40 @@ void ServiceProvider::Initialize()
 {
     std::deque<ServiceArchetype> sortedArchetypes;
 
-    // TODO: Sort dependencies
-    for(auto archetype : m_serviceArchetypes) {
-        sortedArchetypes.push_front(archetype);
+    while(m_serviceArchetypes.size() != 0) {
+        for(int i = 0; i < m_serviceArchetypes.size(); i++) {
+            ServiceArchetype archetypeBeingSolved = m_serviceArchetypes[i];
+
+            bool bDependenciesUnmet = false;
+
+            // Find unsorted dependencies
+            for(std::string_view& dependency : archetypeBeingSolved.dependencyNames) {
+                if(std::find_if(m_serviceArchetypes.begin(), 
+                                m_serviceArchetypes.end(), 
+                                [dependency](const ServiceArchetype& element){return dependency == element.serviceName;}) 
+                    != m_serviceArchetypes.end())
+                {
+                    bDependenciesUnmet = true;
+                    break;
+                }
+            }
+            
+            if(bDependenciesUnmet) {
+                continue;
+            }
+
+            sortedArchetypes.push_front(m_serviceArchetypes[i]);
+            m_serviceArchetypes.erase(m_serviceArchetypes.begin() + i);
+            --i;
+        }
     }
 
     while(!sortedArchetypes.empty()) {
-        auto archetype = sortedArchetypes.front();
-        IService* service = archetype.m_instantiatorFunc();
+        auto archetype = sortedArchetypes.back();
+        IService* service = archetype.instantiatorFunc();
         service->Initialize();
         AddService(service);
-        sortedArchetypes.pop_front();
+        sortedArchetypes.pop_back();
     }
 }
 

@@ -4,13 +4,8 @@
 #   define PLATFORM_WINDOWS
 #elif __linux__
 #   define PLATFORM_LINUX
-#elif __unix__ // all unices, not all compilers
+#elif __unix__
 #   define PLATFORM_UNIX
 #elif __APPLE__
-    // Mac OS, not sure if this is covered by __posix__ and/or __unix__ though...
 #   define PLATFORM_MAC
 #endif
-
-/*
- * ARCH_ARM is guaranteed to be defined for all ARM builds
- */

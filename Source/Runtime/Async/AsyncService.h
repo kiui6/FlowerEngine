@@ -17,13 +17,13 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    template <AsyncTaskClass _TTask>
-    void EnqueueTask(uint8_t priority = 0);
+    template <AsyncTaskClass Task, typename... Args>
+    void EnqueueTask(uint8_t priority, Args&&... args);
 };
 
-template <AsyncTaskClass _TTask>
-inline void AsyncService::EnqueueTask(uint8_t priority)
+template <AsyncTaskClass Task, typename... Args>
+inline void AsyncService::EnqueueTask(uint8_t priority, Args&&... args)
 {
-    std::unique_ptr<IAsyncTask> task = std::make_unique<_TTask>();
+    std::unique_ptr<IAsyncTask> task = std::make_unique<Task>(std::forward<Args>(args)...);
     m_taskPool.QueueTask(task, priority);
 }

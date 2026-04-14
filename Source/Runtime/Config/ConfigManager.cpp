@@ -1,6 +1,8 @@
 #include "ConfigManager.h"
 
-bool ConfigManager::bIsInitialized = RegisterService<ConfigManager>();
+#include <Platform/Platform.h>
+
+bool ConfigManager::bIsInitialized = RegisterService<ConfigManager>({Platform::GetStaticName()});
 
 void ConfigManager::Initialize()
 {

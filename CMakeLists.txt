@@ -55,6 +55,8 @@ set(SrcInput "Source/Runtime/Input/InputManager.cpp" "Source/Runtime/World/Actor
 
 set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp" "Source/Runtime/Engine/Tickable.cpp")
 
+set(SrcObject "Source/Runtime/Object/ObjectLibrary.cpp")
+
 set(SrcAssets "Source/Runtime/Assets/Entity/EntityTemplate/EntityTemplateCompiler.cpp" "Source/Runtime/Assets/Entity/ComponentTemplate/EntityComponentTemplateLibrary.cpp")
 
 set(SrcConfig "Source/Runtime/Config/ConfigManager.cpp")
@@ -63,8 +65,17 @@ set(SrcBlackboard "Source/Runtime/Blackboard/Blackboard.cpp")
 
 set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskPool.cpp")
 
+set(SrcData "Source/Runtime/Data/DataManager.cpp")
+
+set(SrcAsset "Source/Runtime/Asset/AssetLibrary.cpp")
+
+set(SrcPlatform "Source/Runtime/Platform/Platform.cpp")
+
+set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
+
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
-    ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcAssets} ${SrcConfig} ${SrcBlackboard} ${SrcAsync}
+    ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcObject} ${SrcAssets} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
+    ${SrcPlatform} ${SrcLocale}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)

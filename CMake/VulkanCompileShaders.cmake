@@ -2,10 +2,14 @@ include(FetchContent)
 
 function(add_shaders TARGET_NAME)
   # Find glslc
-  # find_package(Vulkan REQUIRED glslc)
+  find_program(GLSLC_EXECUTABLE glslc REQUIRED)
 
   set(SHADER_SOURCE_FILES ${ARGN}) # the rest of arguments to this function will be assigned as shader source files
-  set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
+  if(MSVC)
+    set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>/")
+  else()
+    set(BUILD_CONFIG "")
+  endif()
   
   # Validate that source files have been passed
   list(LENGTH SHADER_SOURCE_FILES FILE_COUNT)
@@ -30,18 +34,18 @@ function(add_shaders TARGET_NAME)
 
     list(APPEND MAKEDIR_COMMAND COMMAND)
     list(APPEND MAKEDIR_COMMAND ${CMAKE_COMMAND} -E make_directory)
-    list(APPEND MAKEDIR_COMMAND "${BUILD_CONFIG}/Content/${SHADER_RELATIVE_PATH}")
+    list(APPEND MAKEDIR_COMMAND "${BUILD_CONFIG}Content/${SHADER_RELATIVE_PATH}")
 
     
     # Build command
     list(APPEND SHADER_COMMAND COMMAND)
-    list(APPEND SHADER_COMMAND "glslc")
+    list(APPEND SHADER_COMMAND ${GLSLC_EXECUTABLE})
     list(APPEND SHADER_COMMAND "${SHADER_SOURCE}")
     list(APPEND SHADER_COMMAND "-o")
-    list(APPEND SHADER_COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_CONFIG}/Content/${SHADER_RELATIVE_SOURCE}.spv")
+    list(APPEND SHADER_COMMAND "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_CONFIG}Content/${SHADER_RELATIVE_SOURCE}.spv")
 
     # Add product
-    list(APPEND SHADER_PRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_CONFIG}/Content/${SHADER_RELATIVE_SOURCE}.spv")
+    list(APPEND SHADER_PRODUCTS "${CMAKE_CURRENT_BINARY_DIR}/${BUILD_CONFIG}Content/${SHADER_RELATIVE_SOURCE}.spv")
 
   endforeach()
 

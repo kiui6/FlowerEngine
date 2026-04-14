@@ -35,7 +35,7 @@ enum class ObjectFlags : uint8_t {
 class Object
 {
 protected:
-    uint8_t Flags = 0;
+    uint16_t Flags = 0;
     uint32_t ID = 0;
     std::string Name = "";
     
@@ -54,13 +54,13 @@ public:
     inline uint32_t GetID() const {return ID;}
     inline const std::string& GetName() const {return Name;}
 
-    void SetFlag(ObjectFlags flag) {Flags |= (uint8_t)flag;}
-    void ClearFlag(ObjectFlags flag) {Flags &= ~(uint8_t)flag;}
-    bool HasFlag(ObjectFlags flag) {return (Flags & (uint8_t)flag) == (uint8_t)flag;}
+    void SetFlag(ObjectFlags flag) {Flags |= (uint16_t)flag;}
+    void ClearFlag(ObjectFlags flag) {Flags &= ~(uint16_t)flag;}
+    bool HasFlag(ObjectFlags flag) {return (Flags & (uint16_t)flag) == (uint16_t)flag;}
 
     // Marks object Dirty, meaning that the object has changed and should be saved again
     void Dirty();
-    void BeginUnload() {Flags |= (uint8_t)ObjectFlags::Unload;}
+    void BeginUnload() {Flags |= (uint16_t)ObjectFlags::Unload;}
 
     template <typename ChildObjectT = Object>
     inline std::vector<ChildObjectT*> GetChildren() const {

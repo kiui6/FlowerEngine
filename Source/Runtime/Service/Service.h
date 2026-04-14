@@ -44,9 +44,9 @@ struct ServiceInstantiator {
 };
 
 struct ServiceArchetype {
-    std::function<IService*()> m_instantiatorFunc;
-    std::string_view m_serviceName;
-    std::vector<std::string_view> m_dependencyNames;
+    std::function<IService*()> instantiatorFunc;
+    std::string_view serviceName;
+    std::vector<std::string_view> dependencyNames;
 };
 
 class ServiceProvider
@@ -79,9 +79,9 @@ inline bool RegisterService(std::vector<std::string_view> dependencies = {})
     ServiceProvider &provider = ServiceProvider::Get();
     
     ServiceArchetype archetype = {
-        .m_instantiatorFunc = ServiceInstantiator<ServiceType>::Get(),
-        .m_serviceName = ServiceType::GetStaticName(),
-        .m_dependencyNames = dependencies
+        .instantiatorFunc = ServiceInstantiator<ServiceType>::Get(),
+        .serviceName = ServiceType::GetStaticName(),
+        .dependencyNames = dependencies
     };
     
     bool bSuccess = provider.RegisterServiceArchetype(archetype);

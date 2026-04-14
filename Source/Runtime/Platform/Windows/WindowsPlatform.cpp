@@ -1,3 +1,5 @@
+#include "WindowsPlatform.h"
+
 #include "../Platform.h"
 
 #define WIN32_LEAN_AND_MEAN
@@ -5,17 +7,7 @@
 
 #pragma comment(lib, "Kernel32.lib")
 
-namespace Platform
+void Platform::DebugPrint(const char* string)
 {
-    void DebugPrint(const char* string)
-    {
-        OutputDebugStringA(string);
-    }
-
-    namespace FileSystem {
-        std::string GetLocalDirectory()
-        {
-            return "";
-        }
-    }
-};
+    OutputDebugStringA(string);
+}
