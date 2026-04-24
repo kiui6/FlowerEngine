@@ -7,12 +7,12 @@
 class Text
 {
     std::string_view m_id;
-    std::string m_cached;
+    std::string_view m_cached;
 public:
     Text(std::string_view id);
 
-    std::string& Get();
-    std::promise<std::string&> GetLazily();
+    std::string_view& Get();
+    std::promise<std::string_view&> GetLazily();
 
-    std::string& Format(std::string_view &arg, ...);
+    std::string Format(std::string_view &arg, ...);
 };

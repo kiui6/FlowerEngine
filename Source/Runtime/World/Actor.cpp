@@ -4,36 +4,24 @@
 
 World *Actor::GetWorld()
 {
-    return GetParent<World>();
+    return m_world;
 }
 
 void Actor::Tick(float deltaTime)
 {
 }
 
-Transform Actor::GetTransform()
+Transform2D Actor::GetTransform()
 {
-    if(Actor* parent = GetParent<Actor>()) {
-        return transform + parent->transform;
-    } else {
-        return transform;
-    }
+    return transform;
 }
 
-glm::vec3 Actor::GetLocation()
+glm::vec2 Actor::GetLocation()
 {
-    if(Actor* act = GetParent<Actor>()) {
-        return transform.Location + act->transform.Location;
-    } else {
-        return transform.Location;
-    }
+    return transform.Location;
 }
 
-void Actor::SetLocation(const glm::vec3 &loc)
+void Actor::SetLocation(const glm::vec2 &loc)
 {
-    if(Actor* act = GetParent<Actor>()) {
-        transform.Location += loc - act->transform.Location;
-    } else {
-        transform.Location = loc;
-    }
+    transform.Location = loc;
 }

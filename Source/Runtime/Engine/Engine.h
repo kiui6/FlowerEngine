@@ -3,7 +3,6 @@
 #include <cstdint>
 
 #include <World/World.h>
-#include <Blackboard/Blackboard.h>
 
 class Engine
 {
@@ -12,8 +11,6 @@ class Engine
 protected:
     World* m_world = nullptr;
     World* m_travelWorld = nullptr;
-
-    Blackboard m_blackboard;
 
 public:
 
@@ -25,10 +22,6 @@ public:
     void LoadWorld(uint32_t ID);
     inline World* GetWorld() const {return m_world;}
 #pragma endregion "World"
-
-#pragma region "Blackboard"
-    Blackboard& GetBlackboard() {return m_blackboard;}
-#pragma endregion "Blackboard"
 
     void Tick(float DeltaTime);
 };

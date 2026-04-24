@@ -10,7 +10,7 @@
 #include <Platform/Platform.h>
 
 //#include <Asset/AssetLoader.h>
-//#include <Object/ObjectLibrary.h>
+//#include <Record/ObjectLibrary.h>
 //#include <Thread/ThreadManager.h>
 
 #include <Graphics/Render/Utility.h>
@@ -36,10 +36,6 @@ Application::~Application()
         Application::Singleton = nullptr;
     }
 
-    // delete Render;
-    
-    // delete GameEngine;
-
     ServiceProvider::Get().Deinitialize();
 }
 
@@ -47,11 +43,8 @@ void Application::Initialize()
 {
     ServiceProvider::Get().Initialize();
 
-    // Create Window Manager
-    // WinManager = new WindowManager();
-
     // Create Engine
-    // GameEngine = new Engine();
+    m_engine = std::make_unique<Engine>();
     
     // Create Render Engine object
     // Render = RenderFactory::CreateEngine();
@@ -63,7 +56,7 @@ void Application::Initialize()
 	}
 
     // Create window
-    m_window = new Window("Flower++", 1280, 720);
+    m_window = std::make_unique<Window>("Flower++", 1280, 720);
 	
 	// Render->Initialize(SDLExtensions, InstanceLayers);
 
@@ -108,7 +101,7 @@ void Application::StartLifecycle()
 
 		m_window->Update();
 
-        // GameEngine->Tick(deltaTime);
+        m_engine->Tick(m_deltaTime);
 
         // SceneView& sceneView = RenderEngine->GetFrameScieneView();
         // GameEngine->PrepareSceneView(sceneView)

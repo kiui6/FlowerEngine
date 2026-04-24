@@ -1,8 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
+
 #include <Platform/MappedFile.h>
 
+#include "../../Serialisation/ObjectRecord.h"
+#include "../../Serialisation/ObjectField.h"
 #include "../LUT.h"
 
 #pragma pack(push, 1)
@@ -35,6 +39,8 @@ class MasterFile
 {
     MasterFileHeader m_header;
     std::unique_ptr<IMappedFile> m_file;
+
+    std::vector<ObjectRecord> m_objectRecords;
 public:
     
 };

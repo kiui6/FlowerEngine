@@ -6,6 +6,7 @@
 #include <barrier>
 #include <condition_variable>
 #include <functional>
+#include <memory>
 
 #include <Log/Log.h>
 
@@ -16,10 +17,10 @@ class Application
 {
     static Application* Singleton;
 protected:
-    Window *m_window;
+    std::unique_ptr<Window> m_window;
 
-    RenderEngine* m_render;
-    Engine* m_engine;
+    std::unique_ptr<RenderEngine> m_render;
+    std::unique_ptr<Engine> m_engine;
 
     std::atomic_bool m_bRunning = false;
 

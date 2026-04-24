@@ -4,6 +4,9 @@
 
 #include <optional>
 
+#include "Formats/MasterFile/MasterFile.h"
+#include "Formats/PluginFile/PluginFile.h"
+
 class DataManager : public IService
 {
     static bool bIsInitialized;

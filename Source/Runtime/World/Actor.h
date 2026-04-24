@@ -1,41 +1,46 @@
 #pragma once
 
-#include <Object/Object.h>
+#include <Record/Record.h>
+#include <Record/RecordPtr.h>
+#include "ReferenceRecord.h"
 
 #include <Math/Transform.h>
+#include <Math/Bounds.h>
+
+#include <memory>
+
+struct ActorSpatialInstance {
+    RecordID refid;
+    Float2 location;
+    AABB bounds;
+    bool isDynamic;
+};
 
 class Actor;
 
 template<typename T>
 concept ActorClass = std::is_base_of_v<Actor, T>;
 
-enum class ActorMobilityPolicy : bool
-{
-    Static = 0,
-    Dynamic = 1
-};
-
 enum class ActorFlags : uint8_t {
     // This flag means that Actor will get destroyed next tick
-    // It will also remove actor from Object Library. 
+    // It will also remove actor from Record Library. 
     BeginDestroy = (1 << 0),
 };
 
-class Actor : public Object
+class Actor
 {
 protected:
-    Transform transform;
+    RecordID m_refID;
+    RecordPtr<ReferenceRecord> m_ref;
 
-    // Dynamic actors are testing against dynamic value, like collision
-    ActorMobilityPolicy mobilityPolicy = ActorMobilityPolicy::Static;
+    Transform2D transform;
 
     uint8_t actorFlags = 0;
 
     std::string DisplayName = "Actor";
-public:
-    inline ActorMobilityPolicy GetMobility() const {return mobilityPolicy;}
-    inline void SetMobility(ActorMobilityPolicy newValue) {mobilityPolicy = newValue;}
 
+    World* m_world;
+public:
     static std::string GetStaticType() {return "ACT";}
 
     virtual World* GetWorld();
@@ -44,14 +49,14 @@ public:
     virtual void BeginPlay() {}
     virtual void Tick(float deltaTime);
 
-    virtual Transform GetTransform();
-    virtual const Transform& GetRelativeTransform() const {return transform;}
+    virtual Transform2D GetTransform();
+    virtual const Transform2D& GetRelativeTransform() const {return transform;}
 
-    virtual glm::vec3 GetLocation();
-    virtual const glm::vec3& GetRelativeLocation() const {return transform.Location;}
+    virtual glm::vec2 GetLocation();
+    virtual const glm::vec2& GetRelativeLocation() const {return transform.Location;}
 
-    virtual void SetLocation(const glm::vec3& loc);
-    virtual void SetRelativeLocation(const glm::vec3 loc) {transform.Location = loc;}
+    virtual void SetLocation(const glm::vec2& loc);
+    virtual void SetRelativeLocation(const glm::vec2 loc) {transform.Location = loc;}
 
     inline void SetActorFlag(ActorFlags flag) {actorFlags |= (uint8_t)flag;}
     inline void ClearActorFlag(ActorFlags flag) {actorFlags &= ~(uint8_t)flag;}

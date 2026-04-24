@@ -3,6 +3,8 @@
 #include "EngineDelegates.h"
 #include <Log/Log.h>
 
+#include <Record/RecordLibrary.h>
+
 void Engine::InternalTravel()
 {
     // TODO: Unload old world
@@ -20,7 +22,7 @@ void Engine::InternalTravel()
 #   endif
     EngineDelegates::OnWorldLoad.Broadcast(m_world);
 
-    LOGF(Log, LogEngine, "Traveled to world: 0x%08X.", m_world->GetID());
+    LOGF(Log, LogEngine, "Traveled to world: %s.", m_world->GetName().c_str());
 
     m_travelWorld = nullptr;
 }
@@ -39,4 +41,6 @@ void Engine::Tick(float DeltaTime)
     if(m_world) {
         m_world->Tick(DeltaTime);
     }
+
+    GetService<RecordLibrary>()->RunGCPass();
 }

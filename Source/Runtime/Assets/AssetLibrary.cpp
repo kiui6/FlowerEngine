@@ -10,3 +10,8 @@ void AssetLibrary::Initialize()
 void AssetLibrary::Deinitialize()
 {
 }
+
+std::shared_ptr<RawAsset> AssetLibrary::LoadRawAsset(const std::string &path)
+{
+    return std::shared_ptr<RawAsset>();
+}

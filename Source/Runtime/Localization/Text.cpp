@@ -2,7 +2,7 @@
 
 #include "LocaleManager.h"
 
-std::string &Text::Get()
+std::string_view &Text::Get()
 {
     if(m_cached.size()) {
         return m_cached;
@@ -12,8 +12,7 @@ std::string &Text::Get()
 
     std::optional<std::string_view> locale = mgr->FetchLocaleString(m_id);
     if(!locale.has_value()) {
-        m_cached = m_id;
-        return m_cached;
+        return m_id;
     }
 
     m_cached = locale.value();

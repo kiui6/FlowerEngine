@@ -3,36 +3,30 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 
-struct AABB
+#include "Vectors.h"
+
+struct Transform2D
 {
-    glm::vec3 AA = {0, 0, 0};
-    glm::vec3 BB = {0, 0, 0};
-};
+    uint8_t Z = 0;
+    Float2 Location = {0, 0};
+    Int2 Pivot = {0, 0};
+    Int2 Scale = {1, 1};
 
-struct Transform
-{
-    glm::vec3 Location = {0, 0, 0};
-    glm::vec3 Pivot = {0, 0, 0};
-    glm::vec3 Scale = {1, 1, 1};
-    glm::quat Rotator;
+    Transform2D(){}
 
-    Transform(){}
-
-    Transform operator+(Transform const& other) {
-        Transform ret;
+    Transform2D operator+(Transform2D const& other) {
+        Transform2D ret;
         ret.Location = Location + other.Location;
         ret.Pivot = Pivot + other.Pivot;
         ret.Scale = Scale + other.Scale;
-        //ret.Rotator = Rotator + other.Rotator;
         return ret;
     }
 
-    Transform operator-(Transform const& other) {
-        Transform ret;
+    Transform2D operator-(Transform2D const& other) {
+        Transform2D ret;
         ret.Location = Location - other.Location;
         ret.Pivot = Pivot - other.Pivot;
         ret.Scale = Scale - other.Scale;
-        //ret.Rotator = Rotator + other.Rotator;
         return ret;
     }
 };
