@@ -10,15 +10,15 @@
 
 struct RecordFactory
 {
-    virtual uint32_t GetRecordType() {return MakeRecordType('U','N','K','N');}
+    virtual constexpr uint32_t GetRecordType() {return CompMakeRecordType("UNKN");}
     virtual std::unique_ptr<Record> NewRecord() {return nullptr;}
     virtual std::shared_ptr<Actor> CreateWorldActorFromRecord() {return nullptr;}
-    virtual bool ShowInRecordList() {return false;}
+    virtual constexpr bool ShowInRecordList() {return false;}
 };
 
 template <RecordClass RecordType>
 struct TemplatedRecordFactory : public RecordFactory
 {
-    virtual uint32_t GetRecordType() override {return RecordType::GetStaticType();}
+    virtual constexpr uint32_t GetRecordType() override {return RecordType::StaticType();}
     virtual std::unique_ptr<Record> NewRecord() override {return std::make_unique<RecordType>();}
 };

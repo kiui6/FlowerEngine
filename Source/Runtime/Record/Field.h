@@ -15,6 +15,3 @@ public:
     Field(uint32_t id, ValueType defaultValue) : m_id(id), m_value(defaultValue) {}
 
 };
-
-#define DECLARE_FIELD(id, type, defaultValue) \
-    Field<type> id = { #id , defaultValue};

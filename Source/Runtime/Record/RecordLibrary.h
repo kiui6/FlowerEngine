@@ -24,7 +24,12 @@ class RecordLibrary : public IService, protected ThreadAware
     static bool bIsInitialized;
 
     std::unordered_map<uint64_t, std::unique_ptr<Record>> m_records;
+    
+    // GC
     std::vector<RecordRefCount*> m_unloadCandidates;
+    // bit 0x01 specifies whether request is posted
+    // bit 0x02 specifies whether pass should be unrestricted
+    std::atomic<uint8_t> m_GCRequest{0x00};
 public:
     static std::string_view GetStaticName() {return "RecordLibrary";}
 
@@ -46,4 +51,14 @@ public:
      * Removes time restrictions for this GC pass
      */
     void RunGCPass(bool unrestricted = false);
+
+    /* Requests synchronous GC pass next frame
+     *
+     * @param bool unrestricted
+     * Removes time restrictions for this GC pass
+     */
+    void RequestGCPass(bool unrestricted = false);
+
+    bool IsGCPassRequested() const { return m_GCRequest.load(std::memory_order_acquire) & 0x01;}
+    bool IsRequestedGCPassUnrestricted() const { return m_GCRequest.load(std::memory_order_acquire) & 0x02;}
 };

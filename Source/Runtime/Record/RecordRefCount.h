@@ -6,7 +6,6 @@
 class RecordRefCount
 {
     std::atomic<uint32_t> m_refCount{0};
-    std::mutex m_refMtx;
 
     void AddRef();
     void ReleaseRef();

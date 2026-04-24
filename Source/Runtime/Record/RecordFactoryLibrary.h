@@ -20,5 +20,5 @@ concept RecordFactoryClass = std::is_base_of<RecordFactory, T>::value;
 template <RecordFactoryClass RecordFactoryType>
 bool RegisterRecordFactory()
 {
-    
+    return true;
 }

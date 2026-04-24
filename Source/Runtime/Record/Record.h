@@ -60,6 +60,12 @@ protected:
 public:
     Record() {}
     Record(uint32_t id) {m_id = id;}
+
+    Record(const Record&) = delete;
+    Record& operator=(const Record&) = delete;
+    Record(Record&&) = delete;
+    Record& operator=(Record&&) = delete;
+
     virtual ~Record(){}
 
     static uint32_t StaticType() {return MakeRecordType("UNKN");}

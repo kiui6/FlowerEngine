@@ -1,8 +1,12 @@
 #pragma once
 
 #include <Record/Record.h>
+#include <Record/FieldContainers/RecordField.h>
 
 class ReferenceRecord : public Record
 {
     Field<BoolField> f_isDynamic = {FIELDID(DYNA)};
+    Field<WeakRecordField> f_parentChunk = {FIELDID(CHNK)};
+public:
+    static uint32_t StaticType() {return CompMakeRecordType("UNKN");}
 };

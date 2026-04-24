@@ -55,3 +55,10 @@ void RecordLibrary::RunGCPass(bool unrestricted)
 
     LOG(Log, LogGC, "Ending GC pass");
 }
+
+void RecordLibrary::RequestGCPass(bool unrestricted)
+{
+    uint8_t flags = unrestricted ? 0x03 : 0x01;
+
+    m_GCRequest.store(flags, std::memory_order_release);
+}
