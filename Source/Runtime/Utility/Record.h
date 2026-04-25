@@ -15,5 +15,3 @@ consteval uint32_t CompMakeRecordType(const char* str) {
            (static_cast<uint32_t>(str[2]) << 16) |
            (static_cast<uint32_t>(str[3]) << 24);    
 }
-
-#define FIELDID(id) CompMakeRecordType( #id )

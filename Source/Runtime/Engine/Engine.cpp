@@ -27,6 +27,11 @@ void Engine::InternalTravel()
     m_travelWorld = nullptr;
 }
 
+Engine::Engine()
+{
+    m_recLibrary = GetService<RecordLibrary>();
+}
+
 void Engine::TravelTo(World *travelWorld)
 {
     m_travelWorld = travelWorld;
@@ -42,5 +47,7 @@ void Engine::Tick(float DeltaTime)
         m_world->Tick(DeltaTime);
     }
 
-    GetService<RecordLibrary>()->RunGCPass();
+    if(m_recLibrary->IsGCPassRequested()) {
+        m_recLibrary->RunGCPass(m_recLibrary->IsRequestedGCPassUnrestricted());
+    }
 }

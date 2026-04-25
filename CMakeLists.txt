@@ -49,7 +49,7 @@ set(SrcWindow "Source/Runtime/Window/Window.cpp")
 
 set(SrcRender "Source/Runtime/Graphics/Render/Utility.cpp" "Source/Runtime/Graphics/Render/RenderEngine.cpp")
 
-set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor.cpp" "Source/Runtime/World/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
+set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 
 set(SrcInput "Source/Runtime/Input/InputManager.cpp")
 

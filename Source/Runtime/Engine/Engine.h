@@ -12,7 +12,10 @@ protected:
     World* m_world = nullptr;
     World* m_travelWorld = nullptr;
 
+    RecordLibrary* m_recLibrary = nullptr;
+
 public:
+    Engine();
 
 #pragma region "World"
     // Starts a process of traveling to the new world

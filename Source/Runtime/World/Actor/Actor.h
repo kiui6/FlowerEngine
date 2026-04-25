@@ -2,7 +2,7 @@
 
 #include <Record/Record.h>
 #include <Record/RecordPtr.h>
-#include "ReferenceRecord.h"
+#include <World/Actor/ReferenceRecord.h>
 
 #include <Math/Transform.h>
 #include <Math/Bounds.h>

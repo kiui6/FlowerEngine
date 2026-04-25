@@ -3,20 +3,20 @@
 #include "../FieldBase.h"
 #include "../RecordPtr.h"
 
-class RecordField : public FieldContainerBase
+template <RecordClass T = Record>
+struct RecordField
 {
-    RecordPtr<> value;
-public:
-    RecordField() {}
-    explicit RecordField(int) {}
-    RecordField(RecordID init) : value(init) {}
+    using DecayType = RecordPtr<T>;
+
+    static void Serialize(const DecayType& data, std::vector<uint8_t>& out);
+    static void Deserialize(std::span<const uint8_t> data, DecayType& out);
 };
 
-class WeakRecordField : public FieldContainerBase
+template <RecordClass T = Record>
+struct WeakRecordField
 {
-    WeakRecordPtr<> value;
-public:
-    WeakRecordField() {}
-    explicit WeakRecordField(int) {}
-    WeakRecordField(RecordID init) : value(init) {}
+    using DecayType = WeakRecordPtr<T>;
+
+    static void Serialize(const DecayType& data, std::vector<uint8_t>& out);
+    static void Deserialize(std::span<const uint8_t> data, DecayType& out);
 };

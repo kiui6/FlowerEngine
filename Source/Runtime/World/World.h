@@ -3,8 +3,8 @@
 #include <Input/InputEvent.h>
 
 //#include <Object/ObjectRef.h>
-#include "Actor.h"
-#include "Chunk.h"
+#include "Actor/Actor.h"
+#include "Chunk/Chunk.h"
 
 #include <Math/Quadtree.h> 
 

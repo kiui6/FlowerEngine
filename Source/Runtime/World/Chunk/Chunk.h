@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <memory>
 
-#include "Actor.h"
+#include <World/Actor/Actor.h>
 
 class WorldChunk
 {

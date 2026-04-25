@@ -11,6 +11,8 @@
 #include "Field.h"
 #include "RecordRefCount.h"
 
+#include "FieldContainers/StringField.h"
+
 class World;
 class Actor;
 

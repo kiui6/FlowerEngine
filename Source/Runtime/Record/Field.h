@@ -5,13 +5,27 @@
 #include "FieldBase.h"
 #include <Utility/Record.h>
 
-template <FieldContainerClass ValueType>
+#define FIELDID(id) CompMakeRecordType( #id )
+
+template <FieldValueClass FieldValue>
 class Field : public FieldBase
 {
     uint32_t m_id;
-    ValueType m_value;
+
+    FieldValue::DecayType m_cached;
 public:
     Field(uint32_t id) : m_id(id) {}
-    Field(uint32_t id, ValueType defaultValue) : m_id(id), m_value(defaultValue) {}
+    Field(uint32_t id, FieldValue::DecayType defaultValue) : m_id(id), m_cached(defaultValue) {}
 
+    FieldValue::DecayType& Get() { return m_cached; }
+
+    void Serialize() override {
+        std::vector<uint8_t> temp;
+        FieldValue::Serialize(m_cached, temp);
+    }
+
+    void Deserialize() override {
+        std::span<const uint8_t> temp;
+        FieldValue::Deserialize(temp, m_cached);
+    }
 };
