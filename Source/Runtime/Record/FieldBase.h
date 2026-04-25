@@ -5,6 +5,10 @@
 #include <string>
 #include <span>
 
+#include <Utility/Record.h>
+
+#define FIELDID(id) CompMakeRecordType( #id )
+
 class FieldBase
 {
 public:

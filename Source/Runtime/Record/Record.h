@@ -52,11 +52,8 @@ class Record : public RecordRefCount
 protected:
     uint16_t m_flags = 0;
     RecordID m_id = INVALID_RECORD;
-    std::string m_name = "";
     uint32_t m_type;
-    
-    std::vector<Record*> m_children;
-    Record* m_parent = nullptr;
+
 
     Field<StringField> f_edid = {FIELDID(EDID), "Untitled"};
 public:
@@ -73,13 +70,11 @@ public:
     static uint32_t StaticType() {return MakeRecordType("UNKN");}
     uint32_t& GetType() {return m_type;}
 
-    void Reparent(Record* newParent);
     void Rename(const std::string& newName);
     // TODO: Maybe make this private? It can cause big issues
     void SetID(RecordID newID) {m_id = newID;}
 
     inline RecordID GetID() const {return m_id;}
-    inline const std::string& GetName() const {return m_name;}
 
     void SetFlag(RecordFlags flag) {m_flags |= (uint16_t)flag;}
     void ClearFlag(RecordFlags flag) {m_flags &= ~(uint16_t)flag;}
@@ -88,30 +83,6 @@ public:
     // Marks Record Dirty, meaning that the Record has changed and should be saved again
     void Dirty();
     void BeginUnload() {m_flags |= (uint16_t)RecordFlags::Unload;}
-
-    template <typename ChildRecordT = Record>
-    inline std::vector<ChildRecordT*> GetChildren() const {
-        std::vector<ChildRecordT*> typedChildrenArray {};
-        for(Record* child : m_children)
-        {
-            if(ChildRecordT* typedChild = dynamic_cast<ChildRecordT*>(child))
-            {
-                typedChildrenArray.push_back(typedChild);
-            }
-        }
-        return m_children;
-    }
-    
-    template <typename ParentRecordT = Record>
-    ParentRecordT* GetParent() 
-    {
-        // If parent doesn't match the template type, attempt to find next parent
-        if(dynamic_cast<ParentRecordT*>(m_parent) == nullptr && m_parent != nullptr) {
-            return m_parent->GetParent<ParentRecordT>();
-        } else {
-            return dynamic_cast<ParentRecordT*>(m_parent);
-        }
-    }
 };
 
 template<typename T>

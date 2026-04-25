@@ -9,19 +9,16 @@
 
 #include <memory>
 #include <atomic>
+#include <shared_mutex>
+#include <mutex>
 #include <array>
-
-struct RecordDescriptor
-{
-    uint64_t id = 0;
-    std::unique_ptr<Record> record = nullptr;
-    uint32_t type = CompMakeRecordType("UNKN");
-    std::atomic<uint32_t> references = 0;
-};
 
 class RecordLibrary : public IService, protected ThreadAware
 {
     static bool bIsInitialized;
+
+    mutable std::shared_mutex m_mtx;
+    mutable std::mutex m_GCMtx;
 
     std::unordered_map<uint64_t, std::unique_ptr<Record>> m_records;
     
@@ -39,7 +36,7 @@ public:
     // TODO: Create RecordPtr class
     Record* LoadRecord(uint64_t recordID);
     Record* GetRecord(uint64_t recordID);
-    bool IsValidRecord(uint64_t recordID);
+    bool IsValidRecord(uint64_t recordID) const;
 
     // Marks Record as garbage, will cause deletion on the next GC pass, unless reference is reacquired
     // Will not unload record unless refCount is actually zero when GC pass runs

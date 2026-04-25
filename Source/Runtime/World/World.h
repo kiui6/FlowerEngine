@@ -6,6 +6,8 @@
 #include "Actor/Actor.h"
 #include "Chunk/Chunk.h"
 
+#include "WorldRecord.h"
+
 #include <Math/Quadtree.h> 
 
 #include <vector>
@@ -18,6 +20,8 @@ class World
     std::unordered_map<RecordID, std::shared_ptr<Actor>> m_dynamicActors;
     std::vector<WorldChunk> m_chunks;
     std::string m_name;
+
+    RecordPtr<WorldRecord> m_worldRef;
 
     Quadtree<ActorSpatialInstance> m_quadtree;
 public:

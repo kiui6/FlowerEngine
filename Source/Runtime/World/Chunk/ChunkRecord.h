@@ -9,7 +9,7 @@
 
 class ChunkRecord : public Record
 {
-    Field<ListField<RecordField<ReferenceRecord>>> f_references = {FIELDID(LREF)};
+    Field<ListField<RecordField>> f_references = {FIELDID(LREF)};
 public:
     static uint32_t StaticType() {return CompMakeRecordType("CHNK");}
 };

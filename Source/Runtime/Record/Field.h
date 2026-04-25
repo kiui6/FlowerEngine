@@ -3,10 +3,10 @@
 #include <cstdint>
 
 #include "FieldBase.h"
-#include <Utility/Record.h>
 
-#define FIELDID(id) CompMakeRecordType( #id )
-
+/*
+ * Field allows seemless serialization of persistant data in records
+ */
 template <FieldValueClass FieldValue>
 class Field : public FieldBase
 {

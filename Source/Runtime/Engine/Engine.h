@@ -22,7 +22,7 @@ public:
     void TravelTo(World* travelWorld);
     // Loads World for engine and then sets it
     // Only works when called outside of Renderer
-    void LoadWorld(uint32_t ID);
+    void LoadWorld(RecordID worldID);
     inline World* GetWorld() const {return m_world;}
 #pragma endregion "World"
 
