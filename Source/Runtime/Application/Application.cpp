@@ -47,7 +47,7 @@ void Application::Initialize()
     m_engine = std::make_unique<Engine>();
     
     // Create Render Engine object
-    // Render = RenderFactory::CreateEngine();
+    m_render = std::make_unique<RenderEngine>();
 
     // Initialize SDL framework
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD) == false)
@@ -102,10 +102,10 @@ void Application::StartLifecycle()
 		m_window->Update();
 
         m_engine->Tick(m_deltaTime);
-
-        // SceneView& sceneView = RenderEngine->GetFrameScieneView();
-        // GameEngine->PrepareSceneView(sceneView)
-        // RenderEngine->Flush(deltaTime, sceneView);
+        
+        RenderView& renderView = m_render->GetFrameRenderView();
+        m_engine->RecordRenderView(renderView);
+        m_render->Render(m_deltaTime, renderView);
 
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
 	}

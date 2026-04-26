@@ -1,6 +1,8 @@
 #include "InputManager.h"
 #include <Log/Log.h>
 
+bool InputManager::isInitialized = RegisterService<InputManager>();
+
 void InputManager::InternalHandleEvent(SDL_Event e) {
     InputEvent event;
 

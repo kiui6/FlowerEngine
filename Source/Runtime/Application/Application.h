@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Graphics/Render/Render.h>
+#include <Graphics/RenderEngine/RenderEngine.h>
 #include <mutex>
 #include <atomic>
 #include <barrier>
@@ -30,6 +30,9 @@ public:
     ~Application();
 
     static Application* Get() {return Singleton;}
+
+    Engine* GetEngine() {return m_engine.get();}
+    RenderEngine* GetRenderEngine() {return m_render.get();}
 
     void Initialize();
 

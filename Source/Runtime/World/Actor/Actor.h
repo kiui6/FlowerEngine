@@ -7,6 +7,8 @@
 #include <Math/Transform.h>
 #include <Math/Bounds.h>
 
+#include <Graphics/RenderEngine/RenderView/RenderView.h>
+
 #include <memory>
 
 struct ActorSpatialInstance {
@@ -61,6 +63,8 @@ public:
     inline void SetActorFlag(ActorFlags flag) {actorFlags |= (uint8_t)flag;}
     inline void ClearActorFlag(ActorFlags flag) {actorFlags &= ~(uint8_t)flag;}
     inline bool HasActorFlag(ActorFlags flag) {return (actorFlags & (uint8_t)flag) == (uint8_t)flag;}
+
+    virtual void RecordRenderView(RenderView& renderView) {}
 
     void BeginDestroy() {SetActorFlag(ActorFlags::BeginDestroy);}
 

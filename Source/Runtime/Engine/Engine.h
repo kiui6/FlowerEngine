@@ -30,4 +30,6 @@ public:
 #pragma endregion "World"
 
     void Tick(float DeltaTime);
+
+    void RecordRenderView(RenderView& renderView);
 };

@@ -40,6 +40,8 @@ public:
     template <ActorClass T>
     std::shared_ptr<T> SpawnActor(ActorCreateInfo&& createInfo);
 
+    std::vector<std::shared_ptr<Actor>> GetDynamicActors();
+
     // Gets called right after SpawnDefaultActors()
     // Allows actors to initialize their data that should be ready on BeginPlay
     void PostInit();
@@ -52,5 +54,5 @@ public:
 
     void BeginDestroy();
 
-    void RecordRenderView(RenderView& view);
+    void RecordRenderView(RenderView& renderView);
 };

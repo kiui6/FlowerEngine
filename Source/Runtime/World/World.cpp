@@ -2,8 +2,15 @@
 
 #include <Record/RecordLibrary.h>
 
+#include <ranges>
+
 void World::SpawnDefaultActors()
 {
+}
+
+std::vector<std::shared_ptr<Actor>> World::GetDynamicActors()
+{
+    return m_dynamicActors | std::views::values | std::ranges::to<std::vector>();
 }
 
 void World::PostInit()
@@ -27,6 +34,9 @@ void World::BeginDestroy()
     m_worldRef.Release();
 }
 
-void World::RecordRenderView(RenderView &view)
+void World::RecordRenderView(RenderView &renderView)
 {
+    for(auto& [key, value] : m_dynamicActors) {
+        value->RecordRenderView(renderView);
+    }
 }

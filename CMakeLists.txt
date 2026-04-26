@@ -47,7 +47,7 @@ set(SrcLog "Source/Runtime/Log/Log.cpp")
 
 set(SrcWindow "Source/Runtime/Window/Window.cpp")
 
-set(SrcRender "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp")
+set(SrcRender "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp" "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp")
 
 set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 

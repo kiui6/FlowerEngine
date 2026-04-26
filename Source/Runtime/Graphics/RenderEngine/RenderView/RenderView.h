@@ -12,29 +12,28 @@
 
 class RenderView
 {
-    ArenaAllocator<Kilobytes(256)> m_rendObjArena;
-
 protected:
     Float4x4 m_viewMatrix;
     Float4x4 m_projMatrix;
 
-    std::unordered_map<uint64_t, RenderObject*> m_staticRenderObjects;
-    std::unordered_map<uint64_t, RenderObject*> m_dynamicRenderObjects;
-    //std::vector<LightRenderObject*> m_StaticLightRenderObjects;
-    //std::vector<LightRenderObject*> m_DynamicLightRenderObjects;
+    std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_staticRenderObjects;
+    std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
+    //std::vector<Lightstd::unique_ptr<RenderObject>> m_StaticLightRenderObjects;
+    //std::vector<Lightstd::unique_ptr<RenderObject>> m_DynamicLightRenderObjects;
 public:
 
-    //void AddStaticLight(LightRenderObject* pLightRendObj);
-    //void AddDynamicLight(LightRenderObject* pLightRendObj);
+    //void AddStaticLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);
+    //void AddDynamicLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);
 
-    void AddStaticRenderObject(uint64_t id, RenderObject* pRendObj);
-    void AddDynamicRenderObject(uint64_t id, RenderObject* pRendObj);
+    void AddStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
+    void AddDynamicRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
 
     void GetStaticRenderObject(uint64_t id);
     void GetDynamicRenderObject(uint64_t id);
 
-    void RemoveStaticRenderObject(uint64_t id, RenderObject* pRendObj);
-    void RemoveDynamicRenderObject(uint64_t id, RenderObject* pRendObj);
+    void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
 
-    RenderObject* AllocateRenderObject();
+    std::unique_ptr<RenderObject> AllocateRenderObject();
+
+    void Reset();
 };

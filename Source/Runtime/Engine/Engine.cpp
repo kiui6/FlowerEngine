@@ -52,3 +52,10 @@ void Engine::Tick(float DeltaTime)
         m_recLibrary->RunGCPass(m_recLibrary->IsRequestedGCPassUnrestricted());
     }
 }
+
+void Engine::RecordRenderView(RenderView &renderView)
+{
+    if(m_world) {
+        m_world->RecordRenderView(renderView);
+    }
+}
