@@ -3,6 +3,7 @@
 #include <cstdint>
 
 enum class RenderPassType : uint32_t {
+    Unknown,
     Opaque,
     Relief,
     Particle,

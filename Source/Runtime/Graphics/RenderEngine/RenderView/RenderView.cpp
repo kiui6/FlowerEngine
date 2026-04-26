@@ -1,5 +1,10 @@
 #include "RenderView.h"
 
+void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
+{
+    m_stateUpdates.push_back(stateUpdate);
+}
+
 std::unique_ptr<RenderObject> RenderView::AllocateRenderObject()
 {
     return std::make_unique<RenderObject>();

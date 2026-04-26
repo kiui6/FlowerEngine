@@ -3,10 +3,13 @@
 #include <cstdint>
 
 enum class RenderElementType : uint32_t {
+    Unknown,
     // Masked sprite, UVs are baked into the Vertex Buffer
     OpaqueSprite,
     // Passes UVs as push constant to avoid buffer updates
     OpaqueSpriteAnimated,
     // Draws height & bump data into the relief buffer for lightning
-    Relief
+    Relief,
+    // Allows rendering of particle systems
+    Particles
 };

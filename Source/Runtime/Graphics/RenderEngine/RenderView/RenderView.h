@@ -9,6 +9,7 @@
 #include <Math/Matrix.h>
 
 #include "RenderObject.h"
+#include "RenderStateUpdate.h"
 
 class RenderView
 {
@@ -20,6 +21,8 @@ protected:
     std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
     //std::vector<Lightstd::unique_ptr<RenderObject>> m_StaticLightRenderObjects;
     //std::vector<Lightstd::unique_ptr<RenderObject>> m_DynamicLightRenderObjects;
+
+    std::vector<RenderStateUpdate*> m_stateUpdates;
 public:
 
     //void AddStaticLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);
@@ -32,6 +35,8 @@ public:
     void GetDynamicRenderObject(uint64_t id);
 
     void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
+
+    void SubmitStateUpdate(RenderStateUpdate* stateUpdate);
 
     std::unique_ptr<RenderObject> AllocateRenderObject();
 

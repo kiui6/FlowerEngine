@@ -7,10 +7,11 @@
 
 struct Transform2D
 {
-    uint8_t Z = 0;
-    Float2 Location = {0, 0};
+    uint8_t Depth = 0;
+    Int2 Location = {0, 0};
     Int2 Pivot = {0, 0};
-    Int2 Scale = {1, 1};
+    Float2 Scale = {1, 1};
+    float Rotation;
 
     Transform2D(){}
 

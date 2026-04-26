@@ -20,6 +20,9 @@ public:
         m_currentOffset = 0;
     }
 
+    ArenaAllocator(const Arena&) = delete;
+    ArenaAllocator(Arena&&) = delete;
+
     void* Allocate(size_t size, size_t align = alignof(std::max_align_t)) {
         uintptr_t addr = reinterpret_cast<uintptr_t>(m_memBlocks[m_lastBlock].get()) + m_currentOffset;
         size_t pad = (align - (addr % align)) % align;
@@ -51,7 +54,9 @@ public:
 
     template<typename T>
     T* AllocateObject() {
-        return static_cast<T*>(Allocate(sizeof(T), alignof(T)));
+        void* memPtr = Allocate(sizeof(T), alignof(T));
+        T* objectPtr = new (memPtr) T();
+        return objectPtr;
     }
 
     void Reset() {
