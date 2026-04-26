@@ -6,6 +6,7 @@
 #include <Math/Vectors.h>
 
 #include "CompiledRenderObject.h"
+#include "RenderElement.h"
 
 class RenderObject
 {

@@ -7,20 +7,21 @@
 
 void Engine::InternalTravel()
 {
-    // TODO: Unload old world
     if(m_world){
-        EngineDelegates::OnWorldUnload.Broadcast(m_world);
-        //objectLibrary->UnloadObject(m_world->GetID());
+        EngineDelegates::OnWorldUnload.Broadcast(m_world.get());
+        m_world->BeginDestroy();
+        m_world.reset();
+        m_recLibrary->RequestGCPass(true);
     }
 
-    m_world = m_travelWorld;
+    m_world = std::move(m_travelWorld);
     m_world->SpawnDefaultActors();
     m_world->PostInit();
 
 #   ifndef EDITOR
     m_world->BeginPlay();
 #   endif
-    EngineDelegates::OnWorldLoad.Broadcast(m_world);
+    EngineDelegates::OnWorldLoad.Broadcast(m_world.get());
 
     LOGF(Log, LogEngine, "Traveled to world: %s.", m_world->GetName().c_str());
 
@@ -32,9 +33,9 @@ Engine::Engine()
     m_recLibrary = GetService<RecordLibrary>();
 }
 
-void Engine::TravelTo(World *travelWorld)
+void Engine::TravelTo(std::unique_ptr<World> travelWorld)
 {
-    m_travelWorld = travelWorld;
+    m_travelWorld = std::move(travelWorld);
 }
 
 void Engine::Tick(float DeltaTime)

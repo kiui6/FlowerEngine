@@ -47,7 +47,7 @@ set(SrcLog "Source/Runtime/Log/Log.cpp")
 
 set(SrcWindow "Source/Runtime/Window/Window.cpp")
 
-set(SrcRender "Source/Runtime/Graphics/Render/Utility.cpp" "Source/Runtime/Graphics/Render/RenderEngine.cpp")
+set(SrcRender "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp")
 
 set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 
@@ -73,9 +73,11 @@ set(SrcPlatform "Source/Runtime/Platform/Platform.cpp")
 
 set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
 
+set(SrcUtility "Source/Runtime/Utility/Arena.cpp")
+
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)

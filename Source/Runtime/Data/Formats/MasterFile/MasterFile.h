@@ -39,8 +39,6 @@ class MasterFile
 {
     MasterFileHeader m_header;
     std::unique_ptr<IMappedFile> m_file;
-
-    std::vector<ObjectRecord> m_objectRecords;
 public:
     
 };

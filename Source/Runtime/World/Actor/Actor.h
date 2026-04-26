@@ -67,3 +67,9 @@ public:
     // Used for testing of collisions and visibility
     virtual AABB GetBoundingBox() {return {};}
 };
+
+struct ActorCreateInfo
+{
+    Transform2D transform;
+    bool isDynamic = false;
+};

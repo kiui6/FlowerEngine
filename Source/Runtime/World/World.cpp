@@ -1,8 +1,6 @@
 #include "World.h"
 
-//#include <Object/ObjectTypeLibrary.h>
-
-//bool ObjWorldType::bRegistered = ObjectTypeLibrary::Get().RegisterObjectType<ObjWorldType>(World::GetStaticType());
+#include <Record/RecordLibrary.h>
 
 void World::SpawnDefaultActors()
 {
@@ -24,3 +22,11 @@ void World::PushInputEvent(InputEvent &input)
 {
 }
 
+void World::BeginDestroy()
+{
+    m_worldRef.Release();
+}
+
+void World::RecordRenderView(RenderView &view)
+{
+}

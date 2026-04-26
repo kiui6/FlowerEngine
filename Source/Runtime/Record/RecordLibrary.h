@@ -36,6 +36,7 @@ public:
     // TODO: Create RecordPtr class
     Record* LoadRecord(uint64_t recordID);
     Record* GetRecord(uint64_t recordID);
+    void UnloadRecord(uint64_t recordID);
     bool IsValidRecord(uint64_t recordID) const;
 
     // Marks Record as garbage, will cause deletion on the next GC pass, unless reference is reacquired
@@ -56,6 +57,6 @@ public:
      */
     void RequestGCPass(bool unrestricted = false);
 
-    bool IsGCPassRequested() const { return m_GCRequest.load(std::memory_order_acquire) & 0x01;}
-    bool IsRequestedGCPassUnrestricted() const { return m_GCRequest.load(std::memory_order_acquire) & 0x02;}
+    inline bool IsGCPassRequested() const { return m_GCRequest.load(std::memory_order_acquire) & 0x01;}
+    inline bool IsRequestedGCPassUnrestricted() const { return m_GCRequest.load(std::memory_order_acquire) & 0x02;}
 };

@@ -27,6 +27,11 @@ Record *RecordLibrary::GetRecord(uint64_t recordID)
     return nullptr;
 }
 
+void RecordLibrary::UnloadRecord(uint64_t recordID)
+{
+    std::unique_lock lock(m_mtx);
+}
+
 bool RecordLibrary::IsValidRecord(uint64_t recordID) const
 {
     std::shared_lock lock(m_mtx);

@@ -15,6 +15,35 @@ public:
 };
 
 template <RecordClass RecordT = Record>
+class WeakRecordPtr
+{
+    RecordID m_id = INVALID_RECORD;
+    RecordT* m_record = nullptr;
+public:
+    WeakRecordPtr() {}
+    WeakRecordPtr(RecordT* record) : m_record(record) {
+        if(record) { 
+            m_id = record->GetID();
+        }
+    }
+    WeakRecordPtr(RecordID recordID) : m_id(recordID) {}
+    WeakRecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { }
+
+    RecordT* Get() {
+        if(m_record) {
+            return m_record;
+        }
+
+        // TODO Fetchinf from RecordLibrary
+        return m_record;
+    }
+
+    bool IsLoaded() const { return m_record != nullptr; }
+    bool IsBound() const { return m_record != nullptr; }
+    bool IsValid() const;
+};
+
+template <RecordClass RecordT = Record>
 class RecordPtr : public RecordPtrBase
 {
 protected:
@@ -34,6 +63,7 @@ public:
             m_record = Load();
         }
     }
+    RecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { }
 
     // Copy constructor
     RecordPtr(const RecordPtr& other) : m_record(other.m_record) {
@@ -84,33 +114,27 @@ public:
         return m_record;
     }
 
-    bool IsLoaded() const { return m_record != nullptr; }
-    bool IsValid() const;
-};
-
-template <RecordClass RecordT = Record>
-class WeakRecordPtr
-{
-    RecordID m_id = INVALID_RECORD;
-    RecordT* m_record = nullptr;
-public:
-    WeakRecordPtr() {}
-    WeakRecordPtr(RecordT* record) : m_record(record) {
-        if(record) { 
-            m_id = record->GetID();
-        }
-    }
-    WeakRecordPtr(RecordID recordID) : m_id(recordID) {}
-
     RecordT* Get() {
-        if(m_record) {
-            return m_record;
-        }
-
-        // TODO Fetchinf from RecordLibrary
         return m_record;
     }
 
-    bool IsLoaded() const { return m_record != nullptr; }
-    bool IsValid() const;
+    void Release() {
+        if(m_record) {
+            RecordPtrBase::ReleaseRef(m_record);
+            m_record = nullptr;
+        }
+    }
+
+    void Reset() {
+        Release();
+        m_id = 0;
+    }
+
+    WeakRecordPtr<RecordT> GetWeak() {
+        return WeakRecordPtr<RecordT>(m_id, m_record);
+    }
+
+    bool Exists() const { return false; }
+    bool IsBound() const { return m_record != nullptr; }
+    bool IsValid() const {{ return m_record; }}
 };

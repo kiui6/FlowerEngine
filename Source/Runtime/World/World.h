@@ -10,6 +10,8 @@
 
 #include <Math/Quadtree.h> 
 
+#include <Graphics/RenderEngine/RenderView/RenderView.h>
+
 #include <vector>
 #include <unordered_map>
 #include <memory>
@@ -30,16 +32,25 @@ public:
     void SetName(std::string_view newName) {m_name = newName;}
 
     // Gets called first when world's loaded.
-    // Creates Player Controller and other default entities
-    virtual void SpawnDefaultActors();
+    // Creates Player Controller and other default actors
+    void SpawnDefaultActors();
 
-    // Gets called right after SpawnDefaultEntities()
-    // Allows entities to initialize their data that should be ready on BeginPlay
-    virtual void PostInit();
+    WeakRecordPtr<WorldRecord> GetRecord() {return m_worldRef.GetWeak();}
 
-    virtual void BeginPlay();
+    template <ActorClass T>
+    std::shared_ptr<T> SpawnActor(ActorCreateInfo&& createInfo);
 
-    virtual void Tick(float DeltaTime);
+    // Gets called right after SpawnDefaultActors()
+    // Allows actors to initialize their data that should be ready on BeginPlay
+    void PostInit();
 
-    virtual void PushInputEvent(InputEvent &input);
+    void BeginPlay();
+
+    void Tick(float DeltaTime);
+
+    void PushInputEvent(InputEvent &input);
+
+    void BeginDestroy();
+
+    void RecordRenderView(RenderView& view);
 };
