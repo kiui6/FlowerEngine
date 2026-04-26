@@ -13,8 +13,6 @@
 //#include <Record/ObjectLibrary.h>
 //#include <Thread/ThreadManager.h>
 
-#include <Graphics/Render/Utility.h>
-
 #include <SDL3/SDL.h>
 
 Application* Application::Singleton = nullptr;

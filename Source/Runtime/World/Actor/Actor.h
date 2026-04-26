@@ -55,7 +55,7 @@ public:
     virtual const Transform2D& GetRelativeTransform() const {return transform;}
 
     virtual glm::vec2 GetLocation();
-    virtual const glm::vec2& GetRelativeLocation() const {return transform.Location;}
+    virtual const glm::vec2 GetRelativeLocation() const {return transform.Location;}
 
     virtual void SetLocation(const glm::vec2& loc);
     virtual void SetRelativeLocation(const glm::vec2 loc) {transform.Location = loc;}

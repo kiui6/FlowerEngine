@@ -20,8 +20,8 @@ public:
         m_currentOffset = 0;
     }
 
-    ArenaAllocator(const Arena&) = delete;
-    ArenaAllocator(Arena&&) = delete;
+    ArenaAllocator(const ArenaAllocator&) = delete;
+    ArenaAllocator(ArenaAllocator&&) = delete;
 
     void* Allocate(size_t size, size_t align = alignof(std::max_align_t)) {
         uintptr_t addr = reinterpret_cast<uintptr_t>(m_memBlocks[m_lastBlock].get()) + m_currentOffset;
