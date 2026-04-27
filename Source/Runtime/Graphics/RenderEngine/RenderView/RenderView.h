@@ -22,7 +22,7 @@ protected:
     //std::vector<Lightstd::unique_ptr<RenderObject>> m_StaticLightRenderObjects;
     //std::vector<Lightstd::unique_ptr<RenderObject>> m_DynamicLightRenderObjects;
 
-    std::vector<RenderStateUpdate*> m_stateUpdates;
+    std::vector<std::unique_ptr<RenderStateUpdate>> m_stateUpdates;
 public:
 
     //void AddStaticLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);

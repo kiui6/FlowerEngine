@@ -24,6 +24,8 @@ public:
 
 	static void Fatal(const char* Namespace, const char* message);
 	static void FatalFormat(const char* Namespace, const char* message, ...);
+
+	static void Assert(const char* Namespace, const char* message);
 };
 
 /* 

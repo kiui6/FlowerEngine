@@ -7,11 +7,15 @@
 #include "CompiledRenderElement.h"
 #include "RenderElementTypes.h"
 
+#include <Graphics/RenderEngine/RenderPass/RenderPassTypes.h>
+
 struct RenderElement
 {
-    RenderElementType type;
+    RenderPassType renderPass;
+    RenderElementType geometryType;
 
-    RenderElement(RenderElementType initType) : type(initType) {}
+    RenderElement(RenderPassType initRenderPass, RenderElementType initGeoType) 
+        : renderPass(initRenderPass), geometryType(initGeoType) {}
     virtual ~RenderElement() {}
 
     virtual CompiledRenderElement* CreateCompiledElement();

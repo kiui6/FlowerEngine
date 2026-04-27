@@ -67,7 +67,7 @@ set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskP
 
 set(SrcData "Source/Runtime/Data/DataManager.cpp")
 
-set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp")
+set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp")
 
 set(SrcPlatform "Source/Runtime/Platform/Platform.cpp")
 
@@ -75,9 +75,11 @@ set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Lo
 
 set(SrcUtility "Source/Runtime/Utility/Arena.cpp")
 
+set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime/GarbageCollector/ReferenceCounter.cpp")
+
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale} ${SrcUtility}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)

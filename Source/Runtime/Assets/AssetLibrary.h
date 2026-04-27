@@ -4,6 +4,7 @@
 #include <Data/DataManager.h>
 
 #include "RawAsset.h"
+#include "AssetPtr.h"
 
 #include <memory>
 #include <string>
@@ -12,7 +13,8 @@ class AssetLibrary : public IService
 {
     static bool bIsInitialized;
 
-    std::unordered_map<std::string, std::shared_ptr<Asset>> m_loadedAssets;
+    std::unordered_map<std::string, std::unique_ptr<Asset>> m_loadedAssets;
+    std::vector<std::unique_ptr<Asset>> m_createdAssets;
 
 public:
     static std::string_view GetStaticName() {return "AssetLibrary";}
@@ -20,5 +22,12 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    std::shared_ptr<RawAsset> LoadRawAsset(const std::string& path);
+    AssetPtr<RawAsset> LoadRawAsset(const std::string& path);
+
+    void UnloadAsset(const std::string& path);
+
+    template <AssetClass T>
+    T CreateAsset();
+
+    void DestroyAsset(Asset* asset);
 };

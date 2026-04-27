@@ -11,5 +11,7 @@ class RenderEngine
 public:
     RenderView& GetFrameRenderView() { return m_renderViews[(m_currentFrame + 1) % m_renderViews.size()];}
 
+    void Initialize();
+
     void Render(float deltaTime, RenderView& renderView);
 };

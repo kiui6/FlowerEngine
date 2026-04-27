@@ -16,7 +16,7 @@ void LocaleManager::LoadLocale(std::string localeName)
 {
     AssetLibrary* lib = GetService<AssetLibrary>();
 
-    std::shared_ptr<RawAsset> localeFile = lib->LoadRawAsset(localeName);
+    AssetPtr<RawAsset> localeFile = lib->LoadRawAsset(localeName);
 }
 
 std::optional<std::string_view> LocaleManager::FetchLocaleString(std::string_view id)

@@ -11,7 +11,15 @@ void AssetLibrary::Deinitialize()
 {
 }
 
-std::shared_ptr<RawAsset> AssetLibrary::LoadRawAsset(const std::string &path)
+AssetPtr<RawAsset> AssetLibrary::LoadRawAsset(const std::string& path)
 {
-    return std::shared_ptr<RawAsset>();
+    return nullptr;
+}
+
+void AssetLibrary::UnloadAsset(const std::string &path)
+{
+}
+
+void AssetLibrary::DestroyAsset(Asset *asset)
+{
 }

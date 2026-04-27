@@ -10,6 +10,7 @@
 #include <Platform/Platform.h>
 #include <cstdarg>
 #include <ctime>
+#include <cassert>
 
 MulticastDelegate<const char*, const char*, const char*> Logger::OnLogMessage = MulticastDelegate<const char*, const char*, const char*>();
 
@@ -122,4 +123,11 @@ void Logger::Fatal(const char* Namespace, const char* message)
 void Logger::FatalFormat(const char* Namespace, const char* message, ...)
 {
 	OnLogMessage.Broadcast("Fatal", Namespace, message);
+}
+
+void Logger::Assert(const char *Namespace, const char *message)
+{
+	InternalLog(Namespace, message, "\x1B[31m");
+
+	assert(!"assertion reached");
 }

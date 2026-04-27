@@ -1,8 +1,8 @@
 #include "RenderView.h"
 
-void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
+void RenderView::SubmitStateUpdate(RenderStateUpdate* stateUpdate)
 {
-    m_stateUpdates.push_back(stateUpdate);
+    m_stateUpdates.emplace_back(std::unique_ptr<RenderStateUpdate>(stateUpdate));
 }
 
 std::unique_ptr<RenderObject> RenderView::AllocateRenderObject()
@@ -14,4 +14,5 @@ void RenderView::Reset()
 {
     // Dynamic Render Objects should be recreated every frame.
     m_dynamicRenderObjects.clear();
+    m_stateUpdates.clear();
 }

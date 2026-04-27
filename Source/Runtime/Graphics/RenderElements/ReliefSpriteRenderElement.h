@@ -4,17 +4,17 @@
 #include <Graphics/RenderEngine/RenderView/RenderResource.h>
 #include <Math/Vectors.h>
 
-struct OpaqueSpriteRenderElement : public RenderElement
+struct ReliefSpriteRenderElement : public RenderElement
 {
-    OpaqueSpriteRenderElement() : RenderElement(RenderPassType::Opaque, RenderElementType::Sprite) {}
+    ReliefSpriteRenderElement() : RenderElement(RenderPassType::Relief, RenderElementType::Sprite) {}
 
     Float2 position;
     uint32_t depth;
     float scale;
     float rotation;
-    Float3 tint = {1, 1, 1};
 
     Texture2DResource texture;
+    float textureComponentCoefficient = 1 << 8;
     // minU, minV, maxU, maxV
     Float4 uv;
 

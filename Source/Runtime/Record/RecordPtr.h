@@ -22,7 +22,7 @@ class WeakRecordPtr
 public:
     WeakRecordPtr() {}
     WeakRecordPtr(RecordT* record) : m_record(record) {
-        if(record) { 
+        if(m_record) { 
             m_id = record->GetID();
         }
     }
@@ -53,8 +53,8 @@ public:
     // Creation constructors
     RecordPtr() {}
     RecordPtr(RecordT* record) : m_record(record) {
-        if(record) { 
-            m_id = record->GetID();
+        if(m_record) { 
+            m_id = m_record->GetID();
             RecordPtrBase::AddRef(m_record);
         }
     }
