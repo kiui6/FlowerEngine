@@ -7,9 +7,9 @@
 #include <concepts>
 
 #include <Utility/Record.h>
+#include <GarbageCollector/ReferenceCounter.h>
 
 #include "Field.h"
-#include "RecordRefCount.h"
 
 #include "FieldContainers/StringField.h"
 
@@ -43,22 +43,20 @@ enum class RecordFlags : uint8_t {
  * 
  * Automated behaviours of Record can be changed by setting flags
  * 
- * Each Record can contain multiple Children, as well as own Parent Record  
- * 
  * Record ID 0 is reserved for None; 
  */
-class Record : public RecordRefCount
+class Record : public ReferenceCounter
 {
+    virtual void RequestSelfDestruction() override;
 protected:
     uint16_t m_flags = 0;
     RecordID m_id = INVALID_RECORD;
     uint32_t m_type;
-
-
-    Field<StringField> f_edid = {FIELDID(EDID), "Untitled"};
 public:
+    Field<StringField> EditorID = {FIELDID(EDID), "Untitled"};
+
     Record() {}
-    Record(uint32_t id) {m_id = id;}
+    Record(RecordID id) {m_id = id;}
 
     Record(const Record&) = delete;
     Record& operator=(const Record&) = delete;
@@ -73,8 +71,15 @@ public:
     void Rename(const std::string& newName);
     // TODO: Maybe make this private? It can cause big issues
     void SetID(RecordID newID) {m_id = newID;}
+    void SetType(uint32_t newType) {m_type = newType;}
 
     inline RecordID GetID() const {return m_id;}
+
+    virtual std::vector<FieldBase*> GetFields() {
+        std::vector<FieldBase*> fields;
+        fields.push_back(&EditorID);
+        return fields;
+    }
 
     void SetFlag(RecordFlags flag) {m_flags |= (uint16_t)flag;}
     void ClearFlag(RecordFlags flag) {m_flags &= ~(uint16_t)flag;}

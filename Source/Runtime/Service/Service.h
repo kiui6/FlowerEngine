@@ -93,5 +93,5 @@ template <ServiceClass ServiceType>
 inline ServiceType* GetService()
 {
     ServiceProvider &provider = ServiceProvider::Get();
-    return dynamic_cast<ServiceType*>(provider.GetServiceByName(ServiceType::GetStaticName()));
+    return static_cast<ServiceType*>(provider.GetServiceByName(ServiceType::GetStaticName()));
 }

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <cstdint>
+#include <concepts>
 
 #include "RenderResource.h"
 #include "CompiledRenderElement.h"
@@ -11,12 +12,18 @@
 
 struct RenderElement
 {
-    RenderPassType renderPass;
-    RenderElementType geometryType;
-
     RenderElement(RenderPassType initRenderPass, RenderElementType initGeoType) 
         : renderPass(initRenderPass), geometryType(initGeoType) {}
     virtual ~RenderElement() {}
 
-    virtual CompiledRenderElement* CreateCompiledElement();
+    virtual CompiledRenderElement* CreateCompiledElement() {return nullptr;}
+
+    inline RenderPassType GetRenderPassType() const {return renderPass;}
+    inline RenderElementType GetRenderElementType() const {return geometryType;}
+protected:
+    RenderPassType renderPass;
+    RenderElementType geometryType;
 };
+
+template<typename T>
+concept RenderElementClass = std::is_base_of<RenderElement, T>::value;

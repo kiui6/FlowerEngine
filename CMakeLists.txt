@@ -31,6 +31,18 @@ FetchContent_MakeAvailable(sdl glm json)
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
+add_library(no_rtti INTERFACE)
+
+target_compile_options(no_rtti INTERFACE
+    # MSVC (including clang-cl)
+    $<$<OR:$<CXX_COMPILER_ID:MSVC>,$<AND:$<CXX_COMPILER_ID:Clang>,$<STREQUAL:$<CXX_COMPILER_FRONTEND_VARIANT>,MSVC>>>:/GR->
+    # GCC
+    $<$<CXX_COMPILER_ID:GNU>:-fno-rtti>
+    # Clang & AppleClang (non-MSVC mode)
+    $<$<CXX_COMPILER_ID:AppleClang>:-fno-rtti>
+    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<NOT:$<STREQUAL:$<CXX_COMPILER_FRONTEND_VARIANT>,MSVC>>>:-fno-rtti>
+)
+
 # Third Party Sources
 set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
 
@@ -55,7 +67,7 @@ set(SrcInput "Source/Runtime/Input/InputManager.cpp")
 
 set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp" "Source/Runtime/Engine/Tickable.cpp")
 
-set(SrcRecord "Source/Runtime/Record/RecordLibrary.cpp" "Source/Runtime/Record/RecordRefCount.cpp")
+set(SrcRecord "Source/Runtime/Record/Record.cpp" "Source/Runtime/Record/RecordLibrary.cpp" )
 
 set(SrcAssets "Source/Runtime/Assets/Entity/EntityTemplate/EntityTemplateCompiler.cpp" "Source/Runtime/Assets/Entity/ComponentTemplate/EntityComponentTemplateLibrary.cpp")
 
@@ -77,9 +89,17 @@ set(SrcUtility "Source/Runtime/Utility/Arena.cpp")
 
 set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime/GarbageCollector/ReferenceCounter.cpp")
 
+set(SrcGameFramework
+    # Actors
+    "Source/Runtime/GameFramework/Actors/SpriteActor/SpriteActor.cpp"
+
+    # Records
+    "Source/Runtime/GameFramework/Records/AtlasRecord/AtlasRecordFactory.cpp"
+)
+
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)
@@ -93,7 +113,7 @@ endif()
 
 add_executable(Game ${Sources})
 
-target_link_libraries(Game SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Game no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(Game PRIVATE "Source/Runtime")
 target_include_directories(Game PRIVATE "Source/ThirdParty")
@@ -113,7 +133,7 @@ set(EditorSources ${EditorSources})
 
 add_executable(Editor ${Sources} ${EditorSources})
 
-target_link_libraries(Editor SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Editor no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
 
@@ -127,7 +147,7 @@ set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
 
 add_executable(EditorASAN ${Sources} ${EditorSources})
 
-target_link_libraries(EditorASAN SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(EditorASAN no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
 

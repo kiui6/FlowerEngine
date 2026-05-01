@@ -2,7 +2,7 @@
 
 #include "LocaleManager.h"
 
-std::string_view &Text::Get()
+std::string_view Text::Get()
 {
     if(m_cached.size()) {
         return m_cached;

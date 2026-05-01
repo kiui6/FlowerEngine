@@ -10,7 +10,7 @@ struct ReliefSpriteRenderElement : public RenderElement
 
     Float2 position;
     uint32_t depth;
-    float scale;
+    Float2 scale;
     float rotation;
 
     Texture2DResource texture;
@@ -18,5 +18,5 @@ struct ReliefSpriteRenderElement : public RenderElement
     // minU, minV, maxU, maxV
     Float4 uv;
 
-    virtual CompiledRenderElement* CreateCompiledElement();
+    virtual CompiledRenderElement* CreateCompiledElement() override {return nullptr;}
 };

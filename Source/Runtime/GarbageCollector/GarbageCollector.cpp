@@ -17,8 +17,17 @@ void GarbageCollector::RunGCPass(bool unrestricted)
 {
     if(!IsOwningThread()) {
         LOG(Assert, LogGC, "Starting GC pass outside of the owning Game Thread is prohibited");
+        m_GCRequest.store(0x00, std::memory_order_release);
         return;
     }
+
+    if(m_unloadCandidates.empty()) {
+        LOG(Log, LogGC, "GC queue empty");
+        m_GCRequest.store(0x00, std::memory_order_release);
+        return;
+    }
+
+    LOG(Log, LogGC, "Starting GC pass");
 
     std::vector<ReferenceCounter*> unloadCandidates;
 
@@ -29,8 +38,6 @@ void GarbageCollector::RunGCPass(bool unrestricted)
         std::ranges::copy(m_unloadCandidates, std::back_inserter(unloadCandidates));
         m_unloadCandidates.clear();
     }    
-
-    LOG(Log, LogGC, "Starting GC pass");
 
     const auto maxMicrosecondsInGC = std::chrono::microseconds(/*TODO: Load maxGCTime from config*/500);
     auto startTime = std::chrono::steady_clock::now();
@@ -61,7 +68,8 @@ void GarbageCollector::RunGCPass(bool unrestricted)
         std::unique_lock queueReturnLock(m_GCQueueMtx);
         m_unloadCandidates.insert_range(unloadCandidates);
     }    
-
+    
+    m_GCRequest.store(0x00, std::memory_order_release);
 }
 
 void GarbageCollector::RequestGCPass(bool unrestricted)

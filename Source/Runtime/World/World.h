@@ -18,8 +18,8 @@
 
 class World
 {
-    std::unordered_map<RecordID, std::shared_ptr<Actor>> m_staticActors;
-    std::unordered_map<RecordID, std::shared_ptr<Actor>> m_dynamicActors;
+    std::unordered_map<RecordID, std::unique_ptr<Actor>> m_staticActors;
+    std::unordered_map<RecordID, std::unique_ptr<Actor>> m_dynamicActors;
     std::vector<WorldChunk> m_chunks;
     std::string m_name;
 
@@ -37,10 +37,18 @@ public:
 
     WeakRecordPtr<WorldRecord> GetRecord() {return m_worldRef.GetWeak();}
 
-    template <ActorClass T>
-    std::shared_ptr<T> SpawnActor(ActorCreateInfo&& createInfo);
+    /*
+     * Spawns new empty actor of specified type
+     * Creates unique ReferenceRecord for it
+     * Must provide Base for creation 
+     */
+    Actor* SpawnActor(ActorCreateInfo& createInfo);
+    /*
+     * Constructs actor from ReferenceRecord 
+     */
+    Actor* InstantiateActor(ReferenceRecord* ref, ActorInstantiateInfo& createInfo);
 
-    std::vector<std::shared_ptr<Actor>> GetDynamicActors();
+    std::vector<Actor*> GetDynamicActors();
 
     // Gets called right after SpawnDefaultActors()
     // Allows actors to initialize their data that should be ready on BeginPlay

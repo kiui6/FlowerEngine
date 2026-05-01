@@ -26,6 +26,7 @@ public:
 	static void FatalFormat(const char* Namespace, const char* message, ...);
 
 	static void Assert(const char* Namespace, const char* message);
+	static void AssertFormat(const char* Namespace, const char* message, ...);
 };
 
 /* 

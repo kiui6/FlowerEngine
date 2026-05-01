@@ -15,4 +15,16 @@ public:
 
     void SetIdentityMatrix(glm::mat4x4&& matrix) { m_identityMatrix = matrix; }
 
+    /*
+     * Creates RenderElement of specified type, gets ownership over it and returns raw pointer
+     * Caller doesn't own the created RenderElement and must not assume ownership
+     * Constructed RenderElement will be invalidated by the end of the frame and should not be stored outside of caller function scope
+     */
+    template <RenderElementClass T>
+    T* CreateRenderElement() {
+        T* element = new T();
+        m_elements.emplace_back(std::unique_ptr<RenderElement>(element));
+        return element;
+    }
+
 };

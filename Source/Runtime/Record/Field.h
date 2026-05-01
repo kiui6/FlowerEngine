@@ -14,10 +14,16 @@ class Field : public FieldBase
 
     FieldValue::DecayType m_cached;
 public:
-    Field(uint32_t id) : m_id(id) {}
+    Field(uint32_t id) : m_id(id), m_cached(FieldValue::DefaultConstructor()) {}
     Field(uint32_t id, FieldValue::DecayType defaultValue) : m_id(id), m_cached(defaultValue) {}
 
-    FieldValue::DecayType& Get() { return m_cached; }
+    FieldValue::DecayType& Get() const { return m_cached; }
+    void Set(FieldValue::DecayType&& value) { m_cached = value; }
+
+    Field<FieldValue>& operator=(FieldValue::DecayType&& value) {m_cached = std::move(value); return *this;}
+    Field<FieldValue>& operator=(FieldValue::DecayType& value) {m_cached = value; return *this;}
+
+    operator typename FieldValue::DecayType&() {return m_cached;}
 
     void Serialize() override {
         std::vector<uint8_t> temp;

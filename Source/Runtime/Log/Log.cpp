@@ -131,3 +131,21 @@ void Logger::Assert(const char *Namespace, const char *message)
 
 	assert(!"assertion reached");
 }
+
+
+void Logger::AssertFormat(const char* Namespace, const char* message, ...)
+{
+	va_list varg_ptr;
+	va_start(varg_ptr, message);
+
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	char* buffer = new char[bufferSize];
+
+	vsprintf(buffer, message, varg_ptr);
+
+	InternalLog(Namespace, buffer, "\x1B[31m");
+
+	va_end(varg_ptr);
+
+	assert(!"assertion reached");
+}

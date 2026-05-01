@@ -10,7 +10,7 @@ struct OpaqueSpriteRenderElement : public RenderElement
 
     Float2 position;
     uint32_t depth;
-    float scale;
+    Float2 scale;
     float rotation;
     Float3 tint = {1, 1, 1};
 
@@ -18,5 +18,5 @@ struct OpaqueSpriteRenderElement : public RenderElement
     // minU, minV, maxU, maxV
     Float4 uv;
 
-    virtual CompiledRenderElement* CreateCompiledElement();
+    virtual CompiledRenderElement* CreateCompiledElement() override {return nullptr;}
 };

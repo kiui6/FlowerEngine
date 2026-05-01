@@ -5,12 +5,14 @@
 
 #include <World/World.h>
 
+class GarbageCollector;
+
 class Engine
 {
     void InternalTravel();
     
 protected:
-    RecordLibrary* m_recLibrary = nullptr;
+    GarbageCollector* m_GC = nullptr;
 
     std::unique_ptr<World> m_world = nullptr;
     std::unique_ptr<World> m_travelWorld = nullptr;

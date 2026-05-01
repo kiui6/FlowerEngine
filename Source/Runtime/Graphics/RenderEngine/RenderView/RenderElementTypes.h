@@ -3,7 +3,6 @@
 #include <cstdint>
 
 enum class RenderElementType : uint32_t {
-    Unknown,
     // Masked sprite, UVs are baked into the Uniform Buffer for instanced rendering
     Sprite,
     // Passes UVs as push constant to avoid buffer updates, not instanced

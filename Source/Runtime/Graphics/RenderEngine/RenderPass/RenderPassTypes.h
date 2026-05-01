@@ -3,7 +3,6 @@
 #include <cstdint>
 
 enum class RenderPassType : uint32_t {
-    Unknown,
     Opaque,
     Relief,
     Particle,
@@ -11,5 +10,6 @@ enum class RenderPassType : uint32_t {
     Weather,
     PostProcess,
     Upscale,
-    UI
+    UI,
+    MAX
 };

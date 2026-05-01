@@ -2,17 +2,7 @@
 
 #include "Record.h"
 
-class RecordPtrBase {
-protected:
-    void AddRef(RecordRefCount* record) {
-        record->AddRef();
-    }
-    void ReleaseRef(RecordRefCount* record) {
-        record->ReleaseRef();
-    }
-public:
-    virtual ~RecordPtrBase(){}
-};
+#include <GarbageCollector/ReferenceCounterPtr.h>
 
 template <RecordClass RecordT = Record>
 class WeakRecordPtr
@@ -44,7 +34,7 @@ public:
 };
 
 template <RecordClass RecordT = Record>
-class RecordPtr : public RecordPtrBase
+class RecordPtr : public ReferenceCounterPtr
 {
 protected:
     RecordID m_id = INVALID_RECORD;
@@ -55,28 +45,31 @@ public:
     RecordPtr(RecordT* record) : m_record(record) {
         if(m_record) { 
             m_id = m_record->GetID();
-            RecordPtrBase::AddRef(m_record);
+            ReferenceCounterPtr::AddRef(m_record);
         }
     }
     RecordPtr(RecordID recordID, bool load = false) : m_id(recordID) {
         if(load){
             m_record = Load();
+            if (m_record) ReferenceCounterPtr::AddRef(m_record);
         }
     }
-    RecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { }
+    RecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { 
+        if (m_record) ReferenceCounterPtr::AddRef(m_record);
+    }
 
     // Copy constructor
     RecordPtr(const RecordPtr& other) : m_record(other.m_record) {
-        if (m_record) RecordPtrBase::AddRef(m_record);
+        if (m_record) ReferenceCounterPtr::AddRef(m_record);
     }
 
     // Copy assignment
     RecordPtr& operator=(const RecordPtr& other) {
         if (this != &other) {
-            if (m_record) RecordPtrBase::ReleaseRef(m_record);
+            if (m_record) ReferenceCounterPtr::ReleaseRef(m_record);
             m_id = other.m_id;
             m_record = other.m_record;
-            if (m_record) RecordPtrBase::AddRef(m_record);
+            if (m_record) ReferenceCounterPtr::AddRef(m_record);
         }
         return *this;
     }
@@ -90,7 +83,7 @@ public:
     // Move assignment
     RecordPtr& operator=(RecordPtr&& other) noexcept {
         if (this != &other) {
-            if (m_record) RecordPtrBase::ReleaseRef(m_record);
+            if (m_record) ReferenceCounterPtr::ReleaseRef(m_record);
             m_id = other.m_id;
             m_record = other.m_record;
             other.m_id = INVALID_RECORD;
@@ -101,9 +94,11 @@ public:
 
     ~RecordPtr() {
         if(m_record) {
-            RecordPtrBase::ReleaseRef(m_record);
+            ReferenceCounterPtr::ReleaseRef(m_record);
         }
     }
+
+    RecordID GetID() const { return m_id; }
 
     RecordT* Load() {
         if(m_record) {
@@ -114,13 +109,13 @@ public:
         return m_record;
     }
 
-    RecordT* Get() {
+    RecordT* Get() const {
         return m_record;
     }
 
     void Release() {
         if(m_record) {
-            RecordPtrBase::ReleaseRef(m_record);
+            ReferenceCounterPtr::ReleaseRef(m_record);
             m_record = nullptr;
         }
     }
@@ -134,7 +129,12 @@ public:
         return WeakRecordPtr<RecordT>(m_id, m_record);
     }
 
+    RecordT* operator->() {
+        return m_record;
+    } 
+
+    // Checks if this record is registered within RecordLibrary
     bool Exists() const { return false; }
+    // Checks if this record's instance is bound to the RecordPtr
     bool IsBound() const { return m_record != nullptr; }
-    bool IsValid() const {{ return m_record; }}
 };

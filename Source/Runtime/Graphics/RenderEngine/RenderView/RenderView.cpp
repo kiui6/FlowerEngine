@@ -1,6 +1,11 @@
 #include "RenderView.h"
 
-void RenderView::SubmitStateUpdate(RenderStateUpdate* stateUpdate)
+void RenderView::AddDynamicRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj)
+{
+    m_dynamicRenderObjects.emplace(id, std::move(pRendObj));
+}
+
+void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
 {
     m_stateUpdates.emplace_back(std::unique_ptr<RenderStateUpdate>(stateUpdate));
 }

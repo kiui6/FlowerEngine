@@ -3,7 +3,7 @@
 #include "EngineDelegates.h"
 #include <Log/Log.h>
 
-#include <Record/RecordLibrary.h>
+#include <GarbageCollector/GarbageCollector.h>
 
 void Engine::InternalTravel()
 {
@@ -11,7 +11,7 @@ void Engine::InternalTravel()
         EngineDelegates::OnWorldUnload.Broadcast(m_world.get());
         m_world->BeginDestroy();
         m_world.reset();
-        m_recLibrary->RequestGCPass(true);
+        m_GC->RequestGCPass(true);
     }
 
     m_world = std::move(m_travelWorld);
@@ -30,7 +30,7 @@ void Engine::InternalTravel()
 
 Engine::Engine()
 {
-    m_recLibrary = GetService<RecordLibrary>();
+    m_GC = GetService<GarbageCollector>();
 }
 
 void Engine::TravelTo(std::unique_ptr<World> travelWorld)
@@ -48,8 +48,8 @@ void Engine::Tick(float DeltaTime)
         m_world->Tick(DeltaTime);
     }
 
-    if(m_recLibrary->IsGCPassRequested()) {
-        m_recLibrary->RunGCPass(m_recLibrary->IsRequestedGCPassUnrestricted());
+    if(m_GC->IsGCPassRequested()) {
+        m_GC->RunGCPass(m_GC->IsRequestedGCPassUnrestricted());
     }
 }
 

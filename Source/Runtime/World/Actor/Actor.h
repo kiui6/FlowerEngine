@@ -9,6 +9,8 @@
 
 #include <Graphics/RenderEngine/RenderView/RenderView.h>
 
+#include <Localization/Text.h>
+
 #include <memory>
 
 struct ActorSpatialInstance {
@@ -32,18 +34,22 @@ enum class ActorFlags : uint8_t {
 class Actor
 {
 protected:
-    RecordID m_refID;
     RecordPtr<ReferenceRecord> m_ref;
 
-    Transform2D transform;
+    Transform2D m_transform;
 
     uint8_t actorFlags = 0;
 
-    std::string DisplayName = "Actor";
+    Text DisplayName = {"NoName"};
 
     World* m_world;
 public:
-    static std::string GetStaticType() {return "ACT";}
+    static uint32_t RecordType() {return FIELDID("ACT_");}
+
+    void SetReference(ReferenceRecord* ref);
+    void SetReferenceByID(RecordID recId) {m_ref = recId;}
+    ReferenceRecord* GetReference() const {return m_ref.Get();}
+    RecordID GetReferenceID() const {return m_ref.GetID();}
 
     virtual World* GetWorld();
 
@@ -52,13 +58,13 @@ public:
     virtual void Tick(float deltaTime);
 
     virtual Transform2D GetTransform();
-    virtual const Transform2D& GetRelativeTransform() const {return transform;}
+    virtual const Transform2D& GetRelativeTransform() const {return m_transform;}
 
     virtual glm::vec2 GetLocation();
-    virtual const glm::vec2 GetRelativeLocation() const {return transform.Location;}
+    virtual const glm::vec2 GetRelativeLocation() const {return m_transform.Location;}
 
     virtual void SetLocation(const glm::vec2& loc);
-    virtual void SetRelativeLocation(const glm::vec2 loc) {transform.Location = loc;}
+    virtual void SetRelativeLocation(const glm::vec2 loc) {m_transform.Location = loc;}
 
     inline void SetActorFlag(ActorFlags flag) {actorFlags |= (uint8_t)flag;}
     inline void ClearActorFlag(ActorFlags flag) {actorFlags &= ~(uint8_t)flag;}
@@ -72,8 +78,14 @@ public:
     virtual AABB GetBoundingBox() {return {};}
 };
 
-struct ActorCreateInfo
+struct ActorInstantiateInfo
 {
     Transform2D transform;
+};
+
+struct ActorCreateInfo : public ActorInstantiateInfo
+{
     bool isDynamic = false;
+    Record* base = nullptr;
+    Text displayName;
 };
