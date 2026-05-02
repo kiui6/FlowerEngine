@@ -46,6 +46,8 @@ public:
     RecordPtr<Record> GetRecord(uint64_t recordID);
     void UnloadRecord(uint64_t recordID);
     bool IsValidRecord(uint64_t recordID) const;
+
+    RecordID ReserveLocalRecordID() {return GenerateRecordID(s_runtimeModID); }
 protected:
     uint64_t GenerateRecordID(uint8_t pluginID);
 };

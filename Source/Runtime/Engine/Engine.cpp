@@ -31,6 +31,9 @@ void Engine::InternalTravel()
 Engine::Engine()
 {
     m_GC = GetService<GarbageCollector>();
+    if(!m_GC) {
+        LOG(Fatal, LogEngine, "Failed to retrive pointer to Garbage Collector service. Is it registered?");
+    }
 }
 
 void Engine::TravelTo(std::unique_ptr<World> travelWorld)

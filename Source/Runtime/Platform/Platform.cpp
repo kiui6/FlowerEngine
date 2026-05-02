@@ -25,3 +25,8 @@ void Platform::Deinitialize()
 {
     
 }
+
+File Platform::OpenFile(std::string path, uint8_t ioaccess)
+{
+    return File();
+}

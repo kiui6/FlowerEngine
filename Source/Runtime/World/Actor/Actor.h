@@ -48,11 +48,12 @@ public:
 
     void SetReference(ReferenceRecord* ref);
     void SetReferenceByID(RecordID recId) {m_ref = recId;}
-    ReferenceRecord* GetReference() const {return m_ref.Get();}
-    RecordID GetReferenceID() const {return m_ref.GetID();}
+    inline ReferenceRecord* GetReference() const {return m_ref.Get();}
+    inline RecordID GetReferenceID() const {return m_ref.GetID();}
 
     virtual World* GetWorld();
 
+    virtual void Initialize(){}
     virtual void PostInit(){}
     virtual void BeginPlay() {}
     virtual void Tick(float deltaTime);

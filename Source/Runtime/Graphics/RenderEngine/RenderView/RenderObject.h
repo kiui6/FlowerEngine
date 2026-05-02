@@ -15,6 +15,9 @@ public:
 
     void SetIdentityMatrix(glm::mat4x4&& matrix) { m_identityMatrix = matrix; }
 
+    size_t GetElementsCount() const { return m_elements.size(); }
+    std::vector<std::unique_ptr<RenderElement>>& GetElements() { return m_elements; }
+
     /*
      * Creates RenderElement of specified type, gets ownership over it and returns raw pointer
      * Caller doesn't own the created RenderElement and must not assume ownership

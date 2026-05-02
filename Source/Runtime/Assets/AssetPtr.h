@@ -19,12 +19,12 @@ public:
             ReferenceCounterPtr::AddRef(m_ptr);
         }
     }
-    AssetPtr(std::string_view path, bool load = false) : m_path(path) {
+    AssetPtr(std::string& path, bool load = false) : m_path(path) {
         if(load){
             m_ptr = Load();
         }
     }
-    AssetPtr(std::string_view path, AssetT* record) : m_path(path), m_ptr(record) { }
+    AssetPtr(std::string& path, AssetT* record) : m_path(path), m_ptr(record) { }
 
     // Copy constructor
     AssetPtr(const AssetPtr& other) : m_ptr(other.m_ptr) {
@@ -59,6 +59,8 @@ public:
         }
         return *this;
     }
+
+    AssetT* operator ->() { return m_ptr; }
 
     ~AssetPtr() {
         if(m_ptr) {

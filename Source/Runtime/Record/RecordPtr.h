@@ -92,6 +92,8 @@ public:
         return *this;
     }
 
+    RecordT* operator ->() { return m_record; }
+
     ~RecordPtr() {
         if(m_record) {
             ReferenceCounterPtr::ReleaseRef(m_record);
@@ -128,10 +130,6 @@ public:
     WeakRecordPtr<RecordT> GetWeak() {
         return WeakRecordPtr<RecordT>(m_id, m_record);
     }
-
-    RecordT* operator->() {
-        return m_record;
-    } 
 
     // Checks if this record is registered within RecordLibrary
     bool Exists() const { return false; }

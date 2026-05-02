@@ -7,6 +7,9 @@
 class Texture2DAsset : public Asset
 {
     std::vector<std::byte> m_data;
+    uint16_t m_width, m_height;
 public:
     std::vector<std::byte>& GetTextureData() {return m_data;}
+    uint16_t GetWidth() {return m_width;}
+    uint16_t GetHeight() {return m_height;}
 };

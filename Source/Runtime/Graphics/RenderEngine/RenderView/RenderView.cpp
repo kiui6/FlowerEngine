@@ -2,7 +2,8 @@
 
 void RenderView::AddDynamicRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj)
 {
-    m_dynamicRenderObjects.emplace(id, std::move(pRendObj));
+    if(pRendObj && pRendObj->GetElementsCount())
+        m_dynamicRenderObjects.emplace(id, std::move(pRendObj));
 }
 
 void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
