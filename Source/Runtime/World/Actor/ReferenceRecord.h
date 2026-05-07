@@ -15,7 +15,7 @@ public:
     Field<RecordField> ParentChunk = {FIELDID(CHNK)};
     Field<TextField> DisplayName = {FIELDID(DISP)};
 
-    static uint32_t StaticType() {return CompMakeRecordType("REFR");}
+    static ID32 StaticType() {return MakeID32("REFR");}
 
     virtual std::vector<FieldBase*> GetFields() override {
         std::vector<FieldBase*> fields = Record::GetFields();

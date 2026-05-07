@@ -4,9 +4,9 @@
 // Dev
 #include <GarbageCollector/GarbageCollector.h>
 #include <Record/RecordLibrary.h>
+#include <Assets/AssetLibrary.h>
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
-
 
 int GuardedMain(int argc, char* argv[])
 {
@@ -17,9 +17,12 @@ int GuardedMain(int argc, char* argv[])
     LOG(Log, LogGuardedMain, "Starting application life cycle");
 
     // Test
+    AssetPtr<RawAsset> asset = GetService<AssetLibrary>()->LoadRawAsset("./Data/Image.png");
+
     RecordPtr<TextureRecord> albedoRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     albedoRec->EditorID = "Albedo";
-    albedoRec->TexturePath = "Textures/Test.png";
+    /* TODO: Make absolute resolving ("Texture/Image.png" -> "E:/Game/Data/Texture/Image.png")*/
+    albedoRec->TexturePath = "./Data/Image.png";
 
     RecordPtr<Record> atlasRec = GetService<RecordLibrary>()->CreateRecordFromType(AtlasRecord::StaticType());
     atlasRec->EditorID = "Atlas";

@@ -55,6 +55,8 @@ Actor *World::InstantiateActor(ReferenceRecord *ref, ActorInstantiateInfo &creat
 
     actor->SetReference(ref);
 
+    actor->Initialize();
+
     if(ref->IsDynamic) {
         m_dynamicActors.emplace(ref->GetID(), std::unique_ptr<Actor>(actor));
     } else {

@@ -4,15 +4,19 @@
 
 #include <GarbageCollector/ReferenceCounter.h>
 
+#include <Utility/ID.h>
+
 class Asset : public ReferenceCounter
 {
     virtual void RequestSelfDestruction() override;
 protected:
     std::string m_path;
 public:
+    Asset() {}
+    Asset(std::string_view path) : m_path(path) {}
     virtual ~Asset(){}
 
-    static uint64_t GetStaticType() {return 0;}
+    static ID32 StaticType() {return MakeID32("UNKN");}
 
     const std::string& GetPath() {return m_path;}
 };

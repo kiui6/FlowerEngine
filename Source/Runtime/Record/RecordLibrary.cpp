@@ -34,34 +34,50 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8
     record->SetType(recordType);
     record->SetID(id);
 
+    m_records.emplace(id, record);
+
     return RecordPtr<Record>(id, record);
 }
 
-RecordPtr<Record> RecordLibrary::LoadRecord(uint64_t recordID)
+Record *RecordLibrary::LoadRecordRaw(RecordID recordID)
 {
     std::unique_lock lock(m_mtx);
+
+    // Try find record by ID
+    auto it = m_records.find(recordID);
+    if(it != m_records.end()) {
+        return it->second.get();
+    }
+
+    // TODO: Attempt loading from merged data files
+
     return nullptr;
 }
 
-RecordPtr<Record> RecordLibrary::GetRecord(uint64_t recordID)
+RecordPtr<Record> RecordLibrary::LoadRecord(RecordID recordID)
+{
+    return RecordPtr<Record>(recordID, LoadRecordRaw(recordID));
+}
+
+RecordPtr<Record> RecordLibrary::GetRecord(RecordID recordID)
 {
     std::shared_lock lock(m_mtx);
     return nullptr;
 }
 
-void RecordLibrary::UnloadRecord(uint64_t recordID)
+void RecordLibrary::UnloadRecord(RecordID recordID)
 {
     std::unique_lock lock(m_mtx);
 }
 
-bool RecordLibrary::IsValidRecord(uint64_t recordID) const
+bool RecordLibrary::IsValidRecord(RecordID recordID) const
 {
     std::shared_lock lock(m_mtx);
     return false;
 }
 
-uint64_t RecordLibrary::GenerateRecordID(uint8_t pluginID)
+RecordID RecordLibrary::GenerateRecordID(uint8_t pluginID)
 {
-    uint64_t local = m_nextLocalID.fetch_add(1, std::memory_order_relaxed);
-    return (static_cast<uint64_t>(pluginID) << 56) | (local & 0x00FFFFFFFFFFFFFF);
+    RecordID local = m_nextLocalID.fetch_add(1, std::memory_order_relaxed);
+    return (static_cast<RecordID>(pluginID) << 56) | (local & 0x00FFFFFFFFFFFFFF);
 }

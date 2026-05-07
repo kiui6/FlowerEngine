@@ -1,5 +1,7 @@
 #include "AssetLibrary.h"
 
+#include "AssetFactory.h"
+
 bool AssetLibrary::bIsInitialized = RegisterService<AssetLibrary>({DataManager::GetStaticName()});
 
 void AssetLibrary::Initialize()
@@ -11,9 +13,15 @@ void AssetLibrary::Deinitialize()
 {
 }
 
-AssetPtr<RawAsset> AssetLibrary::LoadRawAsset(const std::string& path)
+AssetPtr<RawAsset> AssetLibrary::LoadRawAsset(std::string_view path)
 {
-    return nullptr;
+    DataView view = GetService<DataManager>()->OpenDataView(path);
+    
+    std::unique_ptr<RawAsset> asset = std::make_unique<RawAsset>(path, view);
+
+    auto pair = m_loadedAssets.emplace(path, std::move(asset));
+
+    return AssetPtr<RawAsset>(static_cast<RawAsset*>(pair.first->second.get()));
 }
 
 void AssetLibrary::UnloadAsset(const std::string &path)

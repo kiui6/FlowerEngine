@@ -9,5 +9,5 @@ class TextureRecord : public Record
 public:
     Field<StringField> TexturePath {FIELDID(TEXP)};
 
-    static uint32_t StaticType() {return CompMakeRecordType("TEX2");}
+    static ID32 StaticType() {return MakeID32("TEX2");}
 };

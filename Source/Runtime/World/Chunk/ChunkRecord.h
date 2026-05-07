@@ -11,5 +11,5 @@ class ChunkRecord : public Record
 {
     Field<ListField<RecordField>> f_references = {FIELDID(LREF)};
 public:
-    static uint32_t StaticType() {return CompMakeRecordType("CHNK");}
+    static ID32 StaticType() {return MakeID32("CHNK");}
 };

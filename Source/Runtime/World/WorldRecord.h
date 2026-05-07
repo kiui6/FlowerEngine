@@ -11,5 +11,5 @@ class WorldRecord : public Record
 {
     Field<HashmapField<uint64_t, RecordField>> f_chunks = {FIELDID(CHNK)};
 public:
-    static uint32_t StaticType() {return CompMakeRecordType("WRLD");}
+    static ID32 StaticType() {return MakeID32("WRLD");}
 };

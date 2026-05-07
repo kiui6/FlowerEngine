@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Record.h"
-#include <Utility/Record.h>
+#include <Utility/ID.h>
 
 #include <memory>
 #include <array>
@@ -11,7 +11,7 @@ class Actor;
 
 struct RecordFactory
 {
-    virtual constexpr uint32_t GetRecordType() {return CompMakeRecordType("UNKN");}
+    virtual constexpr ID32 GetRecordType() {return MakeID32("UNKN");}
     virtual Record* NewRecord() {return nullptr;}
     /*
      * Creates an actor.
@@ -23,7 +23,7 @@ struct RecordFactory
 template <RecordClass RecordType>
 struct TemplatedRecordFactory : public RecordFactory
 {
-    virtual constexpr uint32_t GetRecordType() override {return RecordType::StaticType();}
+    virtual constexpr ID32 GetRecordType() override {return RecordType::StaticType();}
     virtual Record* NewRecord() override {
         Record* record = new RecordType();
         record->SetType(GetRecordType());

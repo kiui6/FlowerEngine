@@ -6,21 +6,16 @@
 #include <array>
 #include <concepts>
 
-#include <Utility/Record.h>
+#include <Utility/ID.h>
 #include <GarbageCollector/ReferenceCounter.h>
 
 #include "Field.h"
+#include "RecordID.h"
 
 #include "FieldContainers/StringField.h"
 
 class World;
 class Actor;
-
-using RecordID = uint64_t;
-
-constexpr RecordID INVALID_RECORD = 0;
-constexpr RecordID PLAYER_RECORD = 1;
-constexpr RecordID GBLACKBOARD_RECORD = 2;
 
 /*
  * Loaded Records may contain these flags, that define their runtime behaviour
@@ -51,7 +46,7 @@ class Record : public ReferenceCounter
 protected:
     uint16_t m_flags = 0;
     RecordID m_id = INVALID_RECORD;
-    uint32_t m_type;
+    ID32 m_type;
 public:
     Field<StringField> EditorID = {FIELDID(EDID), "Untitled"};
 
@@ -65,13 +60,13 @@ public:
 
     virtual ~Record(){}
 
-    static uint32_t StaticType() {return MakeRecordType("UNKN");}
-    uint32_t& GetType() {return m_type;}
+    static ID32 StaticType() {return MakeID32("UNKN");}
+    ID32& GetType() {return m_type;}
 
     void Rename(const std::string& newName);
     // TODO: Maybe make this private? It can cause big issues
     void SetID(RecordID newID) {m_id = newID;}
-    void SetType(uint32_t newType) {m_type = newType;}
+    void SetType(ID32 newType) {m_type = newType;}
 
     inline RecordID GetID() const {return m_id;}
 

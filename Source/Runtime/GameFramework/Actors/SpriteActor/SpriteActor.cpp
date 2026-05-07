@@ -12,12 +12,15 @@ void SpriteActor::Initialize()
     if(GetReference()) {
         m_atlas = RecordPtr<AtlasRecord>(GetReference()->Base, true);
 
-        m_albedo = RecordPtr<TextureRecord>(m_atlas->AlbedoTexture);
+        m_albedo = RecordPtr<TextureRecord>(m_atlas->AlbedoTexture, true);
         m_autogenRelief = m_atlas->AlbedoTexture;
-        m_relief = RecordPtr<TextureRecord>(m_atlas->ReliefTexture);
+        m_relief = RecordPtr<TextureRecord>(m_atlas->ReliefTexture, true);
 
-        m_albedoData = AssetPtr<Texture2DAsset>(m_albedo->TexturePath, true);
-        m_reliefData = AssetPtr<Texture2DAsset>(m_relief->TexturePath, true);
+        if(m_albedo.IsBound())
+            m_albedoData = AssetPtr<Texture2DAsset>(m_albedo->TexturePath, true);
+
+        if(m_relief.IsBound())
+            m_reliefData = AssetPtr<Texture2DAsset>(m_relief->TexturePath, true);
     }
 }
 

@@ -3,6 +3,7 @@
 #include "Record.h"
 
 #include <GarbageCollector/ReferenceCounterPtr.h>
+#include <Mixin/RecordLoadCapable.h>
 
 template <RecordClass RecordT = Record>
 class WeakRecordPtr
@@ -19,14 +20,7 @@ public:
     WeakRecordPtr(RecordID recordID) : m_id(recordID) {}
     WeakRecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { }
 
-    RecordT* Get() {
-        if(m_record) {
-            return m_record;
-        }
-
-        // TODO Fetchinf from RecordLibrary
-        return m_record;
-    }
+    RecordT* Get() { return m_record; }
 
     bool IsLoaded() const { return m_record != nullptr; }
     bool IsBound() const { return m_record != nullptr; }
@@ -34,7 +28,7 @@ public:
 };
 
 template <RecordClass RecordT = Record>
-class RecordPtr : public ReferenceCounterPtr
+class RecordPtr : public ReferenceCounterPtr, private RecordLoadCapable
 {
 protected:
     RecordID m_id = INVALID_RECORD;
@@ -50,7 +44,7 @@ public:
     }
     RecordPtr(RecordID recordID, bool load = false) : m_id(recordID) {
         if(load){
-            m_record = Load();
+            Load();
             if (m_record) ReferenceCounterPtr::AddRef(m_record);
         }
     }
@@ -107,7 +101,17 @@ public:
             return m_record;
         }
 
-        // TODO Loading from RecordPtr
+        Record* loaded = LoadRecord(m_id);
+        if(!loaded) {
+            return nullptr;
+        }
+
+        if(loaded->GetType() != RecordT::StaticType()) {
+            return nullptr;
+        }
+
+        m_record = static_cast<RecordT*>(loaded);
+
         return m_record;
     }
 

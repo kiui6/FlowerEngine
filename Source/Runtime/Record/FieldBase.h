@@ -5,9 +5,9 @@
 #include <string>
 #include <span>
 
-#include <Utility/Record.h>
+#include <Utility/ID.h>
 
-#define FIELDID(id) CompMakeRecordType( #id )
+#define FIELDID(id) MakeID32( #id )
 
 class FieldBase
 {

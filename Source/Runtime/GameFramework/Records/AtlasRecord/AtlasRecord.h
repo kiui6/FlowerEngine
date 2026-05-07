@@ -12,5 +12,5 @@ public:
     Field<BoolField> AutoReliefGeneration {FIELDID(RLFA)};
     Field<RecordField> ReliefTexture {FIELDID(RLFR)};
 
-    static uint32_t StaticType() {return CompMakeRecordType("ATLS");}
+    static ID32 StaticType() {return MakeID32("ATLS");}
 };

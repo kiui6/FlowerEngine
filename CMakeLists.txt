@@ -79,15 +79,17 @@ set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskP
 
 set(SrcData "Source/Runtime/Data/DataManager.cpp")
 
-set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp")
+set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp" "Source/Runtime/Assets/RawAsset.cpp")
 
-set(SrcPlatform "Source/Runtime/Platform/Platform.cpp")
+set(SrcPlatform "Source/Runtime/Platform/Platform.cpp" "Source/Runtime/Platform/File.cpp")
 
 set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
 
-set(SrcUtility "Source/Runtime/Utility/Arena.cpp")
+set(SrcUtility "Source/Runtime/Utility/Arena.cpp" "Source/Runtime/Utility/PathBuilder.cpp")
 
 set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime/GarbageCollector/ReferenceCounter.cpp")
+
+set(SrcMixin "Source/Runtime/Mixin/RecordLoadCapable.cpp")
 
 set(SrcGameFramework
     # Actors
@@ -99,11 +101,11 @@ set(SrcGameFramework
 
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)
-    set(Sources WIN32 ${Sources} "Source/Runtime/Platform/Windows/WindowsPlatform.cpp")
+    set(Sources WIN32 ${Sources} "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" "Source/Runtime/Platform/Windows/WindowsMappedFile.cpp")
 endif()
 if(CMAKE_HOST_SYSTEM MATCHES Linux)
   set(Sources ${Sources} "Source/Runtime/Platform/Linux/LinuxPlatform.cpp")

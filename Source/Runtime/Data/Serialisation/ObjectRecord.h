@@ -4,13 +4,13 @@
 #include <vector>
 #include <memory>
 
-#include <Utility/Record.h>
+#include <Utility/ID.h>
 
 #include "ObjectField.h"
 
 struct ObjectRecordHeader
 {
-    uint32_t objectType = CompMakeRecordType("UNKN");
+    ID32 objectType = MakeID32("UNKN");
     uint64_t objectID = 0;
     uint16_t fieldCount = 0;
 };

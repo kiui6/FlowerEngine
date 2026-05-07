@@ -29,6 +29,6 @@ public:
 
     std::string GetLocalDirectory();
 
-    File OpenFile(std::string path, uint8_t ioaccess);
-    std::unique_ptr<IMappedFile> MapFile(std::string path, uint8_t ioaccess);
+    std::shared_ptr<File> OpenFile(std::string path, FileAccess access);
+    std::shared_ptr<IMappedFile> MapFile(std::string path, FileAccess access);
 };

@@ -21,9 +21,9 @@ class RecordLibrary : public IService
 
     mutable std::shared_mutex m_mtx;
 
-    std::unordered_map<uint64_t, std::unique_ptr<Record>> m_records;
+    std::unordered_map<RecordID, std::unique_ptr<Record>> m_records;
 
-    std::atomic<uint64_t> m_nextLocalID{1};
+    std::atomic<RecordID> m_nextLocalID{1};
 public:
     static std::string_view GetStaticName() {return "RecordLibrary";}
 
@@ -42,14 +42,15 @@ public:
 
     RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint8_t pluginID = s_runtimeModID);
 
-    RecordPtr<Record> LoadRecord(uint64_t recordID);
-    RecordPtr<Record> GetRecord(uint64_t recordID);
-    void UnloadRecord(uint64_t recordID);
-    bool IsValidRecord(uint64_t recordID) const;
+    Record* LoadRecordRaw(RecordID recordID);
+    RecordPtr<Record> LoadRecord(RecordID recordID);
+    RecordPtr<Record> GetRecord(RecordID recordID);
+    void UnloadRecord(RecordID recordID);
+    bool IsValidRecord(RecordID recordID) const;
 
     RecordID ReserveLocalRecordID() {return GenerateRecordID(s_runtimeModID); }
 protected:
-    uint64_t GenerateRecordID(uint8_t pluginID);
+    RecordID GenerateRecordID(uint8_t pluginID);
 };
 
 template <RecordClass T>
