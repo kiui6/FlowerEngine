@@ -7,6 +7,8 @@
 class AtlasRecord : public Record
 {
 public:
+    AtlasRecord() {SetType(AtlasRecord::StaticType());}
+
     Field<RecordField> AlbedoTexture {FIELDID(ALBR)};
 
     Field<BoolField> AutoReliefGeneration {FIELDID(RLFA)};

@@ -26,7 +26,6 @@ struct TemplatedRecordFactory : public RecordFactory
     virtual constexpr ID32 GetRecordType() override {return RecordType::StaticType();}
     virtual Record* NewRecord() override {
         Record* record = new RecordType();
-        record->SetType(GetRecordType());
         return record;
     }
 };

@@ -7,6 +7,8 @@
 class TextureRecord : public Record
 {
 public:
+    TextureRecord() {SetType(TextureRecord::StaticType());}
+
     Field<StringField> TexturePath {FIELDID(TEXP)};
 
     static ID32 StaticType() {return MakeID32("TEX2");}

@@ -13,8 +13,6 @@ struct Transform2D
     Float2 Scale = {1, 1};
     float Rotation;
 
-    Transform2D(){}
-
     Transform2D operator+(Transform2D const& other) {
         Transform2D ret;
         ret.Location = Location + other.Location;

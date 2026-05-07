@@ -62,7 +62,6 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
     RecordID id = GenerateRecordID(pluginID);
     T* record = new T();
     record->SetID(id);
-    record->SetType(T::StaticType());
 
     RecordPtr<T> recPtr(id, record);
 

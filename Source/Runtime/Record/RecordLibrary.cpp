@@ -31,7 +31,6 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8
 
     Record* record;
     record = factory->NewRecord();
-    record->SetType(recordType);
     record->SetID(id);
 
     m_records.emplace(id, record);

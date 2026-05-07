@@ -6,3 +6,4 @@
 #include "FieldContainers/ListField.h"
 #include "FieldContainers/IntField.h"
 #include "FieldContainers/TextField.h"
+#include "FieldContainers/StructField.h"

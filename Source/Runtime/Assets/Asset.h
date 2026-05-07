@@ -8,14 +8,14 @@
 #include <Mixin/Reflected.h>
 
 // TODO: Reflection
-class Asset : public ReferenceCounter, public Reflected
+class Asset : public ReferenceCounter, public Typed
 {
     virtual void RequestSelfDestruction() override;
 protected:
     std::string m_path;
 public:
-    Asset() : Reflected(Asset::StaticType()) {}
-    Asset(std::string_view path) : Reflected(Asset::StaticType()), m_path(path) {}
+    Asset() : Typed(Asset::StaticType()) {}
+    Asset(std::string_view path) : Typed(Asset::StaticType()), m_path(path) {}
     virtual ~Asset(){}
 
     static ID32 StaticType() {return MakeID32("UNKN");}

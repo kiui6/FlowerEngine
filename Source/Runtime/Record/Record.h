@@ -8,6 +8,7 @@
 
 #include <Utility/ID.h>
 #include <GarbageCollector/ReferenceCounter.h>
+#include <Mixin/Reflected.h>
 
 #include "Field.h"
 #include "RecordID.h"
@@ -40,18 +41,17 @@ enum class RecordFlags : uint8_t {
  * 
  * Record ID 0 is reserved for None; 
  */
-class Record : public ReferenceCounter
+class Record : public ReferenceCounter, public Typed
 {
     virtual void RequestSelfDestruction() override;
 protected:
     uint16_t m_flags = 0;
     RecordID m_id = INVALID_RECORD;
-    ID32 m_type;
 public:
     Field<StringField> EditorID = {FIELDID(EDID), "Untitled"};
 
-    Record() {}
-    Record(RecordID id) {m_id = id;}
+    Record() : Typed(StaticType()) {}
+    Record(RecordID id) : Typed(StaticType()) {m_id = id;}
 
     Record(const Record&) = delete;
     Record& operator=(const Record&) = delete;
@@ -61,12 +61,6 @@ public:
     virtual ~Record(){}
 
     static ID32 StaticType() {return MakeID32("UNKN");}
-    ID32& GetType() {return m_type;}
-
-    void Rename(const std::string& newName);
-    // TODO: Maybe make this private? It can cause big issues
-    void SetID(RecordID newID) {m_id = newID;}
-    void SetType(ID32 newType) {m_type = newType;}
 
     inline RecordID GetID() const {return m_id;}
 
@@ -83,6 +77,11 @@ public:
     // Marks Record Dirty, meaning that the Record has changed and should be saved again
     void Dirty();
     void BeginUnload() {m_flags |= (uint16_t)RecordFlags::Unload;}
+
+protected: 
+    void SetID(RecordID newID) {m_id = newID;}
+
+    friend class RecordLibrary;
 };
 
 template<typename T>
