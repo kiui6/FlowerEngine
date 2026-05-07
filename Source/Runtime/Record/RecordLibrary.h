@@ -4,6 +4,7 @@
 
 #include <Data/DataManager.h>
 #include <Mixin/ThreadAware.h>
+#include <Log/Log.h>
 
 #include "Record.h"
 #include "RecordPtr.h"
@@ -66,6 +67,8 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
     RecordPtr<T> recPtr(id, record);
 
     m_records.emplace(id, std::unique_ptr<Record>(record));
+
+    LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
 
     return recPtr;
 }

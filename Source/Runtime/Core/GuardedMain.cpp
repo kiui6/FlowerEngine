@@ -17,7 +17,7 @@ int GuardedMain(int argc, char* argv[])
     LOG(Log, LogGuardedMain, "Starting application life cycle");
 
     // Test
-    AssetPtr<RawAsset> asset = GetService<AssetLibrary>()->LoadRawAsset("./Data/Image.png");
+    //AssetPtr<RawAsset> asset = GetService<AssetLibrary>()->LoadRawAsset("./Data/Image.png");
 
     RecordPtr<TextureRecord> albedoRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     albedoRec->EditorID = "Albedo";

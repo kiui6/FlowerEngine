@@ -5,15 +5,17 @@
 #include <GarbageCollector/ReferenceCounter.h>
 
 #include <Utility/ID.h>
+#include <Mixin/Reflected.h>
 
-class Asset : public ReferenceCounter
+// TODO: Reflection
+class Asset : public ReferenceCounter, public Reflected
 {
     virtual void RequestSelfDestruction() override;
 protected:
     std::string m_path;
 public:
-    Asset() {}
-    Asset(std::string_view path) : m_path(path) {}
+    Asset() : Reflected(Asset::StaticType()) {}
+    Asset(std::string_view path) : Reflected(Asset::StaticType()), m_path(path) {}
     virtual ~Asset(){}
 
     static ID32 StaticType() {return MakeID32("UNKN");}

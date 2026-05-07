@@ -3,8 +3,9 @@
 #include <Log/Log.h>
 
 RawAsset::RawAsset(std::string_view path, DataView view)
-    : Asset(path)
 {
+    SetType(RawAsset::StaticType());
+
     if(!view) {
         LOG(Error, LogData, "Failed to load RawAsset, invalid DataView");
         return;

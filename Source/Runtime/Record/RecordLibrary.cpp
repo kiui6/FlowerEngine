@@ -36,6 +36,8 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8
 
     m_records.emplace(id, record);
 
+    LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, recordType, recordType >> 8, recordType >> 16, recordType >> 24);
+
     return RecordPtr<Record>(id, record);
 }
 
