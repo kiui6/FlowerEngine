@@ -9,6 +9,10 @@ class Texture2DAsset : public Asset
     std::vector<std::byte> m_data;
     uint16_t m_width, m_height;
 public:
+    Texture2DAsset(std::string_view path) : Asset(path) {SetType(Texture2DAsset::StaticType());}
+    // TODO
+    Texture2DAsset(std::string_view path, DataView view) : Asset(path) {SetType(Texture2DAsset::StaticType());}
+
     static ID32 StaticType() {return MakeID32("TEX2");}
 
     std::vector<std::byte>& GetTextureData() {return m_data;}

@@ -7,6 +7,8 @@
 #include <Utility/ID.h>
 #include <Mixin/Reflected.h>
 
+#include <Data/DataView.h>
+
 // TODO: Reflection
 class Asset : public ReferenceCounter, public Typed
 {

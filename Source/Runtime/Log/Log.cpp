@@ -123,6 +123,24 @@ void Logger::Fatal(const char* Namespace, const char* message)
 void Logger::FatalFormat(const char* Namespace, const char* message, ...)
 {
 	OnLogMessage.Broadcast("Fatal", Namespace, message);
+
+	va_list varg_ptr;
+	va_start(varg_ptr, message);
+
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	char* buffer = new char[bufferSize];
+
+	vsprintf(buffer, message, varg_ptr);
+
+	InternalLog(Namespace, buffer, "\x1B[31m");
+
+	va_end(varg_ptr);
+
+#if !defined(NDEBUG) || defined(EDITOR)
+	throw std::runtime_error(message);
+#else
+	std::abort();
+#endif
 }
 
 void Logger::Assert(const char *Namespace, const char *message)

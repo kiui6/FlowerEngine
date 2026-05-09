@@ -5,6 +5,7 @@
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <Assets/AssetPtr.h>
 #include <GameFramework/Assets/Texture2DAsset/Texture2DAsset.h>
+#include <Graphics/RenderEngine/RenderView/RenderResource.h>
 
 class SpriteActor : public Actor
 {
@@ -16,6 +17,10 @@ class SpriteActor : public Actor
     AssetPtr<Texture2DAsset> m_reliefData;
     bool m_autogenRelief = false;
     RecordID m_autogenReliefID = INVALID_RECORD;
+
+    /* GPU Resource Handles */
+    Texture2DResource m_albedoRenderResource{};
+    Texture2DResource m_reliefRenderResource{};
 
     uint16_t m_atlasIndex;
 public:

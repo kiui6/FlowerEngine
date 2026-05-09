@@ -2,11 +2,18 @@
 
 #include <World/World.h>
 
+#include <Record/RecordLibrary.h>
+
 void Actor::SetReference(ReferenceRecord *ref)
 {
     m_ref = ref;
 
     DisplayName = m_ref->DisplayName;
+}
+
+void Actor::SetReferenceByID(RecordID recId)
+{
+    m_ref = GetService<RecordLibrary>()->LoadRecord<ReferenceRecord>(recId);
 }
 
 World *Actor::GetWorld()

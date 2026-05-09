@@ -19,12 +19,7 @@ public:
             ReferenceCounterPtr::AddRef(m_ptr);
         }
     }
-    AssetPtr(std::string& path, bool load = false) : m_path(path) {
-        if(load){
-            m_ptr = Load();
-        }
-    }
-    AssetPtr(std::string& path, AssetT* record) : m_path(path), m_ptr(record) { }
+    AssetPtr(std::string_view path, AssetT* record) : m_path(path), m_ptr(record) { }
 
     // Copy constructor
     AssetPtr(const AssetPtr& other) : m_ptr(other.m_ptr) {
@@ -68,15 +63,6 @@ public:
         }
     }
 
-    AssetT* Load() {
-        if(m_ptr) {
-            return m_ptr;
-        }
-
-        // TODO Loading from AssetPtr
-        return m_ptr;
-    }
-
     AssetT* Get() {
         return m_ptr;
     }
@@ -98,7 +84,5 @@ public:
         return WeakAssetPtr<AssetT>(m_path, m_ptr);
     }*/
 
-    bool Exists() const { return false; }
     bool IsBound() const { return m_ptr != nullptr; }
-    bool IsValid() const {{ return m_ptr; }}
 };

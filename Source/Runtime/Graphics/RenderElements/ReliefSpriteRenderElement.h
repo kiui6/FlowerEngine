@@ -13,7 +13,7 @@ struct ReliefSpriteRenderElement : public RenderElement
     Float2 scale;
     float rotation;
 
-    Texture2DResource texture;
+    Texture2DResource* texture = nullptr;
     float textureComponentCoefficient = 1 << 8;
     // minU, minV, maxU, maxV
     Float4 uv;

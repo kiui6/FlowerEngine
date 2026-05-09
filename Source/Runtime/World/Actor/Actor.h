@@ -47,7 +47,7 @@ public:
     static uint32_t RecordType() {return FIELDID("ACT_");}
 
     void SetReference(ReferenceRecord* ref);
-    void SetReferenceByID(RecordID recId) {m_ref = recId;}
+    void SetReferenceByID(RecordID recId);
     inline ReferenceRecord* GetReference() const {return m_ref.Get();}
     inline RecordID GetReferenceID() const {return m_ref.GetID();}
 

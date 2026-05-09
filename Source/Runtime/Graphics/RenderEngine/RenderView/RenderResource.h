@@ -1,7 +1,10 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include "RenderResourceType.h"
+
+#include "CompiledRenderResource.h"
 
 struct RenderResource {
     RenderResource(RenderResourceType initType) 
@@ -9,8 +12,11 @@ struct RenderResource {
 
     uint64_t id = 0;
     bool isDirty = false;
+
+    std::weak_ptr<CompiledRenderResource>& GetCompiledResource() { return m_compiledResource; }
 protected:
     RenderResourceType type;
+    std::weak_ptr<CompiledRenderResource> m_compiledResource;
 };
 
 struct VertexBufferResource : public RenderResource {

@@ -8,5 +8,5 @@
 class AutogenReliefRenderTask : public OnDemandRenderTask
 {
 public:
-    AutogenReliefRenderTask(uint16_t width, uint16_t height, std::vector<std::byte>& data) {}
+    AutogenReliefRenderTask(Texture2DResource& resource, uint16_t width, uint16_t height, std::vector<std::byte>& data) {}
 };

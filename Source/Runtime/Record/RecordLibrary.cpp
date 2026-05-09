@@ -7,11 +7,9 @@
 
 bool RecordLibrary::bIsInitialized = RegisterService<RecordLibrary>({DataManager::GetStaticName()});
 
-uint8_t RecordLibrary::s_runtimeModID = 0xFF;
-
 void RecordLibrary::Initialize()
 {
-    std::string_view data = GetService<DataManager>()->GetName();
+    m_datamgr = GetService<DataManager>();
 }
 
 void RecordLibrary::Deinitialize()
@@ -21,7 +19,7 @@ void RecordLibrary::Deinitialize()
 RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8_t pluginID)
 {
     std::unique_lock lock(m_mtx);
-    RecordID id = GenerateRecordID(pluginID);
+    RecordID id = GenerateRecordID();
 
     RecordFactory* factory = RecordFactoryLibrary::Get().GetFactory(recordType);
     if(!factory) {
@@ -40,30 +38,24 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8
     return RecordPtr<Record>(id, record);
 }
 
-Record *RecordLibrary::LoadRecordRaw(RecordID recordID)
+RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
 {
-    std::unique_lock lock(m_mtx);
-
-    // Try find record by ID
-    auto it = m_records.find(recordID);
-    if(it != m_records.end()) {
-        return it->second.get();
-    }
-
-    // TODO: Attempt loading from merged data files
-
-    return nullptr;
+    return RecordPtr<Record>();
 }
 
-RecordPtr<Record> RecordLibrary::LoadRecord(RecordID recordID)
+RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
 {
-    return RecordPtr<Record>(recordID, LoadRecordRaw(recordID));
+    return RecordPtr<Record>();
 }
 
-RecordPtr<Record> RecordLibrary::GetRecord(RecordID recordID)
+RecordPtr<Record> RecordLibrary::GetRecordRaw(RecordID recordID)
 {
-    std::shared_lock lock(m_mtx);
-    return nullptr;
+    return RecordPtr<Record>();
+}
+
+RecordPtr<Record> RecordLibrary::GetRecordOfType(RecordID recordID, ID32 type)
+{
+    return RecordPtr<Record>();
 }
 
 void RecordLibrary::UnloadRecord(RecordID recordID)
@@ -77,8 +69,8 @@ bool RecordLibrary::IsValidRecord(RecordID recordID) const
     return false;
 }
 
-RecordID RecordLibrary::GenerateRecordID(uint8_t pluginID)
+RecordID RecordLibrary::GenerateRecordID()
 {
     RecordID local = m_nextLocalID.fetch_add(1, std::memory_order_relaxed);
-    return (static_cast<RecordID>(pluginID) << 56) | (local & 0x00FFFFFFFFFFFFFF);
+    return (static_cast<RecordID>(s_runtimeModID) << 56) | (local & 0x00FFFFFFFFFFFFFF);
 }

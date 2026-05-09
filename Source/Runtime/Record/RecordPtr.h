@@ -3,7 +3,6 @@
 #include "Record.h"
 
 #include <GarbageCollector/ReferenceCounterPtr.h>
-#include <Mixin/RecordLoadCapable.h>
 
 template <RecordClass RecordT = Record>
 class WeakRecordPtr
@@ -28,7 +27,7 @@ public:
 };
 
 template <RecordClass RecordT = Record>
-class RecordPtr : public ReferenceCounterPtr, private RecordLoadCapable
+class RecordPtr : public ReferenceCounterPtr
 {
 protected:
     RecordID m_id = INVALID_RECORD;
@@ -40,12 +39,6 @@ public:
         if(m_record) { 
             m_id = m_record->GetID();
             ReferenceCounterPtr::AddRef(m_record);
-        }
-    }
-    RecordPtr(RecordID recordID, bool load = false) : m_id(recordID) {
-        if(load){
-            Load();
-            if (m_record) ReferenceCounterPtr::AddRef(m_record);
         }
     }
     RecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { 
@@ -95,25 +88,6 @@ public:
     }
 
     RecordID GetID() const { return m_id; }
-
-    RecordT* Load() {
-        if(m_record) {
-            return m_record;
-        }
-
-        Record* loaded = LoadRecord(m_id);
-        if(!loaded) {
-            return nullptr;
-        }
-
-        if(loaded->GetType() != RecordT::StaticType()) {
-            return nullptr;
-        }
-
-        m_record = static_cast<RecordT*>(loaded);
-
-        return m_record;
-    }
 
     RecordT* Get() const {
         return m_record;

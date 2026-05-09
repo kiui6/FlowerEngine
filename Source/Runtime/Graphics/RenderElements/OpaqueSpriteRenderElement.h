@@ -14,7 +14,7 @@ struct OpaqueSpriteRenderElement : public RenderElement
     float rotation;
     Float3 tint = {1, 1, 1};
 
-    Texture2DResource texture;
+    Texture2DResource* texture = nullptr;
     // minU, minV, maxU, maxV
     Float4 uv;
 

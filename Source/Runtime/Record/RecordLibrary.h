@@ -18,9 +18,11 @@
 class RecordLibrary : public IService
 {
     static bool bIsInitialized;
-    static uint8_t s_runtimeModID;
+    static constexpr uint8_t s_runtimeModID = 0xFF;
 
     mutable std::shared_mutex m_mtx;
+
+    DataManager* m_datamgr = nullptr;
 
     std::unordered_map<RecordID, std::unique_ptr<Record>> m_records;
 
@@ -33,25 +35,108 @@ public:
 
     /*
      * Creates new serializable record and puts it into library
-     * Creates record will be assigned pluginID of 0xFF (Runtime Records)
+     * Created record will be assigned pluginID of 0xFF (Runtime Records)
      * 
-     * In editor: Will be serialized into master or plugin file
-     * In game: Will be serialized into save file
+     * @note
+     * In editor: Will be serialized into master or plugin file.
+     * 
+     * In game: Will be serialized into save file.
+     * 
+     * Before using result, caller should check `IsBound()` before accessing record.
+     * 
+     * @param pluginID
+     * Used for debug purposes, automatically set to `s_runtimeModID`(0xFF). Should never be changed.
+     * 
+     * @returns
+     * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
      */
     template <RecordClass T>
     RecordPtr<T> CreateRecord(uint8_t pluginID = s_runtimeModID);
 
+    /*
+     * Creates new serializable record of specified type and puts it into library
+     * Created record will be assigned pluginID of 0xFF (Runtime Records)
+     * 
+     * @note
+     * In editor: Will be serialized into master or plugin file.
+     * 
+     * In game: Will be serialized into save file.
+     * 
+     * Before using result, caller should check `IsBound()` before accessing record.
+     * 
+     * @param recordType
+     * ID32 type of record to create. ID32 type can be constructed using MakeID32("CODE") from <Utility/ID.h>
+     * 
+     * @param pluginID
+     * Used for debug purposes, automatically set to `s_runtimeModID`(0xFF). Should never be changed.
+     * 
+     * @returns
+     * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
+     */
     RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint8_t pluginID = s_runtimeModID);
 
-    Record* LoadRecordRaw(RecordID recordID);
-    RecordPtr<Record> LoadRecord(RecordID recordID);
-    RecordPtr<Record> GetRecord(RecordID recordID);
+    /*
+     * Fetches already loaded or synchronously loads the record from data files using its ID
+     * 
+     * @note
+     * Before using result, caller should check `IsBound()` before accessing record
+     * 
+     * @param recordID
+     * ID of a record to load
+     * 
+     * @returns
+     * RecordPtr of record with requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
+     */
+    template <RecordClass T>
+    RecordPtr<T> LoadRecord(RecordID recordID);
+    /*
+     * Fetches already loaded or synchronously loads the record from data files using its ID
+     * 
+     * @note
+     * Before using result, caller should check `IsBound()` before accessing record
+     * 
+     * @param recordID
+     * ID of a record to load
+     * 
+     * @returns
+     * RecordPtr of polymorphic record. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
+     */
+    RecordPtr<Record> LoadRecordRaw(RecordID recordID);
+    /*
+     * Fetches already loaded or synchronously loads the record from data files using its ID
+     * Compares type of record against the requested type before returning
+     * 
+     * @note
+     * Before using result, caller should check `IsBound()` before accessing record
+     * 
+     * @param recordID
+     * ID of a record to load
+     * 
+     * @param type
+     * ID32 type of record to create. ID32 type can be constructed using MakeID32("CODE") from <Utility/ID.h>
+     * 
+     * @returns
+     * RecordPtr of record with requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record, 
+     * or record's type doesn't match requested type. 
+     */
+    RecordPtr<Record> LoadRecordOfType(RecordID recordID, ID32 type);
+
+    template <RecordClass T>
+    RecordPtr<T> GetRecord(RecordID recordID);
+    RecordPtr<Record> GetRecordRaw(RecordID recordID);
+    RecordPtr<Record> GetRecordOfType(RecordID recordID, ID32 type);
+    
     void UnloadRecord(RecordID recordID);
     bool IsValidRecord(RecordID recordID) const;
-
-    RecordID ReserveLocalRecordID() {return GenerateRecordID(s_runtimeModID); }
+    
+    /*
+     *  Returns caller the unique incremental ID for runtime use (with 0xFF prefix)
+     *  This reserved ID can never be claimed again in runtime.
+     *  Doesn't require record associated with it.
+     */
+    RecordID ReserveLocalRecordID() {return GenerateRecordID(); }
 protected:
-    RecordID GenerateRecordID(uint8_t pluginID);
+    RecordID GenerateRecordID();
 };
 
 template <RecordClass T>
@@ -59,7 +144,7 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
 {
     std::unique_lock lock(m_mtx);
 
-    RecordID id = GenerateRecordID(pluginID);
+    RecordID id = GenerateRecordID();
     T* record = new T();
     record->SetID(id);
 
@@ -70,4 +155,46 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
     LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
 
     return recPtr;
+}
+
+template <RecordClass T>
+inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
+{
+    std::unique_lock lock(m_mtx);
+
+    if(recordID == INVALID_RECORD) {
+        LOGF(Error, LogRecord, "Attempted loading INVALID_RECORD of Type[%c%c%c%c]", T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+        return {INVALID_RECORD, nullptr};
+    }
+
+    // Try find record by ID
+    auto it = m_records.find(recordID);
+    if(it != m_records.end()) {
+        if(it->second->GetType() == T::StaticType()) {
+            return {recordID, static_cast<T*>(it->second.get())};
+        }
+    }
+
+    // TODO: Attempt loading from merged data files
+    if(false) {
+        LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    }
+
+    LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    return {recordID, nullptr};
+}
+
+template <RecordClass T>
+inline RecordPtr<T> RecordLibrary::GetRecord(RecordID recordID)
+{
+    std::shared_lock lock(m_mtx);
+    
+    auto it = m_records.find(recordID);
+    if(it != m_records.end()) {
+        if(it->second->GetType() == T::StaticType()) {
+            return {recordID, static_cast<T*>(it->second.get())};
+        }
+    }
+    
+    return {recordID, nullptr};
 }

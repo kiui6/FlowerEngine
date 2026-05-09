@@ -6,21 +6,29 @@
 #include <Graphics/OnDemandTasks/AutogenReliefRenderTask.h>
 
 #include <Record/RecordLibrary.h>
+#include <Assets/AssetLibrary.h>
 
 void SpriteActor::Initialize()
 {
     if(GetReference()) {
-        m_atlas = RecordPtr<AtlasRecord>(GetReference()->Base, true);
+        RecordLibrary* reclib = GetService<RecordLibrary>();
+        AssetLibrary* assetlib = GetService<AssetLibrary>();
 
-        m_albedo = RecordPtr<TextureRecord>(m_atlas->AlbedoTexture, true);
+        m_atlas = reclib->LoadRecord<AtlasRecord>(GetReference()->Base);
+
+        m_albedo = reclib->LoadRecord<TextureRecord>(m_atlas->AlbedoTexture);
         m_autogenRelief = m_atlas->AlbedoTexture;
-        m_relief = RecordPtr<TextureRecord>(m_atlas->ReliefTexture, true);
+        m_relief = reclib->LoadRecord<TextureRecord>(m_atlas->ReliefTexture);
 
-        if(m_albedo.IsBound())
-            m_albedoData = AssetPtr<Texture2DAsset>(m_albedo->TexturePath, true);
+        if(m_albedo.IsBound()) {
+            std::string path = m_albedo->TexturePath;
+            m_albedoData = assetlib->LoadAsset<Texture2DAsset>(path);
+        }
 
-        if(m_relief.IsBound())
-            m_reliefData = AssetPtr<Texture2DAsset>(m_relief->TexturePath, true);
+        if(m_relief.IsBound()) {
+            std::string path = m_relief->TexturePath;
+            m_reliefData = assetlib->LoadAsset<Texture2DAsset>(path);
+        }
     }
 }
 
@@ -37,36 +45,41 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         opaque->rotation = m_transform.Rotation;
         opaque->scale = m_transform.Scale;
 
-        Texture2DResource albedoTex;
-        albedoTex.components = Texture2DComponents::R8G8B8A8_UNORM;
-        albedoTex.id = m_albedo.Get()->GetID();
-        albedoTex.data = m_albedoData.Get()->GetTextureData();
+        if(m_albedoRenderResource.GetCompiledResource().expired()) {
+            m_albedoRenderResource.components = Texture2DComponents::R8G8B8A8_UNORM;
+            m_albedoRenderResource.id = m_albedo.Get()->GetID();
+            m_albedoRenderResource.data = m_albedoData.Get()->GetTextureData();
+            m_albedoRenderResource.isDirty = true;
+        }
 
-        opaque->texture = albedoTex;
+        opaque->texture = &m_albedoRenderResource;
     }
 
     // Relief Sprite Element
     if(m_autogenRelief && m_albedo.IsBound() && m_albedoData.IsBound()) {
+        ReliefSpriteRenderElement* autogenRelief = ro->CreateRenderElement<ReliefSpriteRenderElement>();
+
         // OnDemand Generate Relief Map Task
-        if(m_autogenReliefID == INVALID_RECORD) {
-            m_autogenReliefID = GetService<RecordLibrary>()->ReserveLocalRecordID();
+        if(m_reliefRenderResource.GetCompiledResource().expired()) {
+            if(m_autogenReliefID == INVALID_RECORD) {
+                m_autogenReliefID = GetService<RecordLibrary>()->ReserveLocalRecordID();
+            }
+            
+            m_reliefRenderResource.components = Texture2DComponents::R16G16_UINT;
+            m_reliefRenderResource.id = m_autogenReliefID;
+            m_reliefRenderResource.data = {};
+            m_reliefRenderResource.isDirty = true;
+
             // Execute task
-            GetService<OnDemandRenderService>()->Submit<AutogenReliefRenderTask>(m_albedoData->GetWidth(), m_albedoData->GetHeight(), m_albedoData->GetTextureData());
-        } else {
-            ReliefSpriteRenderElement* autogenRelief = ro->CreateRenderElement<ReliefSpriteRenderElement>();
-
-            autogenRelief->position = m_transform.Location;
-            autogenRelief->depth = m_transform.Depth;
-            autogenRelief->rotation = m_transform.Rotation;
-            autogenRelief->scale = m_transform.Scale;
-
-            Texture2DResource reliefTex;
-            reliefTex.components = Texture2DComponents::R16G16_UINT;
-            reliefTex.id = m_autogenReliefID;
-            reliefTex.data = {};
-
-            autogenRelief->texture = reliefTex;
+            GetService<OnDemandRenderService>()->Submit<AutogenReliefRenderTask>(m_reliefRenderResource, m_albedoData->GetWidth(), m_albedoData->GetHeight(), m_albedoData->GetTextureData());
         }
+
+        autogenRelief->position = m_transform.Location;
+        autogenRelief->depth = m_transform.Depth;
+        autogenRelief->rotation = m_transform.Rotation;
+        autogenRelief->scale = m_transform.Scale;
+
+        autogenRelief->texture = &m_reliefRenderResource;
     } else if(m_relief.IsBound() && m_reliefData.IsBound()) {
 
         ReliefSpriteRenderElement* relief = ro->CreateRenderElement<ReliefSpriteRenderElement>();
@@ -76,12 +89,14 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         relief->rotation = m_transform.Rotation;
         relief->scale = m_transform.Scale;
 
-        Texture2DResource reliefTex;
-        reliefTex.components = Texture2DComponents::R16G16_UINT;
-        reliefTex.id = m_relief.Get()->GetID();
-        reliefTex.data = m_reliefData.Get()->GetTextureData();
+        if(m_reliefRenderResource.GetCompiledResource().expired()) {
+            m_reliefRenderResource.components = Texture2DComponents::R16G16_UINT;
+            m_reliefRenderResource.id = m_relief.Get()->GetID();
+            m_reliefRenderResource.data = m_reliefData.Get()->GetTextureData();
+            m_reliefRenderResource.isDirty = true;
+        }
 
-        relief->texture = reliefTex;   
+        relief->texture = &m_reliefRenderResource;  
     }
 
     renderView.AddDynamicRenderObject(m_ref.GetID(), std::move(ro));
