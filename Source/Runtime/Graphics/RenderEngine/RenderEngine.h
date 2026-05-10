@@ -15,6 +15,8 @@
 
 #include <SDL3/SDL_gpu.h>
 
+#include "GPUContext.h"
+
 class RenderEngine
 {
     std::array<RenderView, 2> m_renderViews;
@@ -24,16 +26,18 @@ class RenderEngine
 
     std::array<std::unique_ptr<RenderPass>, (uint32_t)RenderPassType::MAX> m_renderPasses;
 
-    std::set<OnDemandRenderTask*> m_onDemandTasks;
+    std::set<std::unique_ptr<OnDemandRenderTask>> m_onDemandTasks;
     std::mutex m_onDemandMtx;
 
     std::unordered_map<uint64_t, std::shared_ptr<CompiledRenderResource>> m_resources;
+
+    GPUContext m_ctx;
 public:
     RenderView& GetFrameRenderView() { return m_renderViews[(m_currentFrame + 1) % m_renderViews.size()];}
 
-    void Initialize();
+    void Initialize(SDL_Window* window);
 
     void Render(float deltaTime, RenderView& renderView);
 
-    void SubmitOnDemandTask(OnDemandRenderTask* task){std::unique_lock lock(m_onDemandMtx); m_onDemandTasks.insert(task);}
+    void SubmitOnDemandTask(OnDemandRenderTask* task){std::unique_lock lock(m_onDemandMtx); m_onDemandTasks.insert(std::unique_ptr<OnDemandRenderTask>(task));}
 };

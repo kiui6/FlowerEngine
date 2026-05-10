@@ -56,7 +56,7 @@ void Application::Initialize()
     // Create window
     m_window = std::make_unique<Window>("Flower++", 1280, 720);
 	
-	// Render->Initialize(SDLExtensions, InstanceLayers);
+	m_render->Initialize(m_window->GetSDLWindowHandle());
 
 	// SDL_Vulkan_CreateSurface(m_window->GetSDLWindowHandle(), Render->GetInstance(), nullptr, &dummySurface);
 

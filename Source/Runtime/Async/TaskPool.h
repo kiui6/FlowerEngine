@@ -13,13 +13,9 @@
 #include <queue>
 #include <concepts>
 
-using AsyncTaskFunction = std::function<void(void)>;
+#include "AsyncTask.h"
 
-class IAsyncTask {
-public:
-    virtual ~IAsyncTask() {}
-    virtual void Execute() {}
-};
+using AsyncTaskFunction = std::function<void(void)>;
 
 template<typename T>
 concept AsyncTaskClass = std::is_base_of<IAsyncTask, T>::value;
