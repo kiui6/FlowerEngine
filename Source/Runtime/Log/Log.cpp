@@ -56,16 +56,20 @@ void Logger::Log(const char* Namespace, const char* message)
 
 void Logger::LogFormat(const char* Namespace, const char* message, ...)
 {
-	va_list varg_ptr;
+	va_list varg_ptr, args_copy;
 	va_start(varg_ptr, message);
+	va_copy(args_copy, varg_ptr);
 
-	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, args_copy) + 1;
 	char* buffer = new char[bufferSize];
+
+	va_end(args_copy);
 
 	vsprintf(buffer, message, varg_ptr);
 
 	InternalLog(Namespace, buffer);
 
+	delete[] buffer;
 	va_end(varg_ptr);
 }
 
@@ -76,16 +80,20 @@ void Logger::Warning(const char* Namespace, const char* message)
 
 void Logger::WarningFormat(const char* Namespace, const char* message, ...)
 {
-	va_list varg_ptr;
+	va_list varg_ptr, args_copy;
 	va_start(varg_ptr, message);
+	va_copy(args_copy, varg_ptr);
 
-	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, args_copy) + 1;
 	char* buffer = new char[bufferSize];
+
+	va_end(args_copy);
 
 	vsprintf(buffer, message, varg_ptr);
 
 	InternalLog(Namespace, buffer, "\x1B[33m");
 
+	delete[] buffer;
 	va_end(varg_ptr);
 }
 
@@ -96,16 +104,20 @@ void Logger::Error(const char* Namespace, const char* message)
 
 void Logger::ErrorFormat(const char* Namespace, const char* message, ...)
 {
-	va_list varg_ptr;
+	va_list varg_ptr, args_copy;
 	va_start(varg_ptr, message);
+	va_copy(args_copy, varg_ptr);
 
-	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, args_copy) + 1;
 	char* buffer = new char[bufferSize];
+
+	va_end(args_copy);
 
 	vsprintf(buffer, message, varg_ptr);
 
 	InternalLog(Namespace, buffer, "\x1B[31m");
 
+	delete[] buffer;
 	va_end(varg_ptr);
 }
 
@@ -122,18 +134,20 @@ void Logger::Fatal(const char* Namespace, const char* message)
 
 void Logger::FatalFormat(const char* Namespace, const char* message, ...)
 {
-	OnLogMessage.Broadcast("Fatal", Namespace, message);
-
-	va_list varg_ptr;
+	va_list varg_ptr, args_copy;
 	va_start(varg_ptr, message);
+	va_copy(args_copy, varg_ptr);
 
-	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, args_copy) + 1;
 	char* buffer = new char[bufferSize];
+
+	va_end(args_copy);
 
 	vsprintf(buffer, message, varg_ptr);
 
 	InternalLog(Namespace, buffer, "\x1B[31m");
 
+	delete[] buffer;
 	va_end(varg_ptr);
 
 #if !defined(NDEBUG) || defined(EDITOR)
@@ -153,16 +167,20 @@ void Logger::Assert(const char *Namespace, const char *message)
 
 void Logger::AssertFormat(const char* Namespace, const char* message, ...)
 {
-	va_list varg_ptr;
+	va_list varg_ptr, args_copy;
 	va_start(varg_ptr, message);
+	va_copy(args_copy, varg_ptr);
 
-	const unsigned int bufferSize = vsnprintf(NULL, 0, message, varg_ptr) + 1;
+	const unsigned int bufferSize = vsnprintf(NULL, 0, message, args_copy) + 1;
 	char* buffer = new char[bufferSize];
+
+	va_end(args_copy);
 
 	vsprintf(buffer, message, varg_ptr);
 
 	InternalLog(Namespace, buffer, "\x1B[31m");
 
+	delete[] buffer;
 	va_end(varg_ptr);
 
 	assert(!"assertion reached");

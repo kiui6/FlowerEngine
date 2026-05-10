@@ -3,3 +3,9 @@
 
 All assets are compatible between two backends.
 
+# Compilation
+
+Clang is heavily recomended.
+
+Required libraries:
+* libstdc++ (14.0+)

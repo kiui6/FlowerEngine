@@ -7,7 +7,7 @@
 class Logger {
 	static std::mutex LogMutex;
 protected:
-	inline static void InternalLog(const char* Namespace, const char* message, const char* prefix = "");
+	inline static void InternalLog(const char* Namespace, const char* message, const char* prefix = "\x1B[0m");
 	inline static std::string InternalGetTimeStamp();
 public:
 	static MulticastDelegate<const char*, const char*, const char*> OnLogMessage;

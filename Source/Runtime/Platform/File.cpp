@@ -12,6 +12,7 @@ void File::Open(std::string path, FileAccess access)
     m_stream = SDL_IOFromFile(path.c_str(), "rb");
     if (!m_stream) {
         LOGF(Error, LogFile, "Failed to open file: %s", path.c_str());
+        return;
     }
 
     m_size = SDL_GetIOSize(m_stream);
