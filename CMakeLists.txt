@@ -98,6 +98,7 @@ set(SrcRender
     # Render Engine
     "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp"
     "Source/Runtime/Graphics/RenderEngine/ResourceCompiler.cpp"
+    "Source/Runtime/Graphics/RenderEngine/RenderUtils.cpp"
 
     # Render Engine - Render View
     "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp"
