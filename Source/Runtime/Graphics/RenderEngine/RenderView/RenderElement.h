@@ -14,9 +14,6 @@ struct RenderElement
 {
     RenderElement(RenderPassType initRenderPass, RenderElementType initGeoType) 
         : renderPass(initRenderPass), geometryType(initGeoType) {}
-    virtual ~RenderElement() {}
-
-    virtual CompiledRenderElement* CreateCompiledElement() {return nullptr;}
 
     inline RenderPassType GetRenderPassType() const {return renderPass;}
     inline RenderElementType GetRenderElementType() const {return geometryType;}

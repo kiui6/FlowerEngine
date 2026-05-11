@@ -17,6 +17,4 @@ struct OpaqueSpriteRenderElement : public RenderElement
     Texture2DResource* texture = nullptr;
     // minU, minV, maxU, maxV
     Float4 uv;
-
-    virtual CompiledRenderElement* CreateCompiledElement() override {return nullptr;}
 };

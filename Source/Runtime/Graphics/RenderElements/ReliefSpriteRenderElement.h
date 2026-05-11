@@ -17,8 +17,6 @@ struct ReliefSpriteRenderElement : public RenderElement
     float textureComponentCoefficient = 1 << 8;
     // minU, minV, maxU, maxV
     Float4 uv;
-
-    virtual CompiledRenderElement* CreateCompiledElement() override {return nullptr;}
 };
 
 struct AutogenReliefSpriteRenderElement : public RenderElement
@@ -34,6 +32,4 @@ struct AutogenReliefSpriteRenderElement : public RenderElement
     float textureComponentCoefficient = 1 << 8;
     // minU, minV, maxU, maxV
     Float4 uv;
-
-    virtual CompiledRenderElement* CreateCompiledElement() override {return nullptr;}
 };

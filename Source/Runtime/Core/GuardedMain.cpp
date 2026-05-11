@@ -26,6 +26,7 @@ int GuardedMain(int argc, char* argv[])
 
     RecordPtr<Record> atlasRec = GetService<RecordLibrary>()->CreateRecordFromType(AtlasRecord::StaticType());
     atlasRec->EditorID = "Atlas";
+    ((AtlasRecord*)atlasRec.Get())->AutoReliefGeneration = false;
     ((AtlasRecord*)atlasRec.Get())->AlbedoTexture = albedoRec.GetID();
 
     RecordPtr<ReferenceRecord> refRec = GetService<RecordLibrary>()->CreateRecord<ReferenceRecord>();

@@ -2,6 +2,11 @@
 
 #include <Log/Log.h>
 
+#include <Graphics/RenderPasses/OpaqueRenderPass.h>
+#include <Graphics/RenderPasses/ReliefRenderPass.h>
+#include <Graphics/RenderPasses/LightingRenderPass.h>
+#include <Graphics/RenderPasses/UpscaleRenderPass.h>
+
 void RenderEngine::Initialize(SDL_Window* window)
 {
     m_ctx.window = window;
@@ -40,47 +45,71 @@ void RenderEngine::Initialize(SDL_Window* window)
     SDL_SetGPUSwapchainParameters(m_ctx.device, m_ctx.window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC);
 
     // Initialize Render Passes
-    // TODO: m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>();
+    m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>();
+    m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>();
+    m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>();
+    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>();
 
     LOG(Log, LogRender, "Render Engine initialization complete");
 }
 
 void RenderEngine::Render(float deltaTime, RenderView &renderView)
 {
-    std::unique_lock lock(m_onDemandMtx);
-
     SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(m_ctx.device);
 
     SDL_GPUTexture *swapchainTexture = NULL;
     uint32_t swapchainTextureW, swapchainTextureH;
     SDL_AcquireGPUSwapchainTexture(cmd, m_ctx.window, &swapchainTexture, &swapchainTextureW, &swapchainTextureH);
+    // Don't attempt any rendering if swapchain texture is invalid, it will crash
+    if(!swapchainTexture) {
+        SDL_SubmitGPUCommandBuffer(cmd);
+        SDL_WaitForGPUSwapchain(m_ctx.device, m_ctx.window);
+        renderView.Reset();
+        return;
+    }
 
     // Perform State Changes
+    SDL_PushGPUDebugGroup(cmd, "State Changes");
+    // ...
+    SDL_PopGPUDebugGroup(cmd);
 
     // Execute OnDemand Tasks
-    while(!m_onDemandTasks.empty()) {
-        auto it = std::prev(m_onDemandTasks.end());
-        (*it)->Execute();
-        m_onDemandTasks.erase(it);
+    {
+        // Lock OnDemand Task mutex so that no thread write to queue before we're finished
+        std::unique_lock lock(m_onDemandMtx);
+        SDL_PushGPUDebugGroup(cmd, "On Demand Tasks");
+        auto it = m_onDemandTasks.begin();
+        while(it != m_onDemandTasks.end()) {
+            (*it)->Execute();            
+            it++;
+        }
+        m_onDemandTasks.clear();
+        SDL_PopGPUDebugGroup(cmd);
+    }
+
+    // Sort & Compile elements
+    {
+        RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
+        for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
+            for(const auto& rendElement : rendObject->GetElements()) {
+                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
+            }
+        }
     }
 
     // Render Frame
     SDL_PushGPUDebugGroup(cmd, "Frame");
-    // TODO: Remove this render pass
-    SDL_GPUColorTargetInfo colorTarget = {
-            .texture     = swapchainTexture,
-            .mip_level   = 0,
-            .layer_or_depth_plane = 0,
-            .clear_color = (SDL_FColor){ 0.88f, 0.722f, 0.23f, 1.0f },
-            .load_op     = SDL_GPU_LOADOP_CLEAR,
-            .store_op    = SDL_GPU_STOREOP_STORE,
-        };
 
-    SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(cmd, &colorTarget, 1, NULL);
-    SDL_EndGPURenderPass(pass);
+    FrameContext frameCtx;
+    frameCtx.cmd = cmd;
+    frameCtx.deltaTime = deltaTime;
+    frameCtx.swapchainTexture = swapchainTexture;
+    frameCtx.previousPass = nullptr;
+    frameCtx.resources = &m_compiledRes;
 
     for(size_t passIdx = 0; passIdx < m_renderPasses.size(); passIdx++) {
-        // TODO: m_renderPasses[passIdx]->Render();
+        m_renderPasses[passIdx]->Render(frameCtx);
+        frameCtx.previousPass = m_renderPasses[passIdx].get();
     }
 
     SDL_PopGPUDebugGroup(cmd);

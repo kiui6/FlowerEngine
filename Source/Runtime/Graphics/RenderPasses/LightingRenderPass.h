@@ -2,7 +2,7 @@
 
 #include <Graphics/RenderEngine/RenderPass/RenderPass.h>
 
-class OpaqueRenderPass : public RenderPass
+class LightingRenderPass : public RenderPass
 {
 public:
     virtual void Compile(RenderResourceCompiler& resourceCompiler, RenderObject* object, RenderElement* element) override {}

@@ -5,11 +5,11 @@
 enum class RenderPassType : uint32_t {
     Opaque,
     Relief,
-    Particle,
+//    Particle,
     Lighting,
-    Weather,
-    PostProcess,
+//    Weather,
+//    PostProcess,
     Upscale,
-    UI,
+//    UI,
     MAX
 };

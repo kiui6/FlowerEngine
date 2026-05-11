@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <unordered_map>
 
-#include <Utility/Arena.h>
 #include <Utility/Memory.h>
 #include <Math/Vectors.h>
 #include <Math/Matrix.h>
@@ -13,6 +12,7 @@
 
 class RenderView
 {
+    friend class RenderEngine;
 protected:
     Float4x4 m_viewMatrix;
     Float4x4 m_projMatrix;

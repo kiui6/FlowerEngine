@@ -59,8 +59,6 @@ set(SrcLog "Source/Runtime/Log/Log.cpp")
 
 set(SrcWindow "Source/Runtime/Window/Window.cpp")
 
-set(SrcRender "Source/Runtime/Graphics/OnDemandRenderService/OnDemandRenderService.cpp" "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp" "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp")
-
 set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 
 set(SrcInput "Source/Runtime/Input/InputManager.cpp")
@@ -91,12 +89,33 @@ set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime
 
 set(SrcMixin )
 
+set(SrcRender 
+    # On Demand
+    "Source/Runtime/Graphics/OnDemandRenderService/OnDemandRenderService.cpp" 
+    
+    # Render Engine
+    "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp"
+    "Source/Runtime/Graphics/RenderEngine/ResourceCompiler.cpp"
+
+    # Render Engine - Render View
+    "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp"
+
+    # Render Passes
+    "Source/Runtime/Graphics/RenderPasses/OpaqueRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/ReliefRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/LightingRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass.cpp"
+  )
+
 set(SrcGameFramework
     # Actors
     "Source/Runtime/GameFramework/Actors/SpriteActor/SpriteActor.cpp"
 
     # Records
     "Source/Runtime/GameFramework/Records/AtlasRecord/AtlasRecordFactory.cpp"
+
+    # Assets
+    "Source/Runtime/GameFramework/Assets/Texture2DAsset/Texture2DAsset.cpp"
 )
 
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}

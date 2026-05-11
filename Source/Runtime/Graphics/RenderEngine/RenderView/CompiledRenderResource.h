@@ -1,13 +1,9 @@
 #pragma once
 
-#include "RenderResourceType.h"
+#include "Texture2DComponents.h"
 
-class CompiledRenderResource
+class CompiledRenderResource {};
+
+class CompiledTexture2DResource : public CompiledRenderResource
 {
-    CompiledRenderResource(RenderResourceType initType) 
-        : type(initType) {}
-
-    uint64_t id = 0;
-protected:
-    RenderResourceType type;
 };

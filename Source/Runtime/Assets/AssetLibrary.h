@@ -3,7 +3,6 @@
 #include <Service/Service.h>
 #include <Data/DataManager.h>
 
-#include "RawAsset.h"
 #include "AssetPtr.h"
 #include "AssetFactory.h"
 
@@ -11,12 +10,13 @@
 #include <string>
 
 #include <Log/Log.h>
+#include <Utility/Hash.h>
 
 class AssetLibrary : public IService
 {
     static bool bIsInitialized;
 
-    std::unordered_map<std::string, std::unique_ptr<Asset>> m_loadedAssets;
+    std::unordered_map<std::string, std::unique_ptr<Asset>, StringHash, std::equal_to<>> m_loadedAssets;
     std::vector<std::unique_ptr<Asset>> m_createdAssets;
 
 public:
@@ -24,9 +24,6 @@ public:
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;
-
-
-    AssetPtr<RawAsset> LoadRawAsset(std::string_view path);
 
     template <AssetClass T>
     AssetPtr<T> LoadAsset(std::string_view path);
@@ -42,9 +39,27 @@ public:
 template <AssetClass T>
 inline AssetPtr<T> AssetLibrary::LoadAsset(std::string_view path)
 {
+    auto loadedAsset = m_loadedAssets.find(path);
+    if(loadedAsset != m_loadedAssets.end()) {
+        if(loadedAsset->second->GetType() != T::StaticType()) {
+            ID32 loadedType = loadedAsset->second->GetType();
+            LOGF(Error, LogAssetLibrary, "Failed to load Asset[%s] of Type[%c%c%c%c]: Already loaded with Type[%c%c%c%c]", path.data(), 
+                T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24,
+                loadedType, loadedType >> 8, loadedType >> 16, loadedType >> 24);
+            return AssetPtr<T>(path, nullptr);
+        }
+
+        return AssetPtr<T>(path, static_cast<T*>(loadedAsset->second.get()));
+    }
+
     DataView view = GetService<DataManager>()->OpenDataView(path);
     
     std::unique_ptr<T> asset = std::make_unique<T>(path, view);
+
+    if(!asset || !asset->IsValid()) {
+        LOGF(Error, LogAssetLibrary, "Failed to load Asset[%s] of Type[%c%c%c%c]", path.data(), T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+        return AssetPtr<T>(path, nullptr);
+    }
 
     auto pair = m_loadedAssets.emplace(path, std::move(asset));
 

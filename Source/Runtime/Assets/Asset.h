@@ -23,6 +23,8 @@ public:
     static ID32 StaticType() {return MakeID32("UNKN");}
 
     const std::string& GetPath() {return m_path;}
+
+    virtual bool IsValid() const { return false; }
 };
 
 template<typename T>

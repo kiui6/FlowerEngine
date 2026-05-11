@@ -17,7 +17,7 @@ void SpriteActor::Initialize()
         m_atlas = reclib->LoadRecord<AtlasRecord>(GetReference()->Base);
 
         m_albedo = reclib->LoadRecord<TextureRecord>(m_atlas->AlbedoTexture);
-        m_autogenRelief = m_atlas->AlbedoTexture;
+        m_autogenRelief = m_atlas->AutoReliefGeneration;
         m_relief = reclib->LoadRecord<TextureRecord>(m_atlas->ReliefTexture);
 
         if(m_albedo.IsBound()) {
@@ -49,6 +49,7 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
             m_albedoRenderResource.components = Texture2DComponents::R8G8B8A8_UNORM;
             m_albedoRenderResource.id = m_albedo.Get()->GetID();
             m_albedoRenderResource.data = m_albedoData.Get()->GetTextureData();
+            m_albedoRenderResource.dataSize = m_albedoData.Get()->GetTextureDataSize();
             m_albedoRenderResource.isDirty = true;
         }
 
@@ -71,7 +72,7 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
             m_reliefRenderResource.isDirty = true;
 
             // Execute task
-            GetService<OnDemandRenderService>()->Submit<AutogenReliefRenderTask>(m_reliefRenderResource, m_albedoData->GetWidth(), m_albedoData->GetHeight(), m_albedoData->GetTextureData());
+            GetService<OnDemandRenderService>()->Submit<AutogenReliefRenderTask>(m_reliefRenderResource, m_albedoData->GetWidth(), m_albedoData->GetHeight(), m_albedoData->GetTextureData(), m_albedoData->GetTextureDataSize());
         }
 
         autogenRelief->position = m_transform.Location;
