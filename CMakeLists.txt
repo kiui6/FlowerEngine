@@ -46,6 +46,8 @@ target_compile_options(no_rtti INTERFACE
 # Third Party Sources
 set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
 
+set(SrcLZ4 "Source/ThirdParty/lz4/lz4.c" "Source/ThirdParty/lz4/lz4file.c" "Source/ThirdParty/lz4/lz4frame.c" "Source/ThirdParty/lz4/lz4hc.c" "Source/ThirdParty/lz4/xxhash.c")
+
 set(SrcImgui "Source/ThirdParty/imgui/imgui_demo.cpp" "Source/ThirdParty/imgui/imgui_tables.cpp" 
              "Source/ThirdParty/imgui/imgui_draw.cpp" "Source/ThirdParty/imgui/imgui_widgets.cpp" 
              "Source/ThirdParty/imgui/imgui.cpp" "Source/ThirdParty/imgui/backends/imgui_impl_sdl3.cpp")

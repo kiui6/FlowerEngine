@@ -72,7 +72,9 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
 
     // Perform State Changes
     BeginGPULabel(cmd, "State Changes");
-    // ...
+    for(const auto& updateObj : renderView.m_stateUpdates) {
+        m_renderPasses[(uint32_t)updateObj->GetRenderPassType()]->UpdateState(updateObj.get());
+    }
     EndGPULabel(cmd);
 
     // Execute OnDemand Tasks
@@ -106,6 +108,8 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     frameCtx.cmd = cmd;
     frameCtx.deltaTime = deltaTime;
     frameCtx.swapchainTexture = swapchainTexture;
+    frameCtx.swapchainWidth = swapchainTextureW;
+    frameCtx.swapchainHeight = swapchainTextureH;
     frameCtx.previousPass = nullptr;
     frameCtx.resources = &m_compiledRes;
 
