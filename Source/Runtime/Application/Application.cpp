@@ -5,7 +5,7 @@
 #include <cassert>
 
 #include <Service/Service.h>
-#include <Config/ConfigManager.h>
+#include <Config/Config.h>
 
 #include <Platform/Platform.h>
 

@@ -7,6 +7,8 @@
 #include <Graphics/RenderPasses/LightingRenderPass.h>
 #include <Graphics/RenderPasses/UpscaleRenderPass.h>
 
+#include "RenderUtils.h"
+
 void RenderEngine::Initialize(SDL_Window* window)
 {
     m_ctx.window = window;
@@ -45,10 +47,10 @@ void RenderEngine::Initialize(SDL_Window* window)
     SDL_SetGPUSwapchainParameters(m_ctx.device, m_ctx.window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC);
 
     // Initialize Render Passes
-    m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>();
-    m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>();
-    m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>();
-    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>();
+    m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx);
 
     LOG(Log, LogRender, "Render Engine initialization complete");
 }
@@ -69,22 +71,22 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     }
 
     // Perform State Changes
-    SDL_PushGPUDebugGroup(cmd, "State Changes");
+    BeginGPULabel(cmd, "State Changes");
     // ...
-    SDL_PopGPUDebugGroup(cmd);
+    EndGPULabel(cmd);
 
     // Execute OnDemand Tasks
     {
         // Lock OnDemand Task mutex so that no thread write to queue before we're finished
         std::unique_lock lock(m_onDemandMtx);
-        SDL_PushGPUDebugGroup(cmd, "On Demand Tasks");
+        BeginGPULabel(cmd, "On Demand Tasks");
         auto it = m_onDemandTasks.begin();
         while(it != m_onDemandTasks.end()) {
             (*it)->Execute();            
             it++;
         }
         m_onDemandTasks.clear();
-        SDL_PopGPUDebugGroup(cmd);
+        EndGPULabel(cmd);
     }
 
     // Sort & Compile elements
@@ -98,7 +100,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     }
 
     // Render Frame
-    SDL_PushGPUDebugGroup(cmd, "Frame");
+    BeginGPULabel(cmd, "Frame");
 
     FrameContext frameCtx;
     frameCtx.cmd = cmd;
@@ -112,7 +114,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         frameCtx.previousPass = m_renderPasses[passIdx].get();
     }
 
-    SDL_PopGPUDebugGroup(cmd);
+    EndGPULabel(cmd);
 
     SDL_SubmitGPUCommandBuffer(cmd);
 

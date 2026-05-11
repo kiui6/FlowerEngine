@@ -1,11 +1,11 @@
 #include "GarbageCollector.h"
 
-#include <Config/ConfigManager.h>
+#include <Config/Config.h>
 
 #include <Log/Log.h>
 #include <ranges>
 
-bool GarbageCollector::bIsInitialized = RegisterService<GarbageCollector>({ConfigManager::GetStaticName()});
+bool GarbageCollector::bIsInitialized = RegisterService<GarbageCollector>({Config::GetStaticName()});
 
 void GarbageCollector::Mark(ReferenceCounter *refCount)
 {

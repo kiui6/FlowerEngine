@@ -69,7 +69,7 @@ set(SrcRecord "Source/Runtime/Record/Record.cpp" "Source/Runtime/Record/RecordLi
 
 set(SrcAssets "Source/Runtime/Assets/Entity/EntityTemplate/EntityTemplateCompiler.cpp" "Source/Runtime/Assets/Entity/ComponentTemplate/EntityComponentTemplateLibrary.cpp")
 
-set(SrcConfig "Source/Runtime/Config/ConfigManager.cpp")
+set(SrcConfig "Source/Runtime/Config/Config.cpp")
 
 set(SrcBlackboard "Source/Runtime/Blackboard/Blackboard.cpp")
 

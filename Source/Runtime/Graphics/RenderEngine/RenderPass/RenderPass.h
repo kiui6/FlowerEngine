@@ -2,6 +2,7 @@
 
 #include <Graphics/RenderEngine/ResourceCompiler.h>
 #include <Graphics/RenderEngine/FrameContext.h>
+#include <Graphics/RenderEngine/RenderUtils.h>
 
 #include <SDL3/SDL_gpu.h>
 

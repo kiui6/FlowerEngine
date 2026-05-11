@@ -1,8 +1,16 @@
 #include "UpscaleRenderPass.h"
 
-void UpscaleRenderPass::Render(FrameContext& ctx)
+UpscaleRenderPass::UpscaleRenderPass(GPUContext &context)
 {
-    SDL_PushGPUDebugGroup(ctx.cmd, "Upscale");
+}
+
+UpscaleRenderPass::~UpscaleRenderPass()
+{
+}
+
+void UpscaleRenderPass::Render(FrameContext &ctx)
+{
+    BeginGPULabel(ctx.cmd, "Upscale");
 
         SDL_GPUColorTargetInfo colorTarget = {
             .texture     = ctx.swapchainTexture,
@@ -16,5 +24,5 @@ void UpscaleRenderPass::Render(FrameContext& ctx)
     SDL_GPURenderPass* pass = SDL_BeginGPURenderPass(ctx.cmd, &colorTarget, 1, NULL);
     SDL_EndGPURenderPass(pass);
 
-    SDL_PopGPUDebugGroup(ctx.cmd);
+    EndGPULabel(ctx.cmd);
 }

@@ -2,7 +2,7 @@
 
 #include <Platform/Platform.h>
 #include <Async/AsyncService.h>
-#include <Config/ConfigManager.h>
+#include <Config/Config.h>
 
 #include "Formats/MasterFile/MasterFile.h"
 #include "Formats/PluginFile/PluginFile.h"
@@ -10,7 +10,7 @@
 #include <SDL3/SDL.h>
 #include <Log/Log.h>
 
-bool DataManager::bIsInitialized = RegisterService<DataManager>({Platform::GetStaticName(), AsyncService::GetStaticName(), ConfigManager::GetStaticName()});
+bool DataManager::bIsInitialized = RegisterService<DataManager>({Platform::GetStaticName(), AsyncService::GetStaticName(), Config::GetStaticName()});
 
 void DataManager::Initialize()
 {

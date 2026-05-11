@@ -1,8 +1,8 @@
 #include "AsyncService.h"
 
-#include <Config/ConfigManager.h>
+#include <Config/Config.h>
 
-bool AsyncService::bIsInitialized = RegisterService<AsyncService>({ConfigManager::GetStaticName()});
+bool AsyncService::bIsInitialized = RegisterService<AsyncService>({Config::GetStaticName()});
 
 AsyncService::AsyncService()
     : m_taskPool(4)

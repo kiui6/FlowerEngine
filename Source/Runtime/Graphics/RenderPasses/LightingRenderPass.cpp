@@ -1,8 +1,16 @@
 #include "LightingRenderPass.h"
 
-void LightingRenderPass::Render(FrameContext& ctx)
+LightingRenderPass::LightingRenderPass(GPUContext &context)
 {
-    SDL_PushGPUDebugGroup(ctx.cmd, "Lighting");
+}
 
-    SDL_PopGPUDebugGroup(ctx.cmd);
+LightingRenderPass::~LightingRenderPass()
+{
+}
+
+void LightingRenderPass::Render(FrameContext &ctx)
+{
+    BeginGPULabel(ctx.cmd, "Lighting");
+
+    EndGPULabel(ctx.cmd);
 }
