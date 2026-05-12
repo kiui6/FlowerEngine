@@ -69,7 +69,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         m_onDemandTasks.clear();
     }
 
-    // Assemble & Compile elements
+    // Assemble elements
     {
         RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
         for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
@@ -77,14 +77,20 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
                 m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.get(), rendElement.get());
             }
         }
-
-        // After all data is assembled into batches, it can be compiled into GPU resources
-        for(const auto& pass : m_renderPasses) {
-            pass->Compile();
-        }
     }
 
     SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(m_ctx.device);
+
+    // After all data is assembled into batches, it can be compiled into GPU resources
+    BeginGPULabel(cmd, "Compilation");
+    SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
+
+    for(const auto& pass : m_renderPasses) {
+        pass->Compile(cmd, copyPass);
+    }
+
+    SDL_EndGPUCopyPass(copyPass);
+    EndGPULabel(cmd);
 
     SDL_GPUTexture *swapchainTexture = NULL;
     uint32_t swapchainTextureW, swapchainTextureH;

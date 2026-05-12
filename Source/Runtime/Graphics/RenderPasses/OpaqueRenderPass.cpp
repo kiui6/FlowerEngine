@@ -5,6 +5,7 @@
 #include <Config/Config.h>
 
 #include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
+#include <Graphics/RenderEngine/RenderUtils.h>
 
 #include <Log/Log.h>
 
@@ -65,16 +66,11 @@ void OpaqueRenderPass::Assemble(RenderResourceCompiler &resourceCompiler, Render
     }
 }
 
-void OpaqueRenderPass::Compile()
+void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass)
 {
-    SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(m_gpu.device);
-    
-    SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
-    if(!copyPass) {
-        LOG(Assert, LogOpaqueRenderPass, "Failed to begin copy pass");
-        return;
-    }
+    BeginGPULabel(cmd, "Opaque");
 
+    BeginGPULabel(cmd, "Sprites");
     for(auto& [atlasId, sprites] : m_opaqueSpriteElements) {
         // Determine if we need to grow uniform buffer for opaque sprite elements
         if(sprites.bufferSize[m_gpu.currentFrame] < (sprites.assembly.size() * sprites.elementSize)) {
@@ -97,11 +93,6 @@ void OpaqueRenderPass::Compile()
         memcpy(mapped, sprites.assembly.data(), sprites.assembly.size() * sprites.elementSize);
         SDL_UnmapGPUTransferBuffer(m_gpu.device, sprites.transferBuffer[m_gpu.currentFrame]);
 
-        if(!cmd) {
-            LOG(Assert, LogOpaqueRenderPass, "Failed to acquire command buffer");
-            return;
-        }
-
         const SDL_GPUTransferBufferLocation tbBufferLocation = {
             .transfer_buffer = sprites.transferBuffer[m_gpu.currentFrame],
             .offset = 0
@@ -116,9 +107,9 @@ void OpaqueRenderPass::Compile()
 
         sprites.assembly.clear();
     }
+    EndGPULabel(cmd); // Sprites
 
-    SDL_EndGPUCopyPass(copyPass);
-    SDL_SubmitGPUCommandBuffer(cmd); 
+    EndGPULabel(cmd); // Opaque
 }
 
 void OpaqueRenderPass::Render(FrameContext &ctx)
