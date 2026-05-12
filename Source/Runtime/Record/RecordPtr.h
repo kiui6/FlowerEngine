@@ -46,7 +46,7 @@ public:
     }
 
     // Copy constructor
-    RecordPtr(const RecordPtr& other) : m_record(other.m_record) {
+    RecordPtr(const RecordPtr& other) : m_id(other.m_id), m_record(other.m_record) {
         if (m_record) ReferenceCounterPtr::AddRef(m_record);
     }
 
@@ -62,8 +62,10 @@ public:
     }
 
     // Move constructor
-    RecordPtr(RecordPtr&& other) noexcept : m_id(other.m_id), m_record(other.m_record) {
-        other.m_record = m_record;
+    RecordPtr(RecordPtr&& other) noexcept {
+        m_id = other.m_id;
+        m_record = other.m_record;
+        other.m_record = nullptr;
         other.m_id = INVALID_RECORD;
     }
     
@@ -109,8 +111,6 @@ public:
         return WeakRecordPtr<RecordT>(m_id, m_record);
     }
 
-    // Checks if this record is registered within RecordLibrary
-    bool Exists() const { return false; }
     // Checks if this record's instance is bound to the RecordPtr
     bool IsBound() const { return m_record != nullptr; }
 };

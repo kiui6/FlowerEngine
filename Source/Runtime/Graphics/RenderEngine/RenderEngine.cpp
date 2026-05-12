@@ -57,6 +57,28 @@ void RenderEngine::Initialize(SDL_Window* window)
 
 void RenderEngine::Render(float deltaTime, RenderView &renderView)
 {
+    // Execute OnDemand Tasks
+    {
+        // Lock OnDemand Task mutex so that no thread write to queue before we're finished
+        std::unique_lock lock(m_onDemandMtx);
+        auto it = m_onDemandTasks.begin();
+        while(it != m_onDemandTasks.end()) {
+            (*it)->Execute();            
+            it++;
+        }
+        m_onDemandTasks.clear();
+    }
+
+    // Sort & Compile elements
+    {
+        RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
+        for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
+            for(const auto& rendElement : rendObject->GetElements()) {
+                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
+            }
+        }
+    }
+
     SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(m_ctx.device);
 
     SDL_GPUTexture *swapchainTexture = NULL;
@@ -77,36 +99,13 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     }
     EndGPULabel(cmd);
 
-    // Execute OnDemand Tasks
-    {
-        // Lock OnDemand Task mutex so that no thread write to queue before we're finished
-        std::unique_lock lock(m_onDemandMtx);
-        BeginGPULabel(cmd, "On Demand Tasks");
-        auto it = m_onDemandTasks.begin();
-        while(it != m_onDemandTasks.end()) {
-            (*it)->Execute();            
-            it++;
-        }
-        m_onDemandTasks.clear();
-        EndGPULabel(cmd);
-    }
-
-    // Sort & Compile elements
-    {
-        RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
-        for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
-            for(const auto& rendElement : rendObject->GetElements()) {
-                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
-            }
-        }
-    }
-
     // Render Frame
     BeginGPULabel(cmd, "Frame");
 
     FrameContext frameCtx;
     frameCtx.cmd = cmd;
     frameCtx.deltaTime = deltaTime;
+    frameCtx.frameIndex = m_currentFrame;
     frameCtx.swapchainTexture = swapchainTexture;
     frameCtx.swapchainWidth = swapchainTextureW;
     frameCtx.swapchainHeight = swapchainTextureH;
@@ -126,4 +125,6 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
 
     // Cleanup render view after frame is rendered
     renderView.Reset();
+
+    m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
 }

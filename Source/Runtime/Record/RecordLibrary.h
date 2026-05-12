@@ -148,13 +148,11 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
     T* record = new T();
     record->SetID(id);
 
-    RecordPtr<T> recPtr(id, record);
-
     m_records.emplace(id, std::unique_ptr<Record>(record));
 
     LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
 
-    return recPtr;
+    return RecordPtr<T>(id, record);
 }
 
 template <RecordClass T>

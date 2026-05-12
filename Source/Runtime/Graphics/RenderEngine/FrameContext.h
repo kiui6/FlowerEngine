@@ -12,6 +12,7 @@ class RenderPass;
 struct FrameContext {
     SDL_GPUCommandBuffer* cmd;
     float deltaTime = 0.0f;
+    uint8_t frameIndex = 0;
     SDL_GPUTexture* swapchainTexture;
     uint32_t swapchainWidth, swapchainHeight;
     CompiledRenderResources* resources;

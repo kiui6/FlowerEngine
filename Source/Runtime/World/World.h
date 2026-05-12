@@ -21,15 +21,15 @@ class World
     std::unordered_map<RecordID, std::unique_ptr<Actor>> m_staticActors;
     std::unordered_map<RecordID, std::unique_ptr<Actor>> m_dynamicActors;
     std::vector<WorldChunk> m_chunks;
-    std::string m_name;
-
+    
     RecordPtr<WorldRecord> m_worldRef;
 
     Quadtree<ActorSpatialInstance> m_quadtree;
 public:
+    World(const RecordPtr<WorldRecord>& worldRec) : m_worldRef(worldRec) {}
+    World(RecordPtr<WorldRecord>&& worldRec) : m_worldRef(worldRec) {}
 
-    std::string& GetName() {return m_name;}
-    void SetName(std::string_view newName) {m_name = newName;}
+    std::string& GetName() {return m_worldRef->DisplayName;}
 
     // Gets called first when world's loaded.
     // Creates Player Controller and other default actors

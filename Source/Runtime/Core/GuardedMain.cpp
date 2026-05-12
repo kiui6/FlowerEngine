@@ -35,7 +35,11 @@ int GuardedMain(int argc, char* argv[])
     refRec->Base = atlasRec->GetID();
     refRec->IsDynamic = true;
 
-    std::unique_ptr<World> myWorld = std::make_unique<World>();
+    RecordPtr<WorldRecord> worldRec = GetService<RecordLibrary>()->CreateRecord<WorldRecord>();
+    worldRec->EditorID = "TestWorld";
+    worldRec->DisplayName = "Test World";
+
+    std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 
     ActorInstantiateInfo acinfo1{};
     Actor* act1 = myWorld->InstantiateActor(refRec.Get(), acinfo1);

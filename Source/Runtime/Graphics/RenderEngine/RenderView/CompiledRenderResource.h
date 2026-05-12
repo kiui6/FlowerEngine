@@ -2,8 +2,13 @@
 
 #include "Texture2DComponents.h"
 
-class CompiledRenderResource {};
+#include <SDL3/SDL_gpu.h>
 
-class CompiledTexture2DResource : public CompiledRenderResource
+struct CompiledRenderResource {};
+
+struct CompiledTexture2DResource : public CompiledRenderResource
 {
+    uint32_t width, height;
+    SDL_GPUTextureFormat format;
+    SDL_GPUTexture* texture;
 };

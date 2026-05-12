@@ -17,7 +17,7 @@ Texture2DAsset::Texture2DAsset(std::string_view path, DataView view)
     int w, h, channels;
 
     m_data = std::unique_ptr<unsigned char, decltype(&stbi_image_free)>(
-        stbi_load_from_memory(inputBuffer, view.size(), &w, &h, &channels, 0),
+        stbi_load_from_memory(inputBuffer, view.size(), &w, &h, &channels, /*TODO: Maybe make another ways of texture conversion*/4),
         &stbi_image_free);
     if(!m_data) {
         LOG(Error, LogTexture2DAsset, "Failed to read Texture 2D asset: failed to parse file");
@@ -26,7 +26,8 @@ Texture2DAsset::Texture2DAsset(std::string_view path, DataView view)
 
     m_width = static_cast<uint16_t>(w);
     m_height = static_cast<uint16_t>(h);
-    m_channels = static_cast<uint8_t>(channels);
+    // TODO: Need better conversion handling instead in the future
+    m_channels = 4;
 
-    m_dataSize = static_cast<size_t>(w) * h * channels;
+    m_dataSize = static_cast<size_t>(w) * h * m_channels;
 }

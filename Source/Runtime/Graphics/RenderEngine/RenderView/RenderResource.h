@@ -19,6 +19,8 @@ struct RenderResource {
 protected:
     RenderResourceType type;
     std::weak_ptr<CompiledRenderResource> m_compiledResource;
+
+    friend class RenderResourceCompiler;
 };
 
 struct VertexBufferResource : public RenderResource {

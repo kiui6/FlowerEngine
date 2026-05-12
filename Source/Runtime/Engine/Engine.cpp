@@ -4,6 +4,7 @@
 #include <Log/Log.h>
 
 #include <GarbageCollector/GarbageCollector.h>
+#include <Record/RecordLibrary.h>
 
 void Engine::InternalTravel()
 {
@@ -23,7 +24,7 @@ void Engine::InternalTravel()
 #   endif
     EngineDelegates::OnWorldLoad.Broadcast(m_world.get());
 
-    LOGF(Log, LogEngine, "Traveled to world: %s.", m_world->GetName().c_str());
+    LOGF(Log, LogEngine, "Traveled to world: \"%s\"", m_world->GetName().c_str());
 
     m_travelWorld = nullptr;
 }
@@ -39,6 +40,17 @@ Engine::Engine()
 void Engine::TravelTo(std::unique_ptr<World> travelWorld)
 {
     m_travelWorld = std::move(travelWorld);
+}
+
+void Engine::TravelTo(RecordID travelWorldId)
+{
+    RecordPtr<WorldRecord> worldRecord = GetService<RecordLibrary>()->LoadRecord<WorldRecord>(travelWorldId);
+    if(!worldRecord.IsBound()) {
+        LOGF(Error, LogEngine, "Failed to travel to world: ID[0x%016llX] is invalid for WorldRecord", travelWorldId);
+        return;
+    }
+
+    m_travelWorld = std::make_unique<World>(std::move(worldRecord));
 }
 
 void Engine::Tick(float DeltaTime)

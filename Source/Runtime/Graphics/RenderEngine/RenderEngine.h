@@ -18,10 +18,11 @@
 
 #include "GPUContext.h"
 #include "ResourceCompiler.h"
+#include "RenderUtils.h"
 
 class RenderEngine
 {
-    std::array<RenderView, 2> m_renderViews;
+    std::array<RenderView, FRAMES_IN_FLIGHT> m_renderViews;
     uint8_t m_currentFrame = 0;
 
     SDL_GPUCommandBuffer *m_renderBuffer, *m_onDemandBuffer;

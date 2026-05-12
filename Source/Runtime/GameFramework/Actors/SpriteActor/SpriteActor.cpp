@@ -48,6 +48,8 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         if(m_albedoRenderResource.GetCompiledResource().expired()) {
             m_albedoRenderResource.components = Texture2DComponents::R8G8B8A8_UNORM;
             m_albedoRenderResource.id = m_albedo.Get()->GetID();
+            m_albedoRenderResource.width = m_albedoData.Get()->GetWidth();
+            m_albedoRenderResource.height = m_albedoData.Get()->GetHeight();
             m_albedoRenderResource.data = m_albedoData.Get()->GetTextureData();
             m_albedoRenderResource.dataSize = m_albedoData.Get()->GetTextureDataSize();
             m_albedoRenderResource.isDirty = true;
@@ -68,6 +70,8 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
             
             m_reliefRenderResource.components = Texture2DComponents::R16G16_UINT;
             m_reliefRenderResource.id = m_autogenReliefID;
+            m_reliefRenderResource.width = m_reliefData.Get()->GetWidth();
+            m_reliefRenderResource.height = m_reliefData.Get()->GetHeight();
             m_reliefRenderResource.data = {};
             m_reliefRenderResource.isDirty = true;
 
@@ -93,6 +97,8 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         if(m_reliefRenderResource.GetCompiledResource().expired()) {
             m_reliefRenderResource.components = Texture2DComponents::R16G16_UINT;
             m_reliefRenderResource.id = m_relief.Get()->GetID();
+            m_reliefRenderResource.width = m_reliefData.Get()->GetWidth();
+            m_reliefRenderResource.height = m_reliefData.Get()->GetHeight();
             m_reliefRenderResource.data = m_reliefData.Get()->GetTextureData();
             m_reliefRenderResource.isDirty = true;
         }

@@ -4,6 +4,8 @@
 
 #include <Config/Config.h>
 
+#include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
+
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context)
     : m_gpu(context)
 {
@@ -23,6 +25,21 @@ OpaqueRenderPass::OpaqueRenderPass(GPUContext& context)
 OpaqueRenderPass::~OpaqueRenderPass()
 {
     SDL_ReleaseGPUTexture(m_gpu.device, m_albedo);
+}
+
+void OpaqueRenderPass::Compile(RenderResourceCompiler &resourceCompiler, RenderObject *object, RenderElement *element)
+{
+    switch(element->GetRenderElementType()) {
+        case RenderElementType::Sprite:
+            if(!static_cast<OpaqueSpriteRenderElement*>(element)->texture) {
+                return;
+            }
+
+            resourceCompiler.CompileTexture2D(*(static_cast<OpaqueSpriteRenderElement*>(element)->texture));
+            break;
+        default:
+            return;
+    }
 }
 
 void OpaqueRenderPass::Render(FrameContext &ctx)
