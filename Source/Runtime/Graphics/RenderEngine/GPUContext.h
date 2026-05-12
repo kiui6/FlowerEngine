@@ -7,5 +7,6 @@ struct GPUContext {
     SDL_GPUDevice* device;
     SDL_GPUSwapchainComposition swapchainComposition;
     SDL_GPUPresentMode presentMode;
+    uint8_t currentFrame = 0;
     bool vsync;
 };

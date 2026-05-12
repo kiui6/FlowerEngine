@@ -23,7 +23,6 @@
 class RenderEngine
 {
     std::array<RenderView, FRAMES_IN_FLIGHT> m_renderViews;
-    uint8_t m_currentFrame = 0;
 
     SDL_GPUCommandBuffer *m_renderBuffer, *m_onDemandBuffer;
 
@@ -36,7 +35,7 @@ class RenderEngine
 
     CompiledRenderResources m_compiledRes;
 public:
-    RenderView& GetFrameRenderView() { return m_renderViews[(m_currentFrame + 1) % m_renderViews.size()];}
+    RenderView& GetFrameRenderView() { return m_renderViews[(m_ctx.currentFrame + 1) % m_renderViews.size()];}
 
     void Initialize(SDL_Window* window);
 

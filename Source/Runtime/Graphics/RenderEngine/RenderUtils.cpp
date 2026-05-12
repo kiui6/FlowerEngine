@@ -12,6 +12,10 @@ SDL_GPUBuffer *RenderUtils::CreateBuffer(SDL_GPUDevice *device, SDL_GPUBufferUsa
         LOG(Assert, LogCreateBuffer, "Failed to create buffer");
         return nullptr;
     }
+
+    if(!data) { 
+        return buffer;
+    }
     
     SDL_GPUTransferBufferCreateInfo tbInfo = {};
     tbInfo.size = size;

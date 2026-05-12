@@ -63,19 +63,24 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         std::unique_lock lock(m_onDemandMtx);
         auto it = m_onDemandTasks.begin();
         while(it != m_onDemandTasks.end()) {
-            (*it)->Execute();            
+            (*it)->Execute();
             it++;
         }
         m_onDemandTasks.clear();
     }
 
-    // Sort & Compile elements
+    // Assemble & Compile elements
     {
         RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
         for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
             for(const auto& rendElement : rendObject->GetElements()) {
-                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
+                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.get(), rendElement.get());
             }
+        }
+
+        // After all data is assembled into batches, it can be compiled into GPU resources
+        for(const auto& pass : m_renderPasses) {
+            pass->Compile();
         }
     }
 
@@ -105,7 +110,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     FrameContext frameCtx;
     frameCtx.cmd = cmd;
     frameCtx.deltaTime = deltaTime;
-    frameCtx.frameIndex = m_currentFrame;
+    frameCtx.frameIndex = m_ctx.currentFrame;
     frameCtx.swapchainTexture = swapchainTexture;
     frameCtx.swapchainWidth = swapchainTextureW;
     frameCtx.swapchainHeight = swapchainTextureH;
@@ -126,5 +131,5 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // Cleanup render view after frame is rendered
     renderView.Reset();
 
-    m_currentFrame = (m_currentFrame + 1) % FRAMES_IN_FLIGHT;
+    m_ctx.currentFrame = (m_ctx.currentFrame + 1) % FRAMES_IN_FLIGHT;
 }
