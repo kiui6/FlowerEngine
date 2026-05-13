@@ -61,6 +61,7 @@ RecordPtr<Record> RecordLibrary::GetRecordOfType(RecordID recordID, ID32 type)
 void RecordLibrary::UnloadRecord(RecordID recordID)
 {
     std::unique_lock lock(m_mtx);
+    m_records.erase(m_records.find(recordID));
 }
 
 bool RecordLibrary::IsValidRecord(RecordID recordID) const

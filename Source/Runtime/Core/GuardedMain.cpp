@@ -8,13 +8,19 @@
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 
+class DummyDebugWindow : public DebugWindow {
+protected:
+    virtual void OnRender() override {}
+};
+
 int GuardedMain(int argc, char* argv[])
 {
     Application application;
 
     application.Initialize();
 
-    LOG(Log, LogGuardedMain, "Starting application life cycle");
+    // TODO: Remove test window
+    application.SetDebugWindow(new DummyDebugWindow());
 
     // Test
     //AssetPtr<RawAsset> asset = GetService<AssetLibrary>()->LoadRawAsset("./Data/Image.png");
@@ -51,8 +57,15 @@ int GuardedMain(int argc, char* argv[])
     Actor* act2 = myWorld->SpawnActor(acinfo2);
 
     application.GetEngine()->TravelTo(std::move(myWorld));
+
+    {
+    RecordPtr<TextureRecord> gcRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
+    }
+
     // This should trigger GC
     GetService<GarbageCollector>()->RequestGCPass();
+
+    LOG(Log, LogGuardedMain, "Starting application life cycle");
 
     application.StartLifecycle();
 

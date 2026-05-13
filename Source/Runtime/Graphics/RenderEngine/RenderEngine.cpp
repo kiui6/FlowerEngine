@@ -2,10 +2,11 @@
 
 #include <Log/Log.h>
 
-#include <Graphics/RenderPasses/OpaqueRenderPass.h>
+#include <Graphics/RenderPasses/OpaqueRenderPass/OpaqueRenderPass.h>
 #include <Graphics/RenderPasses/ReliefRenderPass.h>
 #include <Graphics/RenderPasses/LightingRenderPass.h>
 #include <Graphics/RenderPasses/UpscaleRenderPass.h>
+#include <Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.h>
 
 #include "RenderUtils.h"
 
@@ -51,6 +52,7 @@ void RenderEngine::Initialize(SDL_Window* window)
     m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>(m_ctx);
     m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>(m_ctx);
     m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::DebugUI] = std::make_unique<DebugUIRenderPass>(m_ctx);
 
     LOG(Log, LogRender, "Render Engine initialization complete");
 }
@@ -106,7 +108,9 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // Perform State Changes
     BeginGPULabel(cmd, "State Changes");
     for(const auto& updateObj : renderView.m_stateUpdates) {
-        m_renderPasses[(uint32_t)updateObj->GetRenderPassType()]->UpdateState(updateObj.get());
+        for(RenderPassType passType : updateObj->GetRenderPassTypes()) {
+            m_renderPasses[(uint32_t)passType]->UpdateState(updateObj.get());
+        }
     }
     EndGPULabel(cmd);
 

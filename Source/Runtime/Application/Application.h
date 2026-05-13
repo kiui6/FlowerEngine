@@ -13,6 +13,8 @@
 #include <Window/Window.h>
 #include <Engine/Engine.h>
 
+#include <Debug/DebugWindow.h>
+
 class Application
 {
     static Application* Singleton;
@@ -21,6 +23,8 @@ protected:
 
     std::unique_ptr<RenderEngine> m_render;
     std::unique_ptr<Engine> m_engine;
+    std::shared_ptr<DebugWindow> m_dbgWindow;
+    bool m_dbgWindowUpdated = false;
 
     std::atomic_bool m_bRunning = false;
 
@@ -33,6 +37,8 @@ public:
 
     Engine* GetEngine() {return m_engine.get();}
     RenderEngine* GetRenderEngine() {return m_render.get();}
+
+    void SetDebugWindow(DebugWindow* window);
 
     void Initialize();
 

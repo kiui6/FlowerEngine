@@ -1,0 +1,5 @@
+#ifdef EDITOR
+IDI_ICON1 ICON "editor.ico"
+#else
+IDI_ICON1 ICON "game.ico"
+#endif 

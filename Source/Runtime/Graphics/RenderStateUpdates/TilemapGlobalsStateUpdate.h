@@ -4,5 +4,5 @@
 
 struct TilemapGlobalsStateUpdate : public RenderStateUpdate
 {
-    TilemapGlobalsStateUpdate() : RenderStateUpdate(RenderStateUpdateType::TilemapGlobals) {}
+    TilemapGlobalsStateUpdate() : RenderStateUpdate({RenderPassType::Opaque, RenderPassType::Relief}, RenderStateUpdateType::TilemapGlobals) {}
 };

@@ -9,6 +9,8 @@
 
 #include <Platform/Platform.h>
 
+#include <Graphics/RenderStateUpdates/DebugUIStateUpdate.h>
+
 //#include <Asset/AssetLoader.h>
 //#include <Record/ObjectLibrary.h>
 //#include <Thread/ThreadManager.h>
@@ -35,6 +37,12 @@ Application::~Application()
     }
 
     ServiceProvider::Get().Deinitialize();
+}
+
+void Application::SetDebugWindow(DebugWindow *window)
+{
+    m_dbgWindow = std::shared_ptr<DebugWindow>(window);
+    m_dbgWindowUpdated = true;
 }
 
 void Application::Initialize()
@@ -102,6 +110,12 @@ void Application::StartLifecycle()
         m_engine->Tick(m_deltaTime);
         
         RenderView& renderView = m_render->GetFrameRenderView();
+        // Record state changes
+        if(m_dbgWindowUpdated) {
+            renderView.SubmitStateUpdate(new DebugUIStateUpdate(m_dbgWindow));
+            m_dbgWindowUpdated = false;
+        }
+        // Record from engine
         m_engine->RecordRenderView(renderView);
         m_render->Render(m_deltaTime, renderView);
 

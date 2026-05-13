@@ -7,13 +7,20 @@
 
 #include <unordered_map>
 
+#include "OpaqueSpriteElementBatch.h"
+
 class OpaqueRenderPass : public RenderPass
 {
     SDL_GPUTexture* m_albedo;
     GPUContext& m_gpu;
 
+    SDL_GPUShader* m_opaqueSpritePipelineVertexShader;
+    SDL_GPUShader* m_opaqueSpritePipelineFragmentShader;
+    SDL_GPUGraphicsPipeline* m_opaqueSpritePipeline;
     SDL_GPUSampler* m_opaqueSpriteSampler;
-    std::unordered_map<uint64_t, CompiledOpaqueSpriteRenderElement> m_opaqueSpriteElements;
+
+    std::unordered_map<uint64_t, OpaqueSpriteElementBatch> m_staticOpaqueSpriteElements;
+    std::unordered_map<uint64_t, OpaqueSpriteElementBatch> m_dynamicOpaqueSpriteElements;
 public:
     OpaqueRenderPass(GPUContext& context);
     ~OpaqueRenderPass();

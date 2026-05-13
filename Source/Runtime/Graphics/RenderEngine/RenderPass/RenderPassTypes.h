@@ -10,6 +10,7 @@ enum class RenderPassType : uint32_t {
 //    Weather,
 //    PostProcess,
     Upscale,
+    DebugUI,
 //    UI,
     MAX
 };

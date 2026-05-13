@@ -3,6 +3,7 @@
 #include <Config/Config.h>
 
 #include <Log/Log.h>
+#include <Config/Config.h>
 #include <ranges>
 
 bool GarbageCollector::bIsInitialized = RegisterService<GarbageCollector>({Config::GetStaticName()});
@@ -39,7 +40,7 @@ void GarbageCollector::RunGCPass(bool unrestricted)
         m_unloadCandidates.clear();
     }    
 
-    const auto maxMicrosecondsInGC = std::chrono::microseconds(/*TODO: Load maxGCTime from config*/500);
+    const auto maxMicrosecondsInGC = std::chrono::microseconds(GetService<Config>()->GetNamespace("Game").GetInt("Engine.GC.MaxTimeInGC", 500));
     auto startTime = std::chrono::steady_clock::now();
 
     // Main GC loop
@@ -57,7 +58,7 @@ void GarbageCollector::RunGCPass(bool unrestricted)
             auto elapsedTime = std::chrono::steady_clock::now() - startTime;
             if (elapsedTime >= maxMicrosecondsInGC) {
                 // Break loop if time budget is exhausted
-                LOGF(Log, LogGC, "GC pass ended in %lldus", std::chrono::duration_cast<std::chrono::microseconds>(elapsedTime).count());
+                LOGF(Log, LogGC, "GC pass ended forcefully in %lldus", std::chrono::duration_cast<std::chrono::microseconds>(elapsedTime).count());
                 break; 
             }
         }

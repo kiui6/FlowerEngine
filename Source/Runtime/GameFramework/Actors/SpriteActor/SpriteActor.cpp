@@ -34,7 +34,7 @@ void SpriteActor::Initialize()
 
 void SpriteActor::RecordRenderView(RenderView &renderView)
 {
-    std::unique_ptr<RenderObject> ro = renderView.AllocateRenderObject();
+    RenderObject* ro = renderView.GetDynamicRenderObject(m_ref.GetID());
 
     // Opaque Sprite Element
     if(m_albedo.IsBound() && m_albedoData.IsBound()) {
@@ -105,6 +105,4 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
 
         relief->texture = &m_reliefRenderResource;  
     }
-
-    renderView.AddDynamicRenderObject(m_ref.GetID(), std::move(ro));
 }

@@ -63,6 +63,8 @@ void Engine::Tick(float DeltaTime)
         m_world->Tick(DeltaTime);
     }
 
+    EngineDelegates::OnEngineTick.Broadcast(DeltaTime);
+
     if(m_GC->IsGCPassRequested()) {
         m_GC->RunGCPass(m_GC->IsRequestedGCPassUnrestricted());
     }

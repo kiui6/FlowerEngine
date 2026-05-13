@@ -11,9 +11,12 @@ class RenderObject
 {
     glm::mat4x4 m_identityMatrix;
     std::vector<std::unique_ptr<RenderElement>> m_elements;
+    bool m_isStatic = false;
 public:
 
     void SetIdentityMatrix(glm::mat4x4&& matrix) { m_identityMatrix = matrix; }
+
+    void SetDynamic(bool isStatic) {m_isStatic = isStatic;}
 
     size_t GetElementsCount() const { return m_elements.size(); }
     std::vector<std::unique_ptr<RenderElement>>& GetElements() { return m_elements; }

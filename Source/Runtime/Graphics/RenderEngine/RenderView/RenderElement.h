@@ -5,7 +5,6 @@
 #include <concepts>
 
 #include "RenderResource.h"
-#include "CompiledRenderElement.h"
 #include "RenderElementTypes.h"
 
 #include <Graphics/RenderEngine/RenderPass/RenderPassTypes.h>

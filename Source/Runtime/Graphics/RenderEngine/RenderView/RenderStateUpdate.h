@@ -9,11 +9,11 @@
 
 struct RenderStateUpdate
 {
-    RenderStateUpdate(RenderPassType initPass, RenderStateUpdateType initType) : renderPass(initPass), type(initType) {}
+    RenderStateUpdate(std::vector<RenderPassType> initPasses, RenderStateUpdateType initType) : renderPasses(initPasses), type(initType) {}
 
-    inline RenderPassType GetRenderPassType() const {return renderPass;}
+    inline const std::vector<RenderPassType>& GetRenderPassTypes() const {return renderPasses;}
     inline RenderStateUpdateType GetUpdateType() const {return type;}
 protected:
-    RenderPassType renderPass;
+    std::vector<RenderPassType> renderPasses;
     RenderStateUpdateType type;
 };

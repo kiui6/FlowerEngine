@@ -13,32 +13,29 @@
 class RenderView
 {
     friend class RenderEngine;
+
+    struct StaticRenderObjectHandle {
+        std::shared_ptr<RenderObject> object;
+        bool referenced = false;
+    };
 protected:
     Float4x4 m_viewMatrix;
     Float4x4 m_projMatrix;
 
-    std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_staticRenderObjects;
+    std::unordered_map<uint64_t, StaticRenderObjectHandle> m_staticRenderObjects;
+    bool m_staticRenderObjectsDirty = false;
     std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
-    //std::vector<Lightstd::unique_ptr<RenderObject>> m_StaticLightRenderObjects;
-    //std::vector<Lightstd::unique_ptr<RenderObject>> m_DynamicLightRenderObjects;
 
     std::vector<std::unique_ptr<RenderStateUpdate>> m_stateUpdates;
 public:
+    RenderObject* GetDynamicRenderObject(uint64_t id);
 
-    //void AddStaticLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);
-    //void AddDynamicLight(Lightstd::unique_ptr<RenderObject> pLightRendObj);
-
-    void AddStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
-    void AddDynamicRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
-
-    void GetStaticRenderObject(uint64_t id);
-    void GetDynamicRenderObject(uint64_t id);
+    std::weak_ptr<RenderObject> GetStaticRenderObject(uint64_t id);
 
     void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
 
     void SubmitStateUpdate(RenderStateUpdate* stateUpdate);
 
-    std::unique_ptr<RenderObject> AllocateRenderObject();
 
     void Reset();
 };

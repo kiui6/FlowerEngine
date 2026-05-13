@@ -18,7 +18,7 @@ OpaqueRenderPass::OpaqueRenderPass(GPUContext& context)
     texInfo.type = SDL_GPU_TEXTURETYPE_2D;
     texInfo.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
     texInfo.width = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 320);
-    texInfo.height = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 240);
+    texInfo.height = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 180);
     texInfo.layer_count_or_depth = 1;
     texInfo.num_levels = 1;
     texInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
@@ -70,8 +70,16 @@ void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
 {
     BeginGPULabel(cmd, "Opaque");
 
-    BeginGPULabel(cmd, "Sprites");
-    for(auto& [atlasId, sprites] : m_opaqueSpriteElements) {
+    BeginGPULabel(cmd, "Static Sprites");
+    for(auto& [atlasId, sprites] : m_staticOpaqueSpriteElements) {
+        if(sprites.bIsDirty) {
+
+        }
+    }
+    EndGPULabel(cmd); // Static Sprites
+
+    BeginGPULabel(cmd, "Dynamic Sprites");
+    for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements) {
         // Determine if we need to grow uniform buffer for opaque sprite elements
         if(sprites.bufferSize[m_gpu.currentFrame] < (sprites.assembly.size() * sprites.elementSize)) {
             // Recreate buffer
@@ -107,7 +115,7 @@ void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
 
         sprites.assembly.clear();
     }
-    EndGPULabel(cmd); // Sprites
+    EndGPULabel(cmd); // Dynamic Sprites
 
     EndGPULabel(cmd); // Opaque
 }
@@ -132,7 +140,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     // Render sprites
     BeginGPULabel(ctx.cmd, "Sprites");
 
-    for(auto& [atlasId, sprites] : m_opaqueSpriteElements)
+    for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements)
     {
         SDL_GPUTextureSamplerBinding atlasBinding = {
             .texture =  ctx.resources->texture2D[atlasId]->texture,
@@ -152,11 +160,11 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
 
 void OpaqueRenderPass::AssembleOpaqueSpriteRenderElement(RenderResourceCompiler &resourceCompiler, RenderObject *object, OpaqueSpriteRenderElement *element)
 {
-    CompiledOpaqueSpriteRenderElement* compiled;
+    OpaqueSpriteElementBatch* compiled;
 
     // Check if element already exists for the atlas texture
-    auto it = m_opaqueSpriteElements.find(element->texture->id);
-    if(it != m_opaqueSpriteElements.end()) {
+    auto it = m_dynamicOpaqueSpriteElements.find(element->texture->id);
+    if(it != m_dynamicOpaqueSpriteElements.end()) {
         compiled = &it->second;
     } else {
         if(!element->texture) {
@@ -166,10 +174,10 @@ void OpaqueRenderPass::AssembleOpaqueSpriteRenderElement(RenderResourceCompiler 
     
         resourceCompiler.CompileTexture2D(*element->texture);
 
-        compiled = &m_opaqueSpriteElements.emplace(element->texture->id, CompiledOpaqueSpriteRenderElement{}).first->second;
+        compiled = &m_dynamicOpaqueSpriteElements.emplace(element->texture->id, OpaqueSpriteElementBatch{}).first->second;
     }
 
-    CompiledOpaqueSpriteRenderElement::GPUBufferData entry {
+    OpaqueSpriteElementBatch::GPUBufferData entry {
         .position = element->position,
         .depth = element->depth,
         .scale = element->scale,

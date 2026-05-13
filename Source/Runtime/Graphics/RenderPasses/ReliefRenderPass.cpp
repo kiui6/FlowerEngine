@@ -11,7 +11,7 @@ ReliefRenderPass::ReliefRenderPass(GPUContext &context)
     texInfo.type = SDL_GPU_TEXTURETYPE_2D;
     texInfo.format = SDL_GPU_TEXTUREFORMAT_R32G32_UINT;
     texInfo.width = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 320);
-    texInfo.height = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 240);
+    texInfo.height = config->GetNamespace("Game").GetInt("Render.PixelPerfect.CanvasWidth", 180);
     texInfo.layer_count_or_depth = 1;
     texInfo.num_levels = 1;
     texInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;

@@ -65,7 +65,7 @@ set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.
 
 set(SrcInput "Source/Runtime/Input/InputManager.cpp")
 
-set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp" "Source/Runtime/Engine/Tickable.cpp")
+set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp")
 
 set(SrcRecord "Source/Runtime/Record/Record.cpp" "Source/Runtime/Record/RecordLibrary.cpp" "Source/Runtime/Record/RecordPtr.cpp" )
 
@@ -104,10 +104,11 @@ set(SrcRender
     "Source/Runtime/Graphics/RenderEngine/RenderView/RenderView.cpp"
 
     # Render Passes
-    "Source/Runtime/Graphics/RenderPasses/OpaqueRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/OpaqueRenderPass/OpaqueRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/ReliefRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/LightingRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.cpp"
   )
 
 set(SrcGameFramework
@@ -121,18 +122,22 @@ set(SrcGameFramework
     "Source/Runtime/GameFramework/Assets/Texture2DAsset/Texture2DAsset.cpp"
 )
 
-set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcImgui} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
+set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
     ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)
-    set(Sources WIN32 ${Sources} "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" "Source/Runtime/Platform/Windows/WindowsMappedFile.cpp")
+    set(Sources WIN32 ${Sources} "Editor/Platforms/Windows/resources.rc" "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" "Source/Runtime/Platform/Windows/WindowsMappedFile.cpp")
 endif()
 if(CMAKE_HOST_SYSTEM MATCHES Linux)
   set(Sources ${Sources} "Source/Runtime/Platform/Linux/LinuxPlatform.cpp")
 endif()
 
+# Only include imgui in debug build
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  set(Sources ${Sources} ${SrcImgui}) 
+endif()
 # Game
 
 add_executable(Game ${Sources})
@@ -151,9 +156,14 @@ target_compile_options(Game PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/EHs _HAS_EXCEPTIONS=0->
 )
 
+# Include HAS_IMGUI define to the game in Debug build
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+  target_compile_definitions(Game PUBLIC HAS_IMGUI)
+endif()
+
 # Editor
 
-set(EditorSources ${EditorSources}) 
+set(EditorSources ${SrcImgui}) 
 
 add_executable(Editor ${Sources} ${EditorSources})
 
@@ -164,6 +174,7 @@ target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
 target_include_directories(Editor PRIVATE "Source/ThirdParty")
 
 target_compile_definitions(Editor PUBLIC EDITOR)
+target_compile_definitions(Editor PUBLIC HAS_IMGUI)
 
 set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
 
@@ -178,11 +189,12 @@ target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
 target_include_directories(EditorASAN PRIVATE "Source/ThirdParty")
 
 target_compile_definitions(EditorASAN PUBLIC EDITOR)
+target_compile_definitions(EditorASAN PUBLIC HAS_IMGUI)
 
 set_property(TARGET EditorASAN PROPERTY CXX_STANDARD 23)
 
 if(MSVC)
-  message(STATUS "ASAN: Detected MSVC")
+message(STATUS "ASAN: Detected MSVC")
   target_compile_options(EditorASAN PUBLIC "/MTd" "/fsanitize=address" "/Zi" "/sdl" "/permissive-") 
   target_link_options(EditorASAN PUBLIC "/INCREMENTAL:NO")
   target_link_options(EditorASAN PUBLIC "/subsystem:console")
