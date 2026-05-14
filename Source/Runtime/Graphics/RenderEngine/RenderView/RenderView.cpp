@@ -52,4 +52,5 @@ void RenderView::Reset()
     // Dynamic Render Objects should be recreated every frame.
     m_dynamicRenderObjects.clear();
     m_stateUpdates.clear();
+    m_renderJobs.clear();
 }

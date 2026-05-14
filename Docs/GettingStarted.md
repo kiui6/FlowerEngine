@@ -1,5 +1,11 @@
 # Flower++ Getting Started
 
+Flower is a Pixel Perfect 2D Open World capable game engine built on persistant record system.
+
+## Records
+[Records](./Records/Record.md) are objects that contain persistant data. Each record has unique [RecordID](./Records/RecordID.md), that is unique for this object among master, all plugins, saves and runtime.
+Records are stored in Master, Plugin or Save files. Records themselves don't contain any functionality, code or anything other than plain data.
+
 ## World
 [Tilemap](./World/Tilemap.md) - An extensive tilemap based environment, allowing users to compose complex tilemaps constructed of dozens of Atlas or Procedural layers.
 

@@ -8,7 +8,7 @@
 
 #include <Utility/ID.h>
 #include <GarbageCollector/ReferenceCounter.h>
-#include <Mixin/Reflected.h>
+#include <Mixin/Typed.h>
 
 #include "Field.h"
 #include "RecordID.h"

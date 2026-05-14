@@ -9,8 +9,8 @@
 
 #include <Log/Log.h>
 
-OpaqueRenderPass::OpaqueRenderPass(GPUContext& context)
-    : m_gpu(context)
+OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
+    : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>())
 {
     Config* config = GetService<Config>();
 

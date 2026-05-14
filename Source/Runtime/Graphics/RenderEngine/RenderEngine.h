@@ -20,6 +20,8 @@
 #include "ResourceCompiler.h"
 #include "RenderUtils.h"
 
+#include "RenderState/RenderStateStore.h"
+
 class RenderEngine
 {
     std::array<RenderView, FRAMES_IN_FLIGHT> m_renderViews;
@@ -32,6 +34,8 @@ class RenderEngine
     std::mutex m_onDemandMtx;
 
     GPUContext m_ctx;
+
+    RenderStateStore m_stateStore;
 
     CompiledRenderResources m_compiledRes;
 public:

@@ -5,7 +5,7 @@
 #include <GarbageCollector/ReferenceCounter.h>
 
 #include <Utility/ID.h>
-#include <Mixin/Reflected.h>
+#include <Mixin/Typed.h>
 
 #include <Data/DataView.h>
 

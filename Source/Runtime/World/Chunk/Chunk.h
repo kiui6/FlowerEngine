@@ -14,6 +14,7 @@ protected:
     float m_worldX = 0, m_worldY = 0;
     bool m_visible = false; 
 
+    // Warning: One ReferenceRecord(Actor) can be referenced by multiple ChunkRecords if it overlaps them
     std::vector<RecordID> m_staticActors;
     std::vector<RecordID> m_dynamicActors;
 public:

@@ -8,7 +8,8 @@
 #include <Math/Matrix.h>
 
 #include "RenderObject.h"
-#include "RenderStateUpdate.h"
+#include <Graphics/RenderEngine/RenderState/RenderStateUpdate.h>
+#include <Graphics/RenderEngine/RenderJob/RenderJob.h>
 
 class RenderView
 {
@@ -27,14 +28,18 @@ protected:
     std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
 
     std::vector<std::unique_ptr<RenderStateUpdate>> m_stateUpdates;
+    std::vector<std::unique_ptr<RenderJob>> m_renderJobs;
 public:
-    RenderObject* GetDynamicRenderObject(uint64_t id);
+    // Submits render state update to the render view. Render state updates are performed before any job, compilation or rendering.
+    void SubmitStateUpdate(RenderStateUpdate* stateUpdate);
 
+    // Submits render job to the render view. Render jobs are executed before any compilation or rendering.
+    void SubmitJob(RenderJob* job);
+
+    RenderObject* GetDynamicRenderObject(uint64_t id);
     std::weak_ptr<RenderObject> GetStaticRenderObject(uint64_t id);
 
     void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
-
-    void SubmitStateUpdate(RenderStateUpdate* stateUpdate);
 
 
     void Reset();
