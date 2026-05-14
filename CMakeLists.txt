@@ -91,10 +91,7 @@ set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime
 
 set(SrcMixin )
 
-set(SrcRender 
-    # On Demand
-    "Source/Runtime/Graphics/OnDemandRenderService/OnDemandRenderService.cpp" 
-    
+set(SrcRender  
     # Render Engine
     "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp"
     "Source/Runtime/Graphics/RenderEngine/ResourceCompiler.cpp"
@@ -109,6 +106,9 @@ set(SrcRender
     "Source/Runtime/Graphics/RenderPasses/LightingRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.cpp"
+    
+    # Render State Updates
+    "Source/Runtime/Graphics/RenderStateUpdates/DebugUIStateUpdate.cpp"
   )
 
 set(SrcGameFramework

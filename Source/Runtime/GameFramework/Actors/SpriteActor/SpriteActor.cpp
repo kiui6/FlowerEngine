@@ -2,8 +2,7 @@
 
 #include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
 #include <Graphics/RenderElements/ReliefSpriteRenderElement.h>
-#include <Graphics/OnDemandRenderService/OnDemandRenderService.h>
-#include <Graphics/OnDemandTasks/AutogenReliefRenderTask.h>
+#include <Graphics/RenderJobs/AutogenReliefRenderTask.h>
 
 #include <Record/RecordLibrary.h>
 #include <Assets/AssetLibrary.h>
@@ -76,12 +75,8 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
             m_reliefRenderResource.dataSize = m_albedoData->GetTextureDataSize();
             m_reliefRenderResource.isDirty = true;
 
-            // FIXME: We have access to the RenderView. We should submit side jobs for the frame to the RenderView.
-            // Also in ReliefAutogen scenario m_reliefRenderResource is filled with albedo's data, 
-            // and submitted render task is expected to use it for compiling an actual asset
-
-            // Execute task
-            GetService<OnDemandRenderService>()->Submit<AutogenReliefRenderTask>(m_reliefRenderResource, m_albedoData->GetWidth(), m_albedoData->GetHeight(), m_albedoData->GetTextureData(), m_albedoData->GetTextureDataSize());
+            AutogenReliefRenderJob* autogenReliefJob = new AutogenReliefRenderJob(m_reliefRenderResource);  
+            renderView.SubmitJob(autogenReliefJob);
         }
 
         autogenRelief->position = m_transform.Location;

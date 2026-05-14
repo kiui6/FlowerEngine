@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <unordered_map>
+#include <set>
 
 #include <Utility/Memory.h>
 #include <Math/Vectors.h>
@@ -17,7 +18,8 @@ class RenderView
 
     struct StaticRenderObjectHandle {
         std::shared_ptr<RenderObject> object;
-        bool referenced = false;
+        // How many frames ago was this object referenced. 0 meaning it's referenced in current frame and should be rendered
+        uint32_t lastReferencedFrames = 0;
     };
 protected:
     Float4x4 m_viewMatrix;
@@ -27,8 +29,8 @@ protected:
     bool m_staticRenderObjectsDirty = false;
     std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
 
-    std::vector<std::unique_ptr<RenderStateUpdate>> m_stateUpdates;
-    std::vector<std::unique_ptr<RenderJob>> m_renderJobs;
+    std::set<std::unique_ptr<RenderStateUpdate>> m_stateUpdates;
+    std::set<std::unique_ptr<RenderJob>> m_renderJobs;
 public:
     // Submits render state update to the render view. Render state updates are performed before any job, compilation or rendering.
     void SubmitStateUpdate(RenderStateUpdate* stateUpdate);

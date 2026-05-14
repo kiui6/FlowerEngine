@@ -4,7 +4,7 @@
 #include "RenderPass/RenderPass.h"
 #include "RenderView/CompiledRenderResource.h"
 #include "RenderView/RenderResourceContainer.h"
-#include "OnDemand/OnDemandRenderTask.h"
+#include "RenderJob/RenderJob.h"
 
 #include <array>
 #include <vector>
@@ -19,6 +19,7 @@
 #include "GPUContext.h"
 #include "ResourceCompiler.h"
 #include "RenderUtils.h"
+#include "RenderConstants.h"
 
 #include "RenderState/RenderStateStore.h"
 
@@ -29,9 +30,6 @@ class RenderEngine
     SDL_GPUCommandBuffer *m_renderBuffer, *m_onDemandBuffer;
 
     std::array<std::unique_ptr<RenderPass>, (uint32_t)RenderPassType::MAX> m_renderPasses;
-
-    std::set<std::unique_ptr<OnDemandRenderTask>> m_onDemandTasks;
-    std::mutex m_onDemandMtx;
 
     GPUContext m_ctx;
 
@@ -45,6 +43,5 @@ public:
 
     void Render(float deltaTime, RenderView& renderView);
 
-    void SubmitOnDemandTask(OnDemandRenderTask* task){std::unique_lock lock(m_onDemandMtx); m_onDemandTasks.insert(std::unique_ptr<OnDemandRenderTask>(task));}
 protected:
 };

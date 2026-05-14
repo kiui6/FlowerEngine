@@ -7,14 +7,15 @@
 #include <memory>
 
 #include <Debug/DebugWindow.h>
-#include <Graphics/RenderStateUpdates/DebugUIStateUpdate.h>
+#include <Graphics/RenderEngine/RenderState/RenderStateStore.h>
+#include <Graphics/RenderStates/DebugUIRenderState.h>
 
 class DebugUIRenderPass : public RenderPass
 {
     GPUContext& m_gpu;
-    std::shared_ptr<DebugWindow> m_window;
+    const DebugUIRenderState& m_state;
 public:
-    DebugUIRenderPass(GPUContext& context);
+    DebugUIRenderPass(GPUContext& context, RenderStateStore& stateStore);
     ~DebugUIRenderPass();
 
     virtual void Assemble(RenderResourceCompiler& resourceCompiler, RenderObject* object, RenderElement* element) override {}

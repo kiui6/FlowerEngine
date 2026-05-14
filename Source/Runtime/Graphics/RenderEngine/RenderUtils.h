@@ -10,8 +10,6 @@
 
 #include <SDL3/SDL_gpu.h>
 
-constexpr uint8_t FRAMES_IN_FLIGHT = 2;
-
 struct RenderUtils {
     static SDL_GPUBuffer* CreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usage, void* data, uint32_t size);
     static bool UpdateBuffer(SDL_GPUDevice* device, SDL_GPUBuffer* buffer, void* data, uint32_t size);

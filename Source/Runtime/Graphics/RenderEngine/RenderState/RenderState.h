@@ -4,10 +4,8 @@
 
 #include <concepts>
 
-class RenderState
+struct RenderState
 {
-
-public:
     static ID32 StaticType() {return MakeID32("NONE");} 
 };
 

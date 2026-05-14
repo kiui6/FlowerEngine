@@ -5,6 +5,7 @@
 
 #include <Math/Vectors.h>
 #include <Graphics/RenderEngine/RenderUtils.h>
+#include <Graphics/RenderEngine/RenderConstants.h>
 #include <SDL3/SDL_gpu.h>
 
 struct OpaqueSpriteElementBatch

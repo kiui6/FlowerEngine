@@ -1,7 +1,7 @@
 #include "DebugUIRenderPass.h"
 
-DebugUIRenderPass::DebugUIRenderPass(GPUContext &context)
-    : m_gpu(context)
+DebugUIRenderPass::DebugUIRenderPass(GPUContext &context, RenderStateStore& stateStore)
+    : m_gpu(context), m_state(stateStore.Get<DebugUIRenderState>())
 {
     
 }

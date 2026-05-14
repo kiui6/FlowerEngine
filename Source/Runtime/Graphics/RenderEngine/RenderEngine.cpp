@@ -52,35 +52,35 @@ void RenderEngine::Initialize(SDL_Window* window)
     m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>(m_ctx);
     m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>(m_ctx);
     m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx);
-    m_renderPasses[(uint32_t)RenderPassType::DebugUI] = std::make_unique<DebugUIRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::DebugUI] = std::make_unique<DebugUIRenderPass>(m_ctx, m_stateStore);
 
     LOG(Log, LogRender, "Render Engine initialization complete");
 }
 
 void RenderEngine::Render(float deltaTime, RenderView &renderView)
 {
-    // Execute OnDemand Tasks
-    {
-        // Lock OnDemand Task mutex so that no thread write to queue before we're finished
-        std::unique_lock lock(m_onDemandMtx);
-        auto it = m_onDemandTasks.begin();
-        while(it != m_onDemandTasks.end()) {
-            (*it)->Execute();
-            it++;
-        }
-        m_onDemandTasks.clear();
+    // Execute Render Jobs
+    for(const auto& job : renderView.m_renderJobs) {
+        job->Execute();
     }
 
     // Assemble elements
-    {
-        RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
-        for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
-            for(const auto& rendElement : rendObject->GetElements()) {
-                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.get(), rendElement.get());
-            }
+    RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
+    for(const auto& [id, rendObject] : renderView.m_staticRenderObjects) {
+        if(rendObject.lastReferencedFrames != 0) continue;
+
+        for(const auto& rendElement : rendObject.object->GetElements()) {
+            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.object.get(), rendElement.get());
         }
     }
 
+    for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
+        for(const auto& rendElement : rendObject->GetElements()) {
+            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.get(), rendElement.get());
+        }
+    }
+
+    // Start recording main command buffer
     SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(m_ctx.device);
 
     // After all data is assembled into batches, it can be compiled into GPU resources
