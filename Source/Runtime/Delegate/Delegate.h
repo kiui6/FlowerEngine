@@ -8,8 +8,16 @@
 template <typename RetValType, typename... ArgTypes>
 class Delegate
 {
+public:
+    using FuncType = RetValType(ArgTypes...);
+    
+    template <typename UserClass>
+    using MemFuncType = typename MemFuncPtr<false,
+            UserClass,
+            FuncType
+        >::Type;
 protected:
-    std::shared_ptr<DelegateInstance<RetValType(ArgTypes...)>>instance;
+    std::shared_ptr<DelegateInstance<FuncType>>instance;
 
     std::mutex mtx;
 public:
@@ -20,7 +28,7 @@ public:
         UserClass* InUserObject,
         typename MemFuncPtr<false,
             UserClass,
-            RetValType(ArgTypes...)
+            FuncType
         >::Type InFunc)
     {
         Delegate<RetValType, ArgTypes...> Result;
@@ -35,7 +43,7 @@ public:
         UserClass* InUserObject,
         typename MemFuncPtr<true,
             UserClass,
-            RetValType(ArgTypes...)
+            FuncType
         >::Type InFunc)
     {
         Delegate<RetValType, ArgTypes...> Result;
@@ -44,7 +52,7 @@ public:
     }
 
     inline static Delegate<RetValType, ArgTypes...>
-    CreateRaw(typename RawFuncPtr<RetValType(ArgTypes...)>::Type InFunc)
+    CreateRaw(typename RawFuncPtr<FuncType>::Type InFunc)
     {
         Delegate<RetValType, ArgTypes...> Result;
         Result.instance.reset(new RawDelegateInstance<RetValType, ArgTypes...>(InFunc));
@@ -60,11 +68,21 @@ public:
 
 template <typename... ArgTypes>
 class MulticastDelegate {
-    std::vector<std::shared_ptr<DelegateInstance<void(ArgTypes...)>>> delegates;
+public:
+    using FuncType = void(ArgTypes...);
+
+    template <typename UserClass>
+    using MemFuncType = typename MemFuncPtr<false,
+            UserClass,
+            FuncType
+        >::Type;
+private:
+    std::vector<std::shared_ptr<DelegateInstance<FuncType>>> delegates;
     
     std::mutex mtx;
 public:
-    inline void BindRaw(typename RawFuncPtr<void(ArgTypes...)>::Type InFunc)
+
+    inline void BindRaw(typename RawFuncPtr<FuncType>::Type InFunc)
     {
         std::lock_guard lock(mtx);
         delegates.push_back(std::make_shared<RawDelegateInstance<void, ArgTypes...>>(InFunc));
@@ -74,7 +92,7 @@ public:
     inline void BindMember(UserClass* InUserObject,
         typename MemFuncPtr<false,
             UserClass,
-            void(ArgTypes...)
+            FuncType
         >::Type InFunc)
     {
         std::lock_guard lock(mtx);

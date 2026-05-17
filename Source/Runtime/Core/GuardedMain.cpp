@@ -8,10 +8,16 @@
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 
+#ifdef HAS_DEBUGUI
+#include <imgui/imgui.h>
+
 class DummyDebugWindow : public DebugWindow {
 protected:
-    virtual void OnRender() override {}
+    virtual void OnRender() override {
+        ImGui::ShowDemoWindow();
+    }
 };
+#endif
 
 int GuardedMain(int argc, char* argv[])
 {
@@ -20,7 +26,9 @@ int GuardedMain(int argc, char* argv[])
     application.Initialize();
 
     // TODO: Remove test window
+#ifdef HAS_DEBUGUI
     application.SetDebugWindow(new DummyDebugWindow());
+#endif
 
     // Test
     //AssetPtr<RawAsset> asset = GetService<AssetLibrary>()->LoadRawAsset("./Data/Image.png");

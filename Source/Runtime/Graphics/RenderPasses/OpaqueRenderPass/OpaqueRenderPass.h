@@ -7,6 +7,7 @@
 #include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
 
 #include <Graphics/RenderStates/TilemapRenderState.h>
+#include <Graphics/RenderStates/GlobalRenderState.h>
 
 #include <unordered_map>
 
@@ -16,6 +17,7 @@ class OpaqueRenderPass : public RenderPass
 {
     SDL_GPUTexture* m_albedo;
     GPUContext& m_gpu;
+    const GlobalRenderState& globalState;
     const TilemapRenderState& tilemapState;
 
     SDL_GPUShader* m_opaqueSpritePipelineVertexShader;

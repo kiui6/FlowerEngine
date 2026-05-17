@@ -9,5 +9,5 @@ struct RenderStateUpdate
 {
     virtual ~RenderStateUpdate() = default;
     
-    virtual void Apply(RenderStateStore& store) = 0;
+    virtual void Apply(GPUContext& gpu, RenderStateStore& store) = 0;
 };

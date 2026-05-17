@@ -10,6 +10,11 @@
 
 #include "RenderUtils.h"
 
+RenderEngine::RenderEngine()
+    : m_stateStore(m_ctx)
+{
+}
+
 void RenderEngine::Initialize(SDL_Window* window)
 {
     m_ctx.window = window;
@@ -108,7 +113,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // Perform State Changes
     BeginGPULabel(cmd, "State Changes");
     for(const auto& updateObj : renderView.m_stateUpdates) {
-        updateObj->Apply(m_stateStore);
+        updateObj->Apply(m_ctx, m_stateStore);
     }
     EndGPULabel(cmd);
 

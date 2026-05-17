@@ -7,16 +7,18 @@
 
 class RenderStateStore
 {
+    GPUContext& m_gpu;
+
     std::unordered_map<ID32, std::unique_ptr<RenderState>> m_states;
 
     template <RenderStateClass T>
-    T* GetPointer() {
+    T* GetOrCreate() {
         auto it = m_states.find(T::StaticType());
         if(it != m_states.end()) {
             return static_cast<T*>(it->second.get());
         }
 
-        T* state = new T();
+        T* state = new T(m_gpu);
 
         auto element = m_states.emplace(T::StaticType(), std::unique_ptr<T>(state));
 
@@ -24,13 +26,16 @@ class RenderStateStore
     }
 public:
 
+    RenderStateStore() = delete;
+    RenderStateStore(GPUContext& gpu) : m_gpu(gpu) {}
+
     template <RenderStateClass T>
     const T& Get() {
-        return *GetPointer<T>();
+        return *GetOrCreate<T>();
     }
 
     template <RenderStateClass T>
     T& GetMutable() {
-        return *GetPointer<T>();
+        return *GetOrCreate<T>();
     }
 };

@@ -9,6 +9,7 @@
 #include <Utility/ID.h>
 #include <GarbageCollector/ReferenceCounter.h>
 #include <Mixin/Typed.h>
+#include <Mixin/HasFlags.h>
 
 #include "Field.h"
 #include "RecordID.h"
@@ -28,8 +29,8 @@ enum class RecordFlags : uint8_t {
     Unload = (1<<1),
     // This Record was changed and needs changes to be saved (Save System or Asset System) 
     Dirty = (1<<2),
-    // Marks this Record undestructable by GC
-    BypassGC = (1<<3),
+    // Marks this Record deleted
+    Deleted = (1<<3),
 };
 
 /*
@@ -41,11 +42,10 @@ enum class RecordFlags : uint8_t {
  * 
  * Record ID 0 is reserved for None; 
  */
-class Record : public ReferenceCounter, public Typed
+class Record : public ReferenceCounter, public Typed, public HasFlags<RecordFlags>
 {
     virtual void RequestSelfDestruction() override;
 protected:
-    uint16_t m_flags = 0;
     RecordID m_id = INVALID_RECORD;
 public:
     Field<StringField> EditorID = {FIELDID(EDID), "Untitled"};
@@ -70,13 +70,8 @@ public:
         return fields;
     }
 
-    void SetFlag(RecordFlags flag) {m_flags |= (uint16_t)flag;}
-    void ClearFlag(RecordFlags flag) {m_flags &= ~(uint16_t)flag;}
-    bool HasFlag(RecordFlags flag) {return (m_flags & (uint16_t)flag) == (uint16_t)flag;}
-
     // Marks Record Dirty, meaning that the Record has changed and should be saved again
-    void Dirty();
-    void BeginUnload() {m_flags |= (uint16_t)RecordFlags::Unload;}
+    void MarkDirty() {SetFlag(RecordFlags::Dirty);}
 
 protected: 
     void SetID(RecordID newID) {m_id = newID;}

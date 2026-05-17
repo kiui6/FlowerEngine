@@ -37,6 +37,8 @@ class RenderEngine
 
     CompiledRenderResources m_compiledRes;
 public:
+    RenderEngine();
+
     RenderView& GetFrameRenderView() { return m_renderViews[(m_ctx.currentFrame + 1) % m_renderViews.size()];}
 
     void Initialize(SDL_Window* window);

@@ -28,8 +28,6 @@ template<typename T>
 concept FieldValueClass = 
     requires {
         typename T::DecayType;
-        { T::DefaultConstructor() } 
-            -> std::same_as<typename T::DecayType>;
         { T::Deserialize(std::span<const uint8_t>{}, std::declval<typename T::DecayType&>()) } 
             -> std::same_as<void>;
         { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<std::vector<uint8_t>&>()) } 

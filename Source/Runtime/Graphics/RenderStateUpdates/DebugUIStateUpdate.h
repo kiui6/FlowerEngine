@@ -11,5 +11,5 @@ struct DebugUIStateUpdate : public RenderStateUpdate
 
     std::weak_ptr<DebugWindow> window;
 
-    virtual void Apply(RenderStateStore& store) override;
+    virtual void Apply(GPUContext& gpu, RenderStateStore& store) override;
 };

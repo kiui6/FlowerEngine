@@ -35,6 +35,7 @@ public:
 
     static Application* Get() {return Singleton;}
 
+    Window* GetWindow() {return m_window.get();}
     Engine* GetEngine() {return m_engine.get();}
     RenderEngine* GetRenderEngine() {return m_render.get();}
 

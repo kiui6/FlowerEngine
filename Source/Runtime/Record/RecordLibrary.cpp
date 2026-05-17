@@ -5,7 +5,13 @@
 #include <Log/Log.h>
 #include "RecordFactoryLibrary.h"
 
+#include <Data/DataReader.h>
+
 bool RecordLibrary::bIsInitialized = RegisterService<RecordLibrary>({DataManager::GetStaticName()});
+
+RecordLibrary::RecordLibrary()
+{
+}
 
 void RecordLibrary::Initialize()
 {
@@ -16,7 +22,7 @@ void RecordLibrary::Deinitialize()
 {
 }
 
-RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint8_t pluginID)
+RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint16_t pluginID)
 {
     std::unique_lock lock(m_mtx);
     RecordID id = GenerateRecordID();
@@ -45,6 +51,33 @@ RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
 
 RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
 {
+    // TODO: Get DataView into record
+    DataView recordView;
+
+    DataReader reader(recordView);
+
+    auto loadedRecordTypeOpt = reader.ReadUInt32();
+    if(!loadedRecordTypeOpt.has_value()) {
+        LOGF(Assert, LogRecord, "Attempted loading Record[0x%016llX] of Type[%c%c%c%c], but encountered unexpected EOF when trying to read type",
+            recordID,
+            type, type >> 8, type >> 16, type >> 24);
+        return {};
+    }
+
+    ID32 loadedRecordType = loadedRecordTypeOpt.value();
+
+    if(loadedRecordType != type) {
+        LOGF(Assert, LogRecord, "Attempted loading Record[0x%016llX] of Type[%c%c%c%c], but real type is Type[%c%c%c%c]", 
+            recordID, 
+            type, type >> 8, type >> 16, type >> 24,
+            loadedRecordType, loadedRecordType >> 8, loadedRecordType >> 16, loadedRecordType >> 24);
+        return {};
+    }
+
+    Record* record = CreateEmptyRecordFromType(type);
+
+
+
     return RecordPtr<Record>();
 }
 
@@ -73,5 +106,15 @@ bool RecordLibrary::IsValidRecord(RecordID recordID) const
 RecordID RecordLibrary::GenerateRecordID()
 {
     RecordID local = m_nextLocalID.fetch_add(1, std::memory_order_relaxed);
-    return (static_cast<RecordID>(s_runtimeModID) << 56) | (local & 0x00FFFFFFFFFFFFFF);
+    return (static_cast<RecordID>(s_runtimeModID) << 48) | (local & 0x0000FFFFFFFFFFFF);
+}
+
+Record *RecordLibrary::CreateEmptyRecordFromType(ID32 type)
+{
+    RecordFactory* factory = RecordFactoryLibrary::Get().GetFactory(type);
+    if(!factory) {
+        return nullptr;
+    }
+
+    return factory->NewRecord();
 }

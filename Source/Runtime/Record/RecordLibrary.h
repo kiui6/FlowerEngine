@@ -8,30 +8,55 @@
 
 #include "Record.h"
 #include "RecordPtr.h"
+#include "IRecordSource.h"
+#include "RecordMerger.h"
 
 #include <memory>
 #include <atomic>
 #include <shared_mutex>
 #include <mutex>
 #include <array>
+#include <map>
 
 class RecordLibrary : public IService
 {
     static bool bIsInitialized;
-    static constexpr uint8_t s_runtimeModID = 0xFF;
+    static constexpr uint16_t s_runtimeModID = 0xFFFF;
 
     mutable std::shared_mutex m_mtx;
+
+    std::map<uint16_t, IRecordSource*> m_sources;
 
     DataManager* m_datamgr = nullptr;
 
     std::unordered_map<RecordID, std::unique_ptr<Record>> m_records;
 
+    // If editing Master File, should be set outside of bounds of reserved IDs
     std::atomic<RecordID> m_nextLocalID{1};
 public:
+    RecordLibrary();
+
     static std::string_view GetStaticName() {return "RecordLibrary";}
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;
+
+    /*
+     * Adds record source to a specific load order index. Should also be used to load record changes from save files
+     * 
+     * @note
+     * Engine's IO access is sandboxed, so file path should be a sandboxed path ("Game/Plugin.plugin" or "Pref/Savefile0.save")
+     * 
+     * For loading save files, pluginID should be set to 0xFFFF
+     * 
+     * @param pluginID
+     * Sets index in the load order of the mounted plugin. Use 0 for automatic indexing(ignores 0xFFFF)
+     * 
+     * @returns
+     * false if pluginID is already taken
+     */
+    bool AddRecordSource(IRecordSource* source, uint16_t pluginID = 0);
+    bool RemoveRecordSource(uint16_t pluginID = 0);
 
     /*
      * Creates new serializable record and puts it into library
@@ -51,7 +76,7 @@ public:
      * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
      */
     template <RecordClass T>
-    RecordPtr<T> CreateRecord(uint8_t pluginID = s_runtimeModID);
+    RecordPtr<T> CreateRecord(uint16_t pluginID = s_runtimeModID);
 
     /*
      * Creates new serializable record of specified type and puts it into library
@@ -73,7 +98,7 @@ public:
      * @returns
      * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
      */
-    RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint8_t pluginID = s_runtimeModID);
+    RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint16_t pluginID = s_runtimeModID);
 
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
@@ -89,6 +114,7 @@ public:
      */
     template <RecordClass T>
     RecordPtr<T> LoadRecord(RecordID recordID);
+
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
      * 
@@ -102,6 +128,7 @@ public:
      * RecordPtr of polymorphic record. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
      */
     RecordPtr<Record> LoadRecordRaw(RecordID recordID);
+
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
      * Compares type of record against the requested type before returning
@@ -128,6 +155,8 @@ public:
     
     void UnloadRecord(RecordID recordID);
     bool IsValidRecord(RecordID recordID) const;
+
+    void DeleteRecord(RecordID recordID);
     
     /*
      *  Returns caller the unique incremental ID for runtime use (with 0xFF prefix)
@@ -137,10 +166,11 @@ public:
     RecordID ReserveLocalRecordID() {return GenerateRecordID(); }
 protected:
     RecordID GenerateRecordID();
+    inline Record* CreateEmptyRecordFromType(ID32 type);
 };
 
 template <RecordClass T>
-inline RecordPtr<T> RecordLibrary::CreateRecord(uint8_t pluginID)
+inline RecordPtr<T> RecordLibrary::CreateRecord(uint16_t pluginID)
 {
     std::unique_lock lock(m_mtx);
 

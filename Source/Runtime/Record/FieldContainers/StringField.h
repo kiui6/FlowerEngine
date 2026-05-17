@@ -8,8 +8,6 @@ struct StringField
 {
     using DecayType = std::string;
 
-    static DecayType DefaultConstructor() {return {};}
-
     static void Serialize(const DecayType& data, std::vector<uint8_t>& out){}
     static void Deserialize(std::span<const uint8_t> data, DecayType& out){}
 };

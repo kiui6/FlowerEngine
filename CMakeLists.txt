@@ -50,7 +50,8 @@ set(SrcLZ4 "Source/ThirdParty/lz4/lz4.c" "Source/ThirdParty/lz4/lz4file.c" "Sour
 
 set(SrcImgui "Source/ThirdParty/imgui/imgui_demo.cpp" "Source/ThirdParty/imgui/imgui_tables.cpp" 
              "Source/ThirdParty/imgui/imgui_draw.cpp" "Source/ThirdParty/imgui/imgui_widgets.cpp" 
-             "Source/ThirdParty/imgui/imgui.cpp" "Source/ThirdParty/imgui/backends/imgui_impl_sdl3.cpp")
+             "Source/ThirdParty/imgui/imgui.cpp" "Source/ThirdParty/imgui/backends/imgui_impl_sdl3.cpp"
+             "Source/ThirdParty/imgui/backends/imgui_impl_sdlgpu3.cpp")
 
 # Modules Sources
 set(SrcApplication "Source/Runtime/Application/Application.cpp")
@@ -77,7 +78,7 @@ set(SrcBlackboard "Source/Runtime/Blackboard/Blackboard.cpp")
 
 set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskPool.cpp")
 
-set(SrcData "Source/Runtime/Data/DataManager.cpp")
+set(SrcData "Source/Runtime/Data/DataManager.cpp" "Source/Runtime/Data/DataReader.cpp")
 
 set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp" "Source/Runtime/Assets/RawAsset.cpp")
 
@@ -107,6 +108,9 @@ set(SrcRender
     "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.cpp"
     
+    # Render States
+    "Source/Runtime/Graphics/RenderStates/GlobalRenderState.cpp"
+
     # Render State Updates
     "Source/Runtime/Graphics/RenderStateUpdates/DebugUIStateUpdate.cpp"
   )
@@ -156,9 +160,9 @@ target_compile_options(Game PRIVATE
     $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/EHs _HAS_EXCEPTIONS=0->
 )
 
-# Include HAS_IMGUI define to the game in Debug build
+# Include HAS_DEBUGUI define to the game in Debug build
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(Game PUBLIC HAS_IMGUI)
+  target_compile_definitions(Game PUBLIC HAS_DEBUGUI)
 endif()
 
 # Editor
@@ -174,7 +178,7 @@ target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
 target_include_directories(Editor PRIVATE "Source/ThirdParty")
 
 target_compile_definitions(Editor PUBLIC EDITOR)
-target_compile_definitions(Editor PUBLIC HAS_IMGUI)
+target_compile_definitions(Editor PUBLIC HAS_DEBUGUI)
 
 set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
 
@@ -189,7 +193,7 @@ target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
 target_include_directories(EditorASAN PRIVATE "Source/ThirdParty")
 
 target_compile_definitions(EditorASAN PUBLIC EDITOR)
-target_compile_definitions(EditorASAN PUBLIC HAS_IMGUI)
+target_compile_definitions(EditorASAN PUBLIC HAS_DEBUGUI)
 
 set_property(TARGET EditorASAN PROPERTY CXX_STANDARD 23)
 
