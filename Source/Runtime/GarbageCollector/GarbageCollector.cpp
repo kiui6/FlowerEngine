@@ -47,7 +47,7 @@ void GarbageCollector::RunGCPass(bool unrestricted)
     while(unloadCandidates.size() > 0) {
         // Check if unload candidate is still eligible for unloading
         ReferenceCounter* ref = unloadCandidates.back();
-        if(ref && ref->CanUnload()) {
+        if(ref && !ref->IsReferenced() && !ref->IsDirty()) {
             ref->RequestSelfDestruction();
         }
 

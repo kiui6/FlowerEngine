@@ -1,6 +1,8 @@
 #include "PathBuilder.h"
 
-std::string PathBuilder::MakeAbsolute(std::string_view base, std::string_view path)
+#include <filesystem>
+
+std::string PathBuilder::MakeRelative(std::string_view base, std::string_view path)
 {
-    return std::string(path);
+    return std::filesystem::relative(path, base).string();
 }

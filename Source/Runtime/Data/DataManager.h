@@ -7,8 +7,11 @@
 #include <atomic>
 #include <shared_mutex>
 #include <mutex>
+#include <filesystem>
 
 #include "DataView.h"
+#include "DataWriter.h"
+#include "DirectoryView.h"
 
 #include "Formats/MasterFile/MasterFile.h"
 #include "Formats/PluginFile/PluginFile.h"
@@ -32,13 +35,23 @@ class DataManager : public IService
 
     std::unordered_map<std::string, FileHandle> m_fileHandles;
 
-    std::string m_basePath, m_prefPath;
+    std::filesystem::path m_basePath, m_prefPath;
 public:
     static std::string_view GetStaticName() {return "DataManager";}
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
+
     DataView OpenDataView(std::string_view relativePath);
     DataView MapDataView(std::string_view relativePath);
+
+    DataWriter OpenDataWriter(std::string_view relativePath);
+
+    DirectoryView OpenDirectoryView(std::string_view relativePath);
+protected:
+    const std::filesystem::path& GetBasePath();
+    const std::filesystem::path& GetPrefPath();
+
+    std::string CanonizePathSandboxed(std::string_view path);
 };

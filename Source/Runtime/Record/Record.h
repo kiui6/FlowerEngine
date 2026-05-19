@@ -73,6 +73,8 @@ public:
     // Marks Record Dirty, meaning that the Record has changed and should be saved again
     void MarkDirty() {SetFlag(RecordFlags::Dirty);}
 
+    bool IsDirty() override;
+
 protected: 
     void SetID(RecordID newID) {m_id = newID;}
 

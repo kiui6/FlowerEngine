@@ -8,15 +8,11 @@
 #include <shared_mutex>
 #include <mutex>
 
-#include "PluginFile.h"
-
-class PluginManager : public IService
+class SaveManager : public IService
 {
     static bool bIsInitialized;
-
-    std::unordered_map<uint16_t, PluginFile> m_plugins;
 public:
-    static std::string_view GetStaticName() {return "PluginManager";}
+    static std::string_view GetStaticName() {return "SaveManager";}
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;

@@ -12,8 +12,9 @@
 class FieldBase
 {
 public:
-    virtual void Serialize(){}
-    virtual void Deserialize(){}
+    virtual inline bool IsDirty() const = 0;
+    virtual void Serialize() = 0;
+    virtual void Deserialize() = 0;
 };
 
 template<typename T>

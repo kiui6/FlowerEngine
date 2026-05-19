@@ -10,7 +10,8 @@ class ReferenceCounter
     void AddRef();
     void ReleaseRef();
 
-    bool CanUnload() const {return m_refCount.load(std::memory_order_acquire) == 0;}
+    virtual bool IsReferenced() const {return m_refCount.load(std::memory_order_acquire) != 0;}
+    virtual bool IsDirty() {return false;}
 
     virtual void RequestSelfDestruction() = 0;
 

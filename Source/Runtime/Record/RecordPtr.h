@@ -21,9 +21,7 @@ public:
 
     RecordT* Get() { return m_record; }
 
-    bool IsLoaded() const { return m_record != nullptr; }
-    bool IsBound() const { return m_record != nullptr; }
-    bool IsValid() const;
+    bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
 };
 
 template <RecordClass RecordT = Record>
@@ -81,7 +79,9 @@ public:
         return *this;
     }
 
-    RecordT* operator ->() { return m_record; }
+    RecordT* operator ->() { 
+        return m_record;
+    }
 
     ~RecordPtr() {
         if(m_record) {
@@ -112,5 +112,5 @@ public:
     }
 
     // Checks if this record's instance is bound to the RecordPtr
-    bool IsBound() const { return m_record != nullptr; }
+    bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
 };

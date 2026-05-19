@@ -29,7 +29,7 @@ public:
     World(const RecordPtr<WorldRecord>& worldRec) : m_worldRef(worldRec) {}
     World(RecordPtr<WorldRecord>&& worldRec) : m_worldRef(worldRec) {}
 
-    std::string& GetName() {return m_worldRef->DisplayName;}
+    const std::string& GetName() {return m_worldRef->DisplayName;}
 
     // Gets called first when world's loaded.
     // Creates Player Controller and other default actors

@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <map>
+#include <optional>
 
 #include "RecordID.h"
 #include "RecordMemory.h"
@@ -9,5 +10,5 @@
 
 struct RecordMerger
 {
-    static RecordMemory Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId);
+    static std::optional<RecordMemory> Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId);
 };
