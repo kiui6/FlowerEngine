@@ -31,12 +31,12 @@ Application::Application()
 
 Application::~Application()
 {
+    ServiceProvider::Get().Deinitialize();
+
     if(Application::Singleton == this)
     {
         Application::Singleton = nullptr;
     }
-
-    ServiceProvider::Get().Deinitialize();
 }
 
 void Application::SetDebugWindow(DebugWindow *window)

@@ -14,7 +14,8 @@ class PluginManager : public IService
 {
     static bool bIsInitialized;
 
-    std::unordered_map<uint16_t, PluginFile> m_plugins;
+    std::vector<PluginFile> m_plugins;
+    std::vector<size_t> m_loadOrder;
 public:
     static std::string_view GetStaticName() {return "PluginManager";}
 

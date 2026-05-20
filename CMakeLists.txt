@@ -78,7 +78,7 @@ set(SrcBlackboard "Source/Runtime/Blackboard/Blackboard.cpp")
 
 set(SrcAsync "Source/Runtime/Async/AsyncService.cpp" "Source/Runtime/Async/TaskPool.cpp")
 
-set(SrcData "Source/Runtime/Data/DataManager.cpp" "Source/Runtime/Data/DataReader.cpp")
+set(SrcData "Source/Runtime/Data/DataManager.cpp" "Source/Runtime/Data/DataReader.cpp" "Source/Runtime/Data/DirectoryView.cpp")
 
 set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp" "Source/Runtime/Assets/RawAsset.cpp")
 
@@ -91,6 +91,8 @@ set(SrcUtility "Source/Runtime/Utility/Arena.cpp" "Source/Runtime/Utility/PathBu
 set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime/GarbageCollector/ReferenceCounter.cpp")
 
 set(SrcMixin )
+
+set(SrcPlugin "Source/Runtime/Plugins/PluginManager.cpp")
 
 set(SrcRender  
     # Render Engine
@@ -128,7 +130,7 @@ set(SrcGameFramework
 
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)

@@ -51,29 +51,6 @@ RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
 
 RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
 {
-    // TODO: Get DataView into record
-    DataView recordView;
-
-    DataReader reader(recordView);
-
-    auto loadedRecordTypeOpt = reader.ReadUInt32();
-    if(!loadedRecordTypeOpt.has_value()) {
-        LOGF(Assert, LogRecord, "Attempted loading Record[0x%016llX] of Type[%c%c%c%c], but encountered unexpected EOF when trying to read type",
-            recordID,
-            type, type >> 8, type >> 16, type >> 24);
-        return {};
-    }
-
-    ID32 loadedRecordType = loadedRecordTypeOpt.value();
-
-    if(loadedRecordType != type) {
-        LOGF(Assert, LogRecord, "Attempted loading Record[0x%016llX] of Type[%c%c%c%c], but real type is Type[%c%c%c%c]", 
-            recordID, 
-            type, type >> 8, type >> 16, type >> 24,
-            loadedRecordType, loadedRecordType >> 8, loadedRecordType >> 16, loadedRecordType >> 24);
-        return {};
-    }
-
     Record* record = CreateEmptyRecordFromType(type);
 
 

@@ -36,7 +36,7 @@ int GuardedMain(int argc, char* argv[])
     RecordPtr<TextureRecord> albedoRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     albedoRec->EditorID = "Albedo";
     /* TODO: Make absolute resolving ("Texture/Image.png" -> "E:/Game/Data/Texture/Image.png")*/
-    albedoRec->TexturePath = "./Data/Image.png";
+    albedoRec->TexturePath = "Game:Image.png";
 
     RecordPtr<Record> atlasRec = GetService<RecordLibrary>()->CreateRecordFromType(AtlasRecord::StaticType());
     atlasRec->EditorID = "Atlas";
