@@ -11,7 +11,7 @@ public:
     ~WindowsMappedFile();
 
     virtual void Open(std::string path, FileAccess access) override;
-    virtual bool IsOpen() const override {return nullptr == nullptr;};
+    virtual bool IsOpen() const override {return m_data != nullptr;};
     virtual void Close() override;
 
     virtual size_t GetSize() const override {return m_size;}

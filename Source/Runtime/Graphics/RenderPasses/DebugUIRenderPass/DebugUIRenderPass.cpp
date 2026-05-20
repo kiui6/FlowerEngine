@@ -18,6 +18,7 @@ DebugUIRenderPass::DebugUIRenderPass(GPUContext &context, RenderStateStore& stat
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = "./Config/imgui.ini";
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;

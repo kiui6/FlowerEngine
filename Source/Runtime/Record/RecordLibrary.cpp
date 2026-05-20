@@ -22,6 +22,12 @@ void RecordLibrary::Deinitialize()
 {
 }
 
+bool RecordLibrary::AddRecordSource(IRecordSource *source, uint16_t pluginID)
+{
+    m_sources.emplace(pluginID, source);
+    return true;
+}
+
 RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint16_t pluginID)
 {
     std::unique_lock lock(m_mtx);

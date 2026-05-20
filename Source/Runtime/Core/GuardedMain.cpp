@@ -9,14 +9,11 @@
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 
 #ifdef HAS_DEBUGUI
-#include <imgui/imgui.h>
-
-class DummyDebugWindow : public DebugWindow {
-protected:
-    virtual void OnRender() override {
-        ImGui::ShowDemoWindow();
-    }
-};
+#   ifdef EDITOR
+#       include <EditorUI/EditorUI.h>
+#   else
+#       include <Debug/DebugGameUI/DebugGameWindow.h>
+#   endif
 #endif
 
 int GuardedMain(int argc, char* argv[])
@@ -25,9 +22,12 @@ int GuardedMain(int argc, char* argv[])
 
     application.Initialize();
 
-    // TODO: Remove test window
 #ifdef HAS_DEBUGUI
-    application.SetDebugWindow(new DummyDebugWindow());
+#   ifdef EDITOR
+    application.SetDebugWindow(new EditorWindow());
+#   else
+    application.SetDebugWindow(new DebugGameWindow());
+#   endif
 #endif
 
     // Test
@@ -35,7 +35,6 @@ int GuardedMain(int argc, char* argv[])
 
     RecordPtr<TextureRecord> albedoRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     albedoRec->EditorID = "Albedo";
-    /* TODO: Make absolute resolving ("Texture/Image.png" -> "E:/Game/Data/Texture/Image.png")*/
     albedoRec->TexturePath = "Game:Image.png";
 
     RecordPtr<Record> atlasRec = GetService<RecordLibrary>()->CreateRecordFromType(AtlasRecord::StaticType());

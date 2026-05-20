@@ -54,7 +54,7 @@ DataView DataManager::OpenDataView(std::string_view relativePath)
     std::shared_ptr<FileBase> file = GetService<Platform>()->OpenFile(path, FileAccess::Read | FileAccess::Binary);
 
     if(!file->IsOpen()) {
-        LOGF(Error, LogData, "Failed to open data view to file: \"%s\"", path.c_str());
+        LOGF(Error, LogData, "Failed to open data view to file: \"%.*s\"", relativePath.length(), relativePath.data());
         return DataView(nullptr);
     }
 
@@ -74,6 +74,7 @@ DataView DataManager::MapDataView(std::string_view relativePath)
     std::shared_ptr<FileBase> file = GetService<Platform>()->MapFile(path, FileAccess::Read | FileAccess::Binary);
 
     if(!file->IsOpen()) {
+        LOGF(Error, LogData, "Failed to map data view to file: \"%.*s\"", relativePath.length(), relativePath.data());
         return DataView(nullptr);
     }
 
