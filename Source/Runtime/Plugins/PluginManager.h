@@ -8,14 +8,17 @@
 #include <shared_mutex>
 #include <mutex>
 
-#include "PluginFile.h"
+#include "PluginReader.h"
+
+#ifdef EDITOR
+#   include "PluginWriter.h"
+#endif
 
 class PluginManager : public IService
 {
     static bool bIsInitialized;
 
-    std::vector<PluginFile> m_plugins;
-    std::vector<size_t> m_loadOrder;
+    std::vector<PluginReader> m_loadedPlugins;
 public:
     static std::string_view GetStaticName() {return "PluginManager";}
 

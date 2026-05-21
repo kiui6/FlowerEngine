@@ -39,6 +39,18 @@ const std::string DirectoryView::GetPath() const
     return m_basePrefix + relativePath.string();
 }
 
+const std::string DirectoryView::GetName() const
+{
+        std::filesystem::path relativePath = m_path.lexically_relative(m_base);
+
+    if(relativePath.empty() || *relativePath.begin() == "..") {
+        LOGF(Assert, LogDirectoryView, "Illegal file path: \"%s\"! Path is outside of base.", relativePath.c_str());
+        return {};
+    }
+
+    return relativePath.string();
+}
+
 bool DirectoryView::HasExtension(std::string_view ext) const
 {
     return m_path.extension() == ext;

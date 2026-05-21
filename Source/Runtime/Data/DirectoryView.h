@@ -15,6 +15,7 @@ class DirectoryView {
 public:
     std::vector<DirectoryView> GetEntries() const;
     const std::string GetPath() const;
+    const std::string GetName() const;
 
     bool IsFile() const {return std::filesystem::is_regular_file(m_path);}
     bool IsDirectory() const {return std::filesystem::is_directory(m_path);}

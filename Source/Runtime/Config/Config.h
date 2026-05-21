@@ -16,7 +16,10 @@ class ConfigNamespace {
 public:
 
     int GetInt(std::string_view name, int defaultValue = 0);
-    int SetInt(std::string_view name, int value);
+    void SetInt(std::string_view name, int value);
+
+    std::string_view GetString(std::string_view name, std::string_view defaultValue = "");
+    void SetString(std::string_view name, std::string_view value);
 };
 
 class Config : public IService

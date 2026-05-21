@@ -31,3 +31,13 @@ int ConfigNamespace::GetInt(std::string_view name, int defaultValue)
 
     return defaultValue;
 }
+
+std::string_view ConfigNamespace::GetString(std::string_view name, std::string_view defaultValue)
+{
+    auto it = m_strings.find(name);
+    if(it != m_strings.end()) {
+        return it->second;
+    }
+
+    return defaultValue;
+}

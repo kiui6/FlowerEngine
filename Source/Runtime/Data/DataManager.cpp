@@ -129,8 +129,7 @@ std::string DataManager::CanonizePathSandboxed(std::string_view path)
     }
 
     std::string_view pathPrefix = path.substr(0, firstDividerPos);
-    std::string_view relativeOriginalPath = path.substr(firstDividerPos + 1);   
-
+    std::string_view relativeOriginalPath = path.substr(firstDividerPos + 1);
 
     // Remove all leading separators
     while (!relativeOriginalPath.empty() && (relativeOriginalPath.front() == '/' || relativeOriginalPath.front() == '\\')) {

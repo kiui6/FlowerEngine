@@ -9,13 +9,13 @@
 class DataWriter {
     std::shared_ptr<FileBase> m_file = nullptr;
     std::vector<std::byte> m_buffer;
-    size_t cursor = 0;
+    size_t m_cursor = 0;
 public:
     DataWriter() {}
     DataWriter(std::shared_ptr<FileBase> file) : m_file(file) {}
 
-    inline void Advance(ptrdiff_t diff) {cursor += diff;}
-    inline void SetOffset(size_t offset) {cursor = offset;}
+    inline void Advance(ptrdiff_t diff) {m_cursor += diff;}
+    inline void SetOffset(size_t offset) {m_cursor = offset;}
 
     void WriteByte(std::byte val);
     void WriteBytes(std::byte* val, size_t size);

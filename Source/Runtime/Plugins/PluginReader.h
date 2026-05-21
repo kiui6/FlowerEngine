@@ -7,8 +7,8 @@
 struct is_master_file_t {};
 is_master_file_t is_master_file;
 
-class PluginFile : public IRecordSource {
-    std::string m_path;
+class PluginReader : public IRecordSource {
+    std::string m_name;
 
     std::optional<DataView> m_fileView;
     bool m_isMaster;
@@ -22,14 +22,14 @@ class PluginFile : public IRecordSource {
     size_t recordsLUTCount;
     std::optional<DataView> m_LUTView;
 public:
-    PluginFile(std::string_view path) : m_path(path) {}
-    PluginFile(is_master_file_t, std::string_view path) : m_path(path), m_isMaster(true) {}
+    PluginReader(std::string_view name) : m_name(name) {}
+    PluginReader(is_master_file_t, std::string_view name) : m_name(name), m_isMaster(true) {}
 
     bool IsMaster() const {return m_isMaster;}
-    bool IsValid() const {return m_fileView.has_value() || m_fileView.value();}
-    std::string_view GetPath() const {return m_path;}
+    bool IsValid() const {return m_fileView.has_value() && m_fileView.value();}
+    std::string_view GetName() const {return m_name;}
 
-    void InitializeFileView(DataView&& view) {m_fileView = std::move(view);}    
+    void InitializeFileView(DataView&& view) {m_fileView = std::move(view);}
 
     RecordMemory FetchRecordMemory(RecordID id) override {return {};}
     ID32 FetchRecordType(RecordID id) override {return 0;}

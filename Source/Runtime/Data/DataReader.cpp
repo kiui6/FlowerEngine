@@ -44,3 +44,8 @@ std::optional<const char *> DataReader::ReadString(size_t length, bool advance)
 {
     return std::optional<const char *>();
 }
+
+std::optional<std::string_view> TextualDataReader::ReadNextLine()
+{
+    return {};
+}

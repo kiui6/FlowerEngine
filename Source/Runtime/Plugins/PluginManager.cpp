@@ -2,44 +2,56 @@
 
 #include <Data/DataManager.h>
 #include <Record/RecordLibrary.h>
+#include <Config/Config.h>
 
 #include <Log/Log.h>
 
-bool PluginManager::bIsInitialized = RegisterService<PluginManager>({DataManager::GetStaticName(), RecordLibrary::GetStaticName()});
+#include <set>
+
+bool PluginManager::bIsInitialized = RegisterService<PluginManager>({Config::GetStaticName(), DataManager::GetStaticName(), RecordLibrary::GetStaticName()});
 
 void PluginManager::Initialize()
 {
     DataManager* dataMgr = GetService<DataManager>();
+    Config* config = GetService<Config>();
 
-    // TODO: Read load order config
-    DataView loadOrderConfig = dataMgr->OpenDataView("Pref:plugins.txt");
+    // Load Master file
+    std::string_view masterFileName = config->GetNamespace("Game").GetString("Master.Filename", "Game.master");
 
-    // Collect plugins available for load
-    DirectoryView rootView = dataMgr->OpenDirectoryView("Game:");
-    for(const DirectoryView& childView : rootView.GetEntries()) {
-        if(childView.HasExtension(".master")) {
-            LOGF(Log, LogPlugin, "Detected master at \"%s\"", childView.GetPath().c_str());
-            m_plugins.emplace_back(PluginFile(is_master_file, childView.GetPath()));
-        } else if(childView.HasExtension(".plugin")) {
-            LOGF(Log, LogPlugin, "Detected plugin at \"%s\"", childView.GetPath().c_str());
-            m_plugins.emplace_back(PluginFile(childView.GetPath()));
+    m_loadedPlugins.emplace_back(PluginReader(is_master_file, masterFileName));
+
+    // Read load order config
+    std::vector<std::string> loadOrder;
+
+    DataView loadOrderConfigView = dataMgr->OpenDataView("Pref:plugins.txt");
+    if(loadOrderConfigView) {
+        TextualDataReader loadOrderConfigReader(loadOrderConfigView);
+
+        std::optional<std::string_view> loadOrderConfigLine = loadOrderConfigReader.ReadNextLine();
+        while(loadOrderConfigLine.has_value()) {
+            loadOrder.push_back(std::string(loadOrderConfigLine.value()));
+
+            loadOrderConfigLine = loadOrderConfigReader.ReadNextLine();
         }
     }
 
-    // Instantiate plugin files
-    size_t pluginFileIndex = 0;
-    for(PluginFile& plugin : m_plugins) {
-        if(plugin.IsMaster()) {
-            // TODO: There should be only one main master, and optional master files for DLCs. Check dependencies to ensure load order
-            DataView view = dataMgr->MapDataView(plugin.GetPath());
-            if(!view) {
-                LOG(Error, LogPlugin, "Failed to map data view into a master file.");
-                return;
-            }
-            plugin.InitializeFileView(std::move(view));
-            m_loadOrder.push_back(pluginFileIndex);
+    // Collect plugins available for load
+    // We assemble the list of available plugins to allow runtime load order setup.
+    DirectoryView rootView = dataMgr->OpenDirectoryView("Game:");
+    for(const DirectoryView& childView : rootView.GetEntries()) {
+        if(childView.HasExtension(".plugin")) {
+            LOGF(Log, LogPlugin, "Detected plugin at \"%s\"", childView.GetPath().c_str());
+            m_plugins.emplace_back(PluginReader(childView.GetName()));
         }
-        pluginFileIndex++;
+    }
+
+    // Add plugins into the load order according to the list.
+    for(const std::string& loadOrderPluginName : loadOrder) {
+        for(size_t pluginFileIndex = 0; pluginFileIndex < m_plugins.size(); pluginFileIndex++) {
+            if(m_plugins[pluginFileIndex].GetName() == loadOrderPluginName) {
+                m_loadOrder.push_back(pluginFileIndex);
+            }
+        }
     }
     
     // Just in case check for load order vector to be smaller than size of uint16_t
@@ -51,7 +63,18 @@ void PluginManager::Initialize()
     // Once all plugin files and load orders are resolved, signal files as record sources to the RecordLibrary
     RecordLibrary* recLib = GetService<RecordLibrary>();
     for(size_t loadOrderIndex = 0; loadOrderIndex < m_loadOrder.size(); loadOrderIndex++) {
-        PluginFile* plugin = &m_plugins[m_loadOrder[loadOrderIndex]];
+        PluginReader* plugin = &m_plugins[m_loadOrder[loadOrderIndex]];
+        
+        // Initialize file with a data view
+        std::string PluginFilePath = "Game:" + std::string(plugin->GetName());
+        DataView view = dataMgr->MapDataView(PluginFilePath);
+        if(!view) {
+            LOG(Fatal, LogPlugin, "Failed to map data view into a plugin file.");
+            return;
+        }
+        plugin->InitializeFileView(std::move(view));
+
+        // Check if plugin was opened and parsed successfully
         if(plugin->IsValid()) {
             if(!recLib->AddRecordSource(plugin)) {
                 LOG(Error, LogPlugin, "Failed to add record source at index.");

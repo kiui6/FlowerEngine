@@ -31,7 +31,6 @@ class DataManager : public IService
     mutable std::shared_mutex m_mtx;
 
     std::vector<MasterFile> m_masters;
-    //TODO: std::vector<PluginFile> m_plugins;
 
     std::unordered_map<std::string, FileHandle> m_fileHandles;
 
