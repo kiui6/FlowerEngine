@@ -2,9 +2,16 @@
 
 #include <Record/RecordID.h>
 
+#include <Utility/Types.h>
+
 struct SerialLUTEntry
 {
-    RecordID id;
-    uint64_t offset;
-    uint8_t deleted;
+    u64 id;
+    u64 offset;
+    u32 type;
+    u16 flags;
+    u16 fieldsCount;
 };
+
+static_assert(sizeof(SerialLUTEntry) % alignof(SerialLUTEntry) == 0);
+static_assert(sizeof(SerialLUTEntry) == 24);

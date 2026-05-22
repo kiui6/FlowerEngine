@@ -18,6 +18,8 @@ class PluginManager : public IService
 {
     static bool bIsInitialized;
 
+    // Contains loaded plugins for this session
+    // Should not be changed after initialization, unless reinitialization is called (i.e. load order is modified)
     std::vector<PluginReader> m_loadedPlugins;
 public:
     static std::string_view GetStaticName() {return "PluginManager";}

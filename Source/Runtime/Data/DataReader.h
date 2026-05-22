@@ -3,6 +3,7 @@
 #include "DataView.h"
 
 #include <optional>
+#include <type_traits>
 
 class DataReader {
     DataView& m_view;
@@ -12,6 +13,9 @@ public:
 
     inline void Advance(ptrdiff_t diff) {m_cursor += diff;}
     inline void SetOffset(size_t offset) {m_cursor = offset;}
+
+    inline size_t GetSize() {return m_view.size();}
+    inline size_t GetCursor() {return m_cursor;}
 
     std::optional<std::byte> ReadByte(bool advance = true);
     std::optional<std::byte*> ReadBytes(size_t length, bool advance = true);
@@ -26,6 +30,20 @@ public:
 
     std::optional<const char*> ReadString(size_t length, bool advance = true);
 
+    template <typename T>
+    requires std::is_trivially_copyable_v<T>
+    std::optional<T> Read(bool advance = true) {
+        if((m_view.size() - m_cursor) < sizeof(T)) {
+            return {};
+        }
+
+        T object;
+        memcpy(&object, m_view.data() + m_cursor, sizeof(object));
+
+        if(advance) Advance(sizeof(object));
+
+        return object;
+    }
 };
 
 class TextualDataReader {

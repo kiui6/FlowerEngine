@@ -2,8 +2,13 @@
 
 #include <cstdint>
 
+#include <Utility/Types.h>
+
 struct SerialDependency
 {
-    uint16_t prefixIndex;
-    uint64_t dependencyID;
+    u64 prefixIndex;
+    u64 dependencyID;
 };
+
+static_assert(sizeof(SerialDependency) % alignof(SerialDependency) == 0);
+static_assert(sizeof(SerialDependency) == 16);

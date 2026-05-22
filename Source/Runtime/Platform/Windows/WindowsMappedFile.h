@@ -2,8 +2,12 @@
 
 #include "../MappedFile.h"
 
+#include "WinAPI.h"
+
 class WindowsMappedFile : public IMappedFile
 {
+    HANDLE m_hFile = INVALID_HANDLE_VALUE;
+    HANDLE m_hMapping = nullptr;
 protected:
     size_t m_size = 0;
     std::byte* m_data = nullptr;

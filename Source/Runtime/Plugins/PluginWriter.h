@@ -13,11 +13,6 @@ class PluginReader;
 
 class PluginWriter {
     PluginReader* m_reader = nullptr;
-
-    SerialHeader m_header;
-    std::vector<SerialDependency> m_dependency;
-    std::vector<SerialRecord> m_records;
-    std::vector<SerialLUTEntry> m_recordsLut;
 public:
     PluginWriter() = default;
     PluginWriter(PluginReader* reader) : m_reader(reader) {}

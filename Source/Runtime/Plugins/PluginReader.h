@@ -4,8 +4,13 @@
 #include <Data/DataView.h>
 #include <Data/DataReader.h>
 
-struct is_master_file_t {};
-is_master_file_t is_master_file;
+#include "Serial/SerialDependency.h"
+#include "Serial/SerialLUTEntry.h"
+#include "Serial/SerialHeader.h"
+#include "Serial/SerialField.h"
+
+struct is_master_plugin_t {};
+static constexpr is_master_plugin_t is_master_plugin{};
 
 class PluginReader : public IRecordSource {
     std::string m_name;
@@ -13,23 +18,22 @@ class PluginReader : public IRecordSource {
     std::optional<DataView> m_fileView;
     bool m_isMaster;
 
-    std::optional<DataView> m_dependenciesView;
+    uint16_t m_dependenciesCount = 0;
+    std::unordered_map<uint16_t, uint64_t> m_dependencies;
 
-    size_t recordsDataOffset;
     std::optional<DataView> m_recordsView;
 
-    size_t recordsLUTOffset;
-    size_t recordsLUTCount;
+    size_t m_recordsLUTCount = 0;
     std::optional<DataView> m_LUTView;
 public:
     PluginReader(std::string_view name) : m_name(name) {}
-    PluginReader(is_master_file_t, std::string_view name) : m_name(name), m_isMaster(true) {}
+    PluginReader(is_master_plugin_t, std::string_view name) : m_name(name), m_isMaster(true) {}
 
     bool IsMaster() const {return m_isMaster;}
     bool IsValid() const {return m_fileView.has_value() && m_fileView.value();}
     std::string_view GetName() const {return m_name;}
 
-    void InitializeFileView(DataView&& view) {m_fileView = std::move(view);}
+    void InitializeFileView(DataView&& view);
 
     RecordMemory FetchRecordMemory(RecordID id) override {return {};}
     ID32 FetchRecordType(RecordID id) override {return 0;}

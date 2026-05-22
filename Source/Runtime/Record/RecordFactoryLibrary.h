@@ -35,3 +35,11 @@ bool RegisterRecordFactory()
     RecordFactoryLibrary::Get().RegisterFactory(factory->GetRecordType(), factory);
     return true;
 }
+
+template <RecordClass RecordType>
+bool RegisterTemplatedRecordFactory()
+{
+    RecordFactory* factory = new TemplatedRecordFactory<RecordType>();
+    RecordFactoryLibrary::Get().RegisterFactory(factory->GetRecordType(), factory);
+    return true;
+}

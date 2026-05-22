@@ -92,7 +92,9 @@ set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime
 
 set(SrcMixin )
 
-set(SrcPlugin "Source/Runtime/Plugins/PluginManager.cpp")
+set(SrcPlugin "Source/Runtime/Plugins/PluginManager.cpp" "Source/Runtime/Plugins/PluginReader.cpp")
+
+set(SrcEntry "Source/Runtime/Entry/EntryRecord.cpp")
 
 set(SrcRender  
     # Render Engine

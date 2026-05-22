@@ -16,8 +16,8 @@ inline FileAccess operator|(FileAccess a, FileAccess b) {
     return static_cast<FileAccess>(static_cast<uint8_t>(a) | static_cast<uint8_t>(b));
 }
 
-inline FileAccess operator&(FileAccess a, FileAccess b) {
-    return static_cast<FileAccess>(static_cast<uint8_t>(a) & static_cast<uint8_t>(b));
+inline bool operator&(FileAccess a, FileAccess b) {
+    return (static_cast<uint8_t>(a) & static_cast<uint8_t>(b)) != 0;
 }
 
 inline bool operator!(FileAccess a) {

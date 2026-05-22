@@ -2,26 +2,29 @@
 
 #include <Utility/ID.h>
 
-#include <cstddef>
+#include <Utility/Types.h>
 
-constexpr uint32_t CURRENT_PLUGIN_FILE_VERSION = 0x00;
+constexpr u32 CURRENT_PLUGIN_FILE_VERSION = 0x00;
 
 struct SerialHeader
 {
-    uint32_t magic = 0xEDEDEDED;
-    uint32_t version = CURRENT_PLUGIN_FILE_VERSION;
-    uint64_t pluginID = 0;
+    u32 magic = 0xEDEDEDED;
+    u32 version = CURRENT_PLUGIN_FILE_VERSION;
+    u64 pluginID = 0;
 
-    uint16_t dependencyCount = 0;
-    uint64_t dependenciesOffset = 0;
+    u64 recordsLutCount = 0;
+    u64 recordsLutOffset = 0;
 
-    uint64_t recordsLutCount = 0;
-    uint64_t recordsLutOffset = 0;
+    u64 recordsBlobSize = 0;
+    u64 recordsBlobOffset = 0;
 
-    uint64_t recordsBlobSize = 0;
-    uint64_t recordsBlobOffset = 0;
+    u64 dependenciesOffset = 0;
+    u16 dependencyCount = 0;
 
-    uint32_t checksum = 0;
+    u16 padding;
 
-    uint8_t padding[2];
+    u32 checksum;
 };
+
+static_assert(sizeof(SerialHeader) % alignof(SerialHeader) == 0);
+static_assert(sizeof(SerialHeader) == 64);

@@ -2,11 +2,10 @@
 
 #include <Utility/ID.h>
 
-#include <cstddef>
+#include <Utility/Types.h>
 
 struct SerialField
 {
-    ID32 id;
-    uint32_t dataSize;
-    std::byte* data;
+    u32 id;
+    u32 dataSize;
 };
