@@ -53,7 +53,7 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
     result.SetRecordType(lutEntry.type); 
 
     // If record is marked as deleted in the Look-up Table, we can ignore reading any fields
-    if(lutEntry.flags & PLUGIN_SERIAL_RECORD_FLAG_DELETED) {
+    if(lutEntry.flags & SerialRecordFlags::Deleted) {
         result.SetDeleted(true);
         return true;
     }    

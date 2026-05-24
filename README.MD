@@ -1,10 +1,10 @@
 # Flower++
-**Flower++** is a C++23 rewrite of Flower TypeScript game engine for JRPG games.
 
-All assets are compatible between two backends.
+![logo](./Docs/Img/flower_editor_icon.png)
+
+**Flower++** is a Modern C++ game engine for JRPG games.
 
 # Compilation
-
 Clang is heavily recomended.
 
 Required libraries:

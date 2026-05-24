@@ -4,14 +4,20 @@
 
 #include <Utility/Types.h>
 
-constexpr uint16_t PLUGIN_SERIAL_RECORD_FLAG_DELETED = 1 << 0;
+enum class SerialRecordFlags : u16 {
+    Deleted = 1 << 0,
+};
+
+inline bool operator&(SerialRecordFlags a, SerialRecordFlags b) {
+    return (static_cast<u16>(a) & static_cast<u16>(b)) != 0;
+}
 
 struct SerialLUTEntry
 {
     u64 id;
     u64 offset;
     u32 type;
-    u16 flags;
+    SerialRecordFlags flags;
     u16 fieldsCount;
 };
 
