@@ -16,13 +16,19 @@ class RecordMemory {
     bool m_isDeleted = false;
     bool m_isOverride = false;
 public:
-    inline void AddField(ID32 fieldId, RecordFieldMemory && fieldMemory) { m_fieldMems.emplace(fieldId, std::move(fieldMemory)); }
+    inline RecordFieldMemory& AddFieldAndRetrieveMemory(ID32 fieldId) { 
+        return m_fieldMems.emplace(fieldId, RecordFieldMemory{}).first->second;
+    }
     inline void SetRecordID(uint64_t id) {m_recordID = id;}
     inline void SetRecordType(ID32 type) {m_type = type;}
     inline void SetDeleted(bool val) {m_isDeleted = val;}
     inline void SetOverride(bool val) {m_isOverride = val;}
 
-    inline std::optional<RecordFieldMemory*> GetField(ID32 id) {
+    inline ID32 GetID() const {return m_recordID;}
+    inline ID32 GetType() const {return m_type;}
+    inline bool IsDeleted() const {return m_isDeleted;}
+    
+    inline RecordFieldMemory* GetField(ID32 id) {
         const auto& pair = m_fieldMems.find(id);
         if(pair != m_fieldMems.end()) {
             return &pair->second;
@@ -31,5 +37,4 @@ public:
         return {};
     }
 
-    inline bool IsDeleted() const {return m_isDeleted;}
 };

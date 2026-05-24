@@ -18,51 +18,48 @@ public:
     inline size_t GetCursor() {return m_cursor;}
 
     std::optional<std::byte> ReadByte(bool advance = true);
-    std::optional<std::byte*> ReadBytes(size_t length, bool advance = true);
+    bool ReadBytes(size_t length, std::unique_ptr<std::byte[]>& result, bool advance = true);
 
-    std::optional<std::string> ReadString(size_t length, bool advance = true) {
+    bool ReadString(size_t length, std::string& result, bool advance = true) {
         if((m_view.size() - m_cursor) < length) {
-            return {};
+            return false;
         }
 
-        std::string str;
-        str.reserve(length);
-        memcpy(str.data(), m_view.data() + m_cursor, length);
+        result.reserve(length);
+        memcpy(result.data(), m_view.data() + m_cursor, length);
 
         if(advance) Advance(length);
 
-        return str;
+        return true;
     }
     
     template <typename T>
     requires std::is_trivially_copyable_v<T>
-    std::optional<std::vector<T>> ReadArray(size_t length, bool advance = true) {
+    bool ReadArray(size_t length, std::vector<T>& result, bool advance = true) {
         if((m_view.size() - m_cursor) < (sizeof(T) * length)) {
-            return {};
+            return false;
         }
 
-        std::vector<T> vector;
-        vector.reserve(length);
-        memcpy(vector.data(), m_view.data() + m_cursor, sizeof(T) * length);
+        result.reserve(length);
+        memcpy(result.data(), m_view.data() + m_cursor, sizeof(T) * length);
 
         if(advance) Advance(sizeof(T) * length);
 
-        return vector;
+        return true;
     }
 
     template <typename T>
     requires std::is_trivially_copyable_v<T>
-    std::optional<T> Read(bool advance = true) {
+    bool Read(T& result, bool advance = true) {
         if((m_view.size() - m_cursor) < sizeof(T)) {
-            return {};
+            return false;
         }
 
-        T object;
-        memcpy(&object, m_view.data() + m_cursor, sizeof(object));
+        memcpy(&result, m_view.data() + m_cursor, sizeof(result));
 
-        if(advance) Advance(sizeof(object));
+        if(advance) Advance(sizeof(result));
 
-        return object;
+        return true;
     }
 };
 

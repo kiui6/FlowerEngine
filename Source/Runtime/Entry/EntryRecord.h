@@ -14,6 +14,12 @@ public:
     Field<StringField> StartupScriptPath {FIELDID(SCRI)};
 
     static ID32 StaticType() {return MakeID32("ENTR");}
+
+    virtual std::vector<FieldBase*> GetFields() override {
+        std::vector<FieldBase*> fields = Record::GetFields();
+        fields.push_back(&StartupScriptPath);
+        return fields;
+    }
 };
 
 class EntryRecordFactory : public TemplatedRecordFactory<EntryRecord>

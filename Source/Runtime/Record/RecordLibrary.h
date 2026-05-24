@@ -76,7 +76,7 @@ public:
      * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
      */
     template <RecordClass T>
-    RecordPtr<T> CreateRecord(uint16_t pluginID = s_runtimeModID);
+    [[nodiscard]] RecordPtr<T> CreateRecord(uint16_t pluginID = s_runtimeModID);
 
     /*
      * Creates new serializable record of specified type and puts it into library
@@ -98,7 +98,7 @@ public:
      * @returns
      * RecordPtr of requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if creation failed. 
      */
-    RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint16_t pluginID = s_runtimeModID);
+    [[nodiscard]] RecordPtr<Record> CreateRecordFromType(uint32_t recordType, uint16_t pluginID = s_runtimeModID);
 
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
@@ -113,7 +113,7 @@ public:
      * RecordPtr of record with requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
      */
     template <RecordClass T>
-    RecordPtr<T> LoadRecord(RecordID recordID);
+    [[nodiscard]] RecordPtr<T> LoadRecord(RecordID recordID);
 
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
@@ -127,7 +127,7 @@ public:
      * @returns
      * RecordPtr of polymorphic record. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
      */
-    RecordPtr<Record> LoadRecordRaw(RecordID recordID);
+    [[nodiscard]] RecordPtr<Record> LoadRecordRaw(RecordID recordID);
 
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
@@ -146,12 +146,12 @@ public:
      * RecordPtr of record with requested type. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record, 
      * or record's type doesn't match requested type. 
      */
-    RecordPtr<Record> LoadRecordOfType(RecordID recordID, ID32 type);
+    [[nodiscard]] RecordPtr<Record> LoadRecordOfType(RecordID recordID, ID32 type);
 
     template <RecordClass T>
-    RecordPtr<T> GetRecord(RecordID recordID);
-    RecordPtr<Record> GetRecordRaw(RecordID recordID);
-    RecordPtr<Record> GetRecordOfType(RecordID recordID, ID32 type);
+    [[nodiscard]] RecordPtr<T> GetRecord(RecordID recordID);
+    [[nodiscard]] RecordPtr<Record> GetRecordRaw(RecordID recordID);
+    [[nodiscard]] RecordPtr<Record> GetRecordOfType(RecordID recordID, ID32 type);
     
     void UnloadRecord(RecordID recordID);
     bool IsValidRecord(RecordID recordID) const;
@@ -203,13 +203,46 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
         }
     }
 
-    // TODO: Attempt loading from merged data files
-    if(false) {
-        LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    // TODO: Implement merging
+    RecordMemory memory;
+    if(!RecordMerger::Merge(m_sources, recordID, memory)) {
+        LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+        return {};
     }
 
-    LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
-    return {recordID, nullptr};
+    if(memory.IsDeleted()) {
+        LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]. Record is deleted", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+            return {};
+    }
+
+    if(memory.GetType() != T::StaticType()) {
+        LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]. Record type mismatch, actual type is Type[%c%c%c%c]", recordID, 
+            T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24,
+            memory.GetType(), memory.GetType() >> 8, memory.GetType() >> 16, memory.GetType() >> 24);
+            return {};
+    }
+
+    T* record = new T();
+    record->SetID(recordID);
+
+    for(FieldBase* field : record->GetFields()) {
+        RecordFieldMemory* fieldMem = memory.GetField(field->GetID());
+        if(!fieldMem) {
+            /*
+            LOGF(Warning, LogRecord, "Found no Field[%c%c%c%c] data for Record[0x%016llX] of Type[%c%c%c%c].", 
+                field->GetID(), field->GetID() >> 8, field->GetID() >> 16, field->GetID() >> 24,
+                recordID, 
+                T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+            */
+            continue;
+        }
+        field->Deserialize(fieldMem);
+    }
+
+    m_records.emplace(recordID, std::unique_ptr<Record>(record));
+
+    LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    return {recordID, record};
 }
 
 template <RecordClass T>

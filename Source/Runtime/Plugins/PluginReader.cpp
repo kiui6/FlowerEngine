@@ -1,6 +1,7 @@
 #include "PluginReader.h"
 
 #include <Log/Log.h>
+#include <Debug/Tracer/Tracer.h>
 
 #include <vector>
 
@@ -15,96 +16,121 @@ void PluginReader::InitializeFileView(DataView &&view)
 
     DataReader fileReader(*m_fileView);
 
-    std::optional<SerialHeader> header = fileReader.Read<SerialHeader>();
-    if(!header) {
+    SerialHeader header;
+    if(!fileReader.Read<SerialHeader>(header)) {
         LOGF(Assert, LogPluginReader, "Plugin reader couldn't read plugin's header");
         return;
     }
 
-    m_dependenciesCount = header->dependencyCount; 
+    m_dependenciesCount = header.dependencyCount; 
     if(m_dependenciesCount) {
-        DataView dependenciesView = m_fileView->MakeSubView(header->dependenciesOffset, m_dependenciesCount * sizeof(SerialDependency));
+        DataView dependenciesView = m_fileView->MakeSubView(header.dependenciesOffset, m_dependenciesCount * sizeof(SerialDependency));
         DataReader dependenciesReader(dependenciesView);
 
-        std::optional<SerialDependency> dependency = dependenciesReader.Read<SerialDependency>();
-        while(dependency.has_value()) {
-            m_dependencies.emplace(dependency->prefixIndex, dependency->dependencyID);
-
-            dependency = dependenciesReader.Read<SerialDependency>();
+        SerialDependency dependency;
+        while(dependenciesReader.Read<SerialDependency>(dependency)) {
+            m_dependencies.emplace(dependency.prefixIndex, dependency.dependencyID);
         }
     }
 
-    m_recordsView = m_fileView->MakeSubView(header->recordsBlobOffset, header->recordsBlobSize);
+    m_recordsView = m_fileView->MakeSubView(header.recordsBlobOffset, header.recordsBlobSize);
     
-    m_recordsLUTCount = header->recordsLutCount;
-    m_LUTView = m_fileView->MakeSubView(header->recordsLutOffset, header->recordsLutCount * sizeof(SerialLUTEntry));
-
-    auto rec = FetchRecordMemory(3);
+    m_recordsLUTCount = header.recordsLutCount;
+    m_LUTView = m_fileView->MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
-std::optional<RecordMemory> PluginReader::FetchRecordMemory(RecordID id)
+bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
 {
-    std::optional<SerialLUTEntry> lutEntry = FindRecordLUTEntry(id);
-    if(!lutEntry) {
-        return {};
+    SerialLUTEntry lutEntry;
+    if(!FindRecordLUTEntry(id, lutEntry)) {
+        return false;
     }
 
-    DataView recordFieldsView = FindRecordFromOffset(lutEntry->offset);
+    DataView recordFieldsView = FindRecordFromOffset(lutEntry.offset);
     DataReader recordFieldsReader(recordFieldsView);
 
-    RecordMemory memory;
-    memory.SetRecordID(id);
-    memory.SetRecordType(lutEntry->type); 
+    result.SetRecordID(id);
+    result.SetRecordType(lutEntry.type); 
 
     // If record is marked as deleted in the Look-up Table, we can ignore reading any fields
-    if(lutEntry->flags & PLUGIN_SERIAL_RECORD_FLAG_DELETED) {
-        memory.SetDeleted(true);
-        return memory;
+    if(lutEntry.flags & PLUGIN_SERIAL_RECORD_FLAG_DELETED) {
+        result.SetDeleted(true);
+        return true;
     }    
 
-    for(uint16_t i = 0; i < lutEntry->fieldsCount; i++) {
-        std::optional<SerialField> fieldHeader = recordFieldsReader.Read<SerialField>();
-        if(!fieldHeader) {
+    for(uint16_t i = 0; i < lutEntry.fieldsCount; i++) {
+        SerialField fieldHeader;
+        if(!recordFieldsReader.Read<SerialField>(fieldHeader)) {
             LOGF(Assert, LogPluginReader, "Expected field header, but met unexpected EOF.");
-            return {};
+            return false;
         }
 
-        std::optional<std::byte*> fieldData = recordFieldsReader.ReadBytes(fieldHeader->dataSize);
-        if(!fieldData) {
+        RecordFieldMemory& fieldMem = result.AddFieldAndRetrieveMemory(fieldHeader.id);
+        uint32_t dataSize;
+
+        // TODO: Implement algorithms for all types
+        switch(fieldHeader.type) {
+            case FieldType::String:
+                if(!recordFieldsReader.Read<uint32_t>(dataSize)) {
+                    LOGF(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
+                    return false;
+                }
+                break;
+            default:
+                dataSize = GetFixedFieldSizeFromType(fieldHeader.type);
+        };
+
+        if(!recordFieldsReader.ReadBytes(dataSize, fieldMem.data)) {
             LOGF(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
-            return {};
+            return false;
         }
 
-        RecordFieldMemory fieldMem;
-        fieldMem.data.assign(*fieldData, *fieldData + fieldHeader->dataSize);
-        
-        memory.AddField(fieldHeader->id, std::move(fieldMem));
+        fieldMem.type = fieldHeader.type;
+        fieldMem.size = dataSize;
     }
 
-    return memory;
+    return true;
 }
 
-std::optional<SerialLUTEntry> PluginReader::FindRecordLUTEntry(RecordID id)
+bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
 {
     size_t entryOffset = 0;
     DataReader reader(*m_LUTView);
 
     size_t left = 0, right = m_recordsLUTCount;
+    RecordID entryID;
     while(left <= right) {
         // Division result should be guaranteed to be truncated towards zero
         size_t mid = left + (right - left) / 2;
 
         reader.Advance(mid * sizeof(SerialLUTEntry));
-        RecordID entryID = *reader.Read<RecordID>(false);
+        reader.Read<RecordID>(entryID, false);
 
-        if (entryID == id) return reader.Read<SerialLUTEntry>(false);
+        if (entryID == id) return reader.Read<SerialLUTEntry>(result, false);
         else if (entryID < id) left = mid + 1;
         else right = mid - 1;
     }
-    return {};
+    return false;
 }
 
 DataView PluginReader::FindRecordFromOffset(size_t offset)
 {
     return m_recordsView->MakeSubView(offset, m_recordsView->size() - offset);
+}
+
+uint8_t PluginReader::GetFixedFieldSizeFromType(FieldType type)
+{
+    switch(type) {
+        case FieldType::Integer:
+            return 4;
+        case FieldType::Unsigned:
+            return 4;
+        case FieldType::Float:
+            return 4;
+        case FieldType::Boolean:
+            return 1;
+        default:
+            return 0;
+    }
+    return 0;
 }

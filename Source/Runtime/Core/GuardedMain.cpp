@@ -7,6 +7,7 @@
 #include <Assets/AssetLibrary.h>
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
+#include <Entry/EntryRecord.h>
 
 #ifdef HAS_DEBUGUI
 #   ifdef EDITOR
@@ -68,6 +69,8 @@ int GuardedMain(int argc, char* argv[])
     {
     RecordPtr<TextureRecord> gcRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     }
+
+    RecordPtr<EntryRecord> loadedRec = GetService<RecordLibrary>()->LoadRecord<EntryRecord>(2);
 
     // This should trigger GC
     GetService<GarbageCollector>()->RequestGCPass();

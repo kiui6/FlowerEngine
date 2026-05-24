@@ -1,6 +1,10 @@
 #include "RecordMerger.h"
 
-std::optional<RecordMemory> RecordMerger::Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId)
+bool RecordMerger::Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordMemory& result)
 {
-    return {};
+    for(const auto& [key, source] : sources) {
+        source->FetchRecordMemory(recordId, result);
+    }
+
+    return true;
 }

@@ -4,8 +4,13 @@
 
 #include <Utility/Types.h>
 
+#include <Record/RecordFieldMemory.h>
+
 struct SerialField
 {
     u32 id;
-    u32 dataSize;
+    FieldType type;
 };
+
+static_assert(sizeof(SerialField) % alignof(SerialField) == 0);
+static_assert(sizeof(SerialField) == 8);

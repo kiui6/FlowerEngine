@@ -68,7 +68,7 @@ set(SrcInput "Source/Runtime/Input/InputManager.cpp")
 
 set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp")
 
-set(SrcRecord "Source/Runtime/Record/Record.cpp" "Source/Runtime/Record/RecordLibrary.cpp" "Source/Runtime/Record/RecordPtr.cpp" )
+set(SrcRecord "Source/Runtime/Record/Record.cpp" "Source/Runtime/Record/RecordLibrary.cpp" "Source/Runtime/Record/RecordPtr.cpp" "Source/Runtime/Record/RecordMerger.cpp" )
 
 set(SrcAssets "Source/Runtime/Assets/Entity/EntityTemplate/EntityTemplateCompiler.cpp" "Source/Runtime/Assets/Entity/ComponentTemplate/EntityComponentTemplateLibrary.cpp")
 

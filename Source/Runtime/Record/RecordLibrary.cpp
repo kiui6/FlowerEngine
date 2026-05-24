@@ -52,6 +52,16 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint1
 
 RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
 {
+    std::unique_lock lock(m_mtx);
+
+    RecordMemory memory;
+    if(!RecordMerger::Merge(m_sources, recordID, memory)) {
+        // TODO: Log error;
+        return {};
+    }
+
+    // TODO
+
     return RecordPtr<Record>();
 }
 

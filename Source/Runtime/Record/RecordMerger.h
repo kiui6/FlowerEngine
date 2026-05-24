@@ -10,5 +10,5 @@
 
 struct RecordMerger
 {
-    static std::optional<RecordMemory> Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId);
+    static bool Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordMemory& result);
 };

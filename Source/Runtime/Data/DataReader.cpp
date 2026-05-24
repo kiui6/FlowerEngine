@@ -5,18 +5,18 @@ std::optional<std::byte> DataReader::ReadByte(bool advance)
     return std::optional<std::byte>();
 }
 
-std::optional<std::byte *> DataReader::ReadBytes(size_t length, bool advance)
+bool DataReader::ReadBytes(size_t length, std::unique_ptr<std::byte[]>& result, bool advance)
 {
     if((m_view.size() - m_cursor) < (length)) {
-        return {};
+        return false;
     }
 
-    std::byte* data = new std::byte[length];
-    memcpy(data, m_view.data() + m_cursor, length);
+    result = std::make_unique<std::byte[]>(length);
+    memcpy(result.get(), m_view.data() + m_cursor, length);
 
     if(advance) Advance(length);
 
-    return data;
+    return true;
 }
 
 void TextualDataReader::NextLine()
