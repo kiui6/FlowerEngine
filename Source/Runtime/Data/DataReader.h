@@ -20,15 +20,35 @@ public:
     std::optional<std::byte> ReadByte(bool advance = true);
     std::optional<std::byte*> ReadBytes(size_t length, bool advance = true);
 
-    std::optional<int16_t> ReadInt16(bool advance = true);
-    std::optional<int32_t> ReadInt32(bool advance = true);
-    std::optional<int64_t> ReadInt64(bool advance = true);
+    std::optional<std::string> ReadString(size_t length, bool advance = true) {
+        if((m_view.size() - m_cursor) < length) {
+            return {};
+        }
 
-    std::optional<uint16_t> ReadUInt16(bool advance = true);
-    std::optional<uint32_t> ReadUInt32(bool advance = true);
-    std::optional<uint64_t> ReadUInt64(bool advance = true);
+        std::string str;
+        str.reserve(length);
+        memcpy(str.data(), m_view.data() + m_cursor, length);
 
-    std::optional<const char*> ReadString(size_t length, bool advance = true);
+        if(advance) Advance(length);
+
+        return str;
+    }
+    
+    template <typename T>
+    requires std::is_trivially_copyable_v<T>
+    std::optional<std::vector<T>> ReadArray(size_t length, bool advance = true) {
+        if((m_view.size() - m_cursor) < (sizeof(T) * length)) {
+            return {};
+        }
+
+        std::vector<T> vector;
+        vector.reserve(length);
+        memcpy(vector.data(), m_view.data() + m_cursor, sizeof(T) * length);
+
+        if(advance) Advance(sizeof(T) * length);
+
+        return vector;
+    }
 
     template <typename T>
     requires std::is_trivially_copyable_v<T>
@@ -59,5 +79,7 @@ class TextualDataReader {
 public:
     TextualDataReader(DataView& view) : m_view(view) {}
 
-    std::optional<std::string_view> ReadNextLine();
+    void NextLine();
+
+    std::optional<std::string> ReadLine();
 };

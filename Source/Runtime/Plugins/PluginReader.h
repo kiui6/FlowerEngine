@@ -35,7 +35,10 @@ public:
 
     void InitializeFileView(DataView&& view);
 
-    RecordMemory FetchRecordMemory(RecordID id) override {return {};}
-    ID32 FetchRecordType(RecordID id) override {return 0;}
+    std::optional<RecordMemory> FetchRecordMemory(RecordID id) override;
+    std::optional<ID32> FetchRecordType(RecordID id) override {return {};}
     bool HasRecord(RecordID id) override {return false;}
+protected:
+    std::optional<SerialLUTEntry> FindRecordLUTEntry(RecordID id); 
+    DataView FindRecordFromOffset(size_t offset); 
 };

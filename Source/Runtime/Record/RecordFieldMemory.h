@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 
 struct RecordFieldMemory {
-    size_t size = 0;
-    std::byte* memory;
+    std::vector<std::byte> data;
 };

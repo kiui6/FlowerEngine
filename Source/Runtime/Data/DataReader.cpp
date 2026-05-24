@@ -7,45 +7,63 @@ std::optional<std::byte> DataReader::ReadByte(bool advance)
 
 std::optional<std::byte *> DataReader::ReadBytes(size_t length, bool advance)
 {
-    return std::optional<std::byte *>();
+    if((m_view.size() - m_cursor) < (length)) {
+        return {};
+    }
+
+    std::byte* data = new std::byte[length];
+    memcpy(data, m_view.data() + m_cursor, length);
+
+    if(advance) Advance(length);
+
+    return data;
 }
 
-std::optional<int16_t> DataReader::ReadInt16(bool advance)
+void TextualDataReader::NextLine()
 {
-    return std::optional<int16_t>();
+    const std::byte* begin = m_view.begin();
+    while(m_cursor < m_view.size() && *(begin + m_cursor) != static_cast<std::byte>('\n')) {
+        m_symbol++;
+        m_cursor++;
+    }
+
+    if (m_cursor < m_view.size() && begin[m_cursor] == static_cast<std::byte>('\n')) {
+        m_cursor++;
+        m_line++;
+        m_symbol = 0;
+    }
 }
 
-std::optional<int32_t> DataReader::ReadInt32(bool advance)
+std::optional<std::string> TextualDataReader::ReadLine()
 {
-    return std::optional<int32_t>();
-}
+    if(m_cursor >= m_view.size()) {
+        return {};
+    }
 
-std::optional<int64_t> DataReader::ReadInt64(bool advance)
-{
-    return std::optional<int64_t>();
-}
+    std::string value;
+    size_t length;
+    uint8_t hasR = false;
 
-std::optional<uint16_t> DataReader::ReadUInt16(bool advance)
-{
-    return std::optional<uint16_t>();
-}
+    const std::byte* begin = m_view.begin();
+    size_t tempCursor = m_cursor;
+    while(tempCursor < m_view.size() && *(begin + tempCursor) != static_cast<std::byte>('\n')) {
+        tempCursor++;
+        if(begin[tempCursor] == static_cast<std::byte>('\r')) {
+            hasR = 1;
+        }
+    }
 
-std::optional<uint32_t> DataReader::ReadUInt32(bool advance)
-{
-    return std::optional<uint32_t>();
-}
+    length = tempCursor - m_cursor - hasR;
+    value.resize(length);
+    memcpy(value.data(), begin + m_cursor, length);
 
-std::optional<uint64_t> DataReader::ReadUInt64(bool advance)
-{
-    return std::optional<uint64_t>();
-}
+    m_cursor = tempCursor;
 
-std::optional<const char *> DataReader::ReadString(size_t length, bool advance)
-{
-    return std::optional<const char *>();
-}
+    if (m_cursor < m_view.size() && begin[m_cursor] == static_cast<std::byte>('\n')) {
+        m_cursor++;
+        m_line++;
+        m_symbol = 0;
+    }
 
-std::optional<std::string_view> TextualDataReader::ReadNextLine()
-{
-    return {};
+    return value;
 }

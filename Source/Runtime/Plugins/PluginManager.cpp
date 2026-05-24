@@ -27,11 +27,11 @@ void PluginManager::Initialize()
     if(loadOrderConfigView) {
         TextualDataReader loadOrderConfigReader(loadOrderConfigView);
 
-        std::optional<std::string_view> loadOrderConfigLine = loadOrderConfigReader.ReadNextLine();
+        std::optional<std::string> loadOrderConfigLine = loadOrderConfigReader.ReadLine();
         while(loadOrderConfigLine.has_value()) {
             m_loadedPlugins.push_back(PluginReader(loadOrderConfigLine.value()));
 
-            loadOrderConfigLine = loadOrderConfigReader.ReadNextLine();
+            loadOrderConfigLine = loadOrderConfigReader.ReadLine();
         }
     }
     // Just in case check for load order vector to be smaller than size of uint16_t
