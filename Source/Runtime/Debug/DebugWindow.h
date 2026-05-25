@@ -3,6 +3,7 @@
 class DebugWindow {
     bool m_isVisible = true;
 protected:
+    virtual void OnUpdate() = 0;
     virtual void OnRender() = 0;
 public:
     virtual ~DebugWindow() = default;
@@ -11,6 +12,7 @@ public:
     inline bool IsVisible() const {return m_isVisible;}
 
     void Render() {
+        this->OnUpdate();
         if(m_isVisible) {
             this->OnRender();
         }
