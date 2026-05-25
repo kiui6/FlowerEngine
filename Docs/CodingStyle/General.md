@@ -1,10 +1,23 @@
 # General Code Style Guidelines
 
 ## Naming convention
-For non-public class fields, prefix `m_` is used. first letter after the prefix should be non-capital, but first letter of each following word should be capitalized. Example: `uint32_t m_frameCount;`
+ * For non-public class fields, prefix `m_` is used. first letter after the prefix should be non-capital, but first letter of each following word should be capitalized. Example: `uint32_t m_frameCount;`
 
-Functions should start from capital letter, and each word in the name should also start from a capital letter. Example: `void ResetAllObjects();`
+ * Functions should start from capital letter, and each word in the name should also start from a capital letter. Example: `void ResetAllObjects();`
 
+ * Comments should not explain what's happening in the section. They should explain why it's happening. Use comments to explain ambiguous or subtle mechanisms of code, not its flow.
+
+ * Self-explanatary code should be prioritized over comments.
+    ```c++
+    Don't:
+    // View into record's field data
+    auto data = GetService<DataManager>()->OpenView(m_path);
+    
+    Do:
+    DataView recordFieldsDataView = GetService<DataManager>()->OpenView(m_pluginFilePath);
+    ```
+
+    
 ## Memory Ownership
 All code must explicitly state ownership model using C++ smart pointers unless stated otherwise.
 
@@ -32,7 +45,7 @@ void DataConsumer() {
 ```
 
 ### Shared Ownership
-If class has shared ownership of data with other elements, 
+If class has shared ownership of data with other elements, `std::shared_ptr` should be used. In this case, resource's lifetime will be shared between all objects storing the pointer.
 
 ### Observing Ownership
 Sometimes we don't want a single class to own and manage data and its lifecycle. Instead we want consumers to grab and use it, and our class to know when it's not used by anything anymore(aka being an `Observer`). Here we can use `std::weak_ptr` or `std::shared_ptr` based on whether we want deletion immediately after references are released or deferred to later. 
@@ -52,7 +65,7 @@ class ObserverService : public IService {
     std::weak_ptr<Data> m_data;
 public:
     DataView LoadData() {
-        if(!m_data.has_expired()) {
+        if(!m_data.expired()) {
             return DataView(m_data.lock()); 
         } else {
             // Load data and return DataView
@@ -65,7 +78,7 @@ public:
 
 // Data consumer
 void DataConsumer() {
-    DataView myData = GetService<ObserverService>()->GetData();
+    DataView myData = GetService<ObserverService>()->LoadData();
     if(!myData) {
         // Handle error
     }

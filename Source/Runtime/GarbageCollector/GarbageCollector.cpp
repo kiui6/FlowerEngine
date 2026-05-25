@@ -67,9 +67,7 @@ void GarbageCollector::RunGCPass(bool unrestricted)
     // Unlock queue mutex and move candidates back to original vector
     {
         std::unique_lock queueReturnLock(m_GCQueueMtx);
-        for (auto&& elem : unloadCandidates) {
-            m_unloadCandidates.insert(elem);
-        }
+        m_unloadCandidates.insert_range(unloadCandidates);
     }    
     
     m_GCRequest.store(0x00, std::memory_order_release);
