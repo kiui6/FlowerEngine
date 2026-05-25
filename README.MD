@@ -8,4 +8,5 @@
 Clang is heavily recomended.
 
 Required libraries:
-* libstdc++ (14.0+)
+* clang 19 or newer(g++-15 or newer)
+* libstdc++ (15.0+)

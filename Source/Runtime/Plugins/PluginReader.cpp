@@ -10,7 +10,7 @@ void PluginReader::InitializeFileView(DataView &&view)
     m_fileView = std::move(view);
 
     if(!m_fileView) {
-        LOGF(Assert, LogPluginReader, "Plugin reader got invalid data view");
+        LOG(Assert, LogPluginReader, "Plugin reader got invalid data view");
         return;
     }
 
@@ -18,7 +18,7 @@ void PluginReader::InitializeFileView(DataView &&view)
 
     SerialHeader header;
     if(!fileReader.Read<SerialHeader>(header)) {
-        LOGF(Assert, LogPluginReader, "Plugin reader couldn't read plugin's header");
+        LOG(Assert, LogPluginReader, "Plugin reader couldn't read plugin's header");
         return;
     }
 
@@ -61,7 +61,7 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
     for(uint16_t i = 0; i < lutEntry.fieldsCount; i++) {
         SerialField fieldHeader;
         if(!recordFieldsReader.Read<SerialField>(fieldHeader)) {
-            LOGF(Assert, LogPluginReader, "Expected field header, but met unexpected EOF.");
+            LOG(Assert, LogPluginReader, "Expected field header, but met unexpected EOF.");
             return false;
         }
 
@@ -72,7 +72,7 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
         switch(fieldHeader.type) {
             case FieldType::String:
                 if(!recordFieldsReader.Read<uint32_t>(dataSize)) {
-                    LOGF(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
+                    LOG(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
                     return false;
                 }
                 break;
@@ -81,7 +81,7 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
         };
 
         if(!recordFieldsReader.ReadBytes(dataSize, fieldMem.data)) {
-            LOGF(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
+            LOG(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
             return false;
         }
 
