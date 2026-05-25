@@ -21,7 +21,7 @@ One example of a case where using custom allocator is preferred is when you push
 ```c++
 // Element is a trivially constructible and destructible structure
 
-Don't:
+Dont:
 std::vector<Element> m_dataContainer;
 
 // Clearing a vector results in destruction of the whole range

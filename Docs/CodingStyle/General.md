@@ -9,7 +9,7 @@
 
  * Self-explanatary code should be prioritized over comments.
     ```c++
-    Don't:
+    Dont:
     // View into record's field data
     auto data = GetService<DataManager>()->OpenView(m_path);
     
