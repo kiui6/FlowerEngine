@@ -12,6 +12,8 @@
 #include <Log/Log.h>
 #include <Utility/Hash.h>
 
+#include <Platform/PlatformDefines.h>
+
 class AssetLibrary : public IService
 {
     static bool bIsInitialized;
@@ -63,7 +65,9 @@ inline AssetPtr<T> AssetLibrary::LoadAsset(std::string_view path)
 
     auto pair = m_loadedAssets.emplace(path, std::move(asset));
 
-    LOGF(Log, LogAssetLibrary, "Loaded Asset[%s] of Type[%c%c%c%c]", pair.first->second->GetPath().c_str(), T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    if constexpr(IS_VERBOSE) {
+        LOGF(Log, LogAssetLibrary, "Loaded Asset[%s] of Type[%c%c%c%c]", pair.first->second->GetPath().c_str(), T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    }
 
     return AssetPtr<T>(path, static_cast<T*>(pair.first->second.get()));
 }

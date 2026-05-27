@@ -16,6 +16,11 @@ class RecordMemory {
     bool m_isDeleted = false;
     bool m_isOverride = false;
 public:
+    RecordMemory() = default;
+    RecordMemory(RecordMemory&&) = default;
+    RecordMemory(RecordMemory&) = default;
+    ~RecordMemory() = default;
+
     inline RecordFieldMemory& AddFieldAndRetrieveMemory(ID32 fieldId) { 
         return m_fieldMems.emplace(fieldId, RecordFieldMemory{}).first->second;
     }
@@ -37,4 +42,11 @@ public:
         return {};
     }
 
+    inline void Reset() {
+        m_fieldMems.clear();
+        m_recordID = 0;
+        m_type = 0;
+        m_isDeleted = false;
+        m_isOverride = false;
+    }
 };

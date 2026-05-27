@@ -8,7 +8,18 @@
 #include "RecordMemory.h"
 #include "IRecordSource.h"
 
+#include <Utility/Defines.h>
+
 struct RecordMerger
 {
-    static bool Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordMemory& result);
+    std::vector<RecordMemory> m_memories;
+public:
+
+    void ResizeMemoryPool(size_t newPoolSize) {
+        if(newPoolSize > m_memories.size()) {
+            m_memories.resize(newPoolSize);
+        }
+    }
+
+    NODISCARD bool Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordMemory& result);
 };

@@ -29,6 +29,7 @@ public:
      */
     template <RenderElementClass T>
     T* CreateRenderElement() {
+        // TODO: Make memory reusable
         T* element = new T();
         m_elements.emplace_back(std::unique_ptr<RenderElement>(element));
         return element;

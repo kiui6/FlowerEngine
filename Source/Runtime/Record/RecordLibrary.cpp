@@ -45,7 +45,9 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint1
 
     m_records.emplace(id, record);
 
-    LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, recordType, recordType >> 8, recordType >> 16, recordType >> 24);
+    if constexpr(IS_VERBOSE) {
+        LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, recordType, recordType >> 8, recordType >> 16, recordType >> 24);
+    }
 
     return RecordPtr<Record>(id, record);
 }
@@ -55,7 +57,7 @@ RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
     std::unique_lock lock(m_mtx);
 
     RecordMemory memory;
-    if(!RecordMerger::Merge(m_sources, recordID, memory)) {
+    if(!m_merger.Merge(m_sources, recordID, memory)) {
         // TODO: Log error;
         return {};
     }

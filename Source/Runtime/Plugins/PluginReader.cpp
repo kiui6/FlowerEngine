@@ -97,18 +97,24 @@ bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
     size_t entryOffset = 0;
     DataReader reader(*m_LUTView);
 
-    size_t left = 0, right = m_recordsLUTCount;
+    int64_t left = 0, right = m_recordsLUTCount - 1;
     RecordID entryID;
     while(left <= right) {
         // Division result should be guaranteed to be truncated towards zero
         size_t mid = left + (right - left) / 2;
 
-        reader.Advance(mid * sizeof(SerialLUTEntry));
+        reader.SetOffset(mid * sizeof(SerialLUTEntry));
         reader.Read<RecordID>(entryID, false);
 
-        if (entryID == id) return reader.Read<SerialLUTEntry>(result, false);
-        else if (entryID < id) left = mid + 1;
-        else right = mid - 1;
+        if (entryID == id) {
+            return reader.Read<SerialLUTEntry>(result, false);
+        }
+        else if (entryID < id) { 
+            left = mid + 1;
+        }
+        else { 
+            right = mid - 1;
+        }
     }
     return false;
 }

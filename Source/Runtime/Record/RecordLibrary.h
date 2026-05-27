@@ -26,6 +26,7 @@ class RecordLibrary : public IService
     mutable std::shared_mutex m_mtx;
 
     std::map<uint16_t, IRecordSource*> m_sources;
+    RecordMerger m_merger;
 
     DataManager* m_datamgr = nullptr;
 
@@ -180,7 +181,9 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint16_t pluginID)
 
     m_records.emplace(id, std::unique_ptr<Record>(record));
 
-    LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    if constexpr(IS_VERBOSE) {
+        LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    }
 
     return RecordPtr<T>(id, record);
 }
@@ -205,7 +208,7 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
 
     // TODO: Implement merging
     RecordMemory memory;
-    if(!RecordMerger::Merge(m_sources, recordID, memory)) {
+    if(!m_merger.Merge(m_sources, recordID, memory)) {
         LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
         return {};
     }
@@ -241,7 +244,10 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
 
     m_records.emplace(recordID, std::unique_ptr<Record>(record));
 
-    LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    if constexpr(IS_VERBOSE) {
+        LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+    }
+
     return {recordID, record};
 }
 

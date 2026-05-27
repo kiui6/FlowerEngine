@@ -12,6 +12,8 @@
 #include <Graphics/RenderEngine/RenderState/RenderStateUpdate.h>
 #include <Graphics/RenderEngine/RenderJob/RenderJob.h>
 
+// TODO: Make all RenderObjects & their elements reusable. Ideally allocate through custom allocator.
+
 class RenderView
 {
     friend class RenderEngine;
@@ -42,7 +44,6 @@ public:
     std::weak_ptr<RenderObject> GetStaticRenderObject(uint64_t id);
 
     void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
-
 
     void Reset();
 };

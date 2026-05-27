@@ -6,6 +6,10 @@
 #include <GarbageCollector/GarbageCollector.h>
 #include <Record/RecordLibrary.h>
 
+#include <Entry/EntryRecord.h>
+
+#include <Platform/PlatformDefines.h>
+
 void Engine::InternalTravel()
 {
     if(m_world){
@@ -34,6 +38,20 @@ Engine::Engine()
     m_GC = GetService<GarbageCollector>();
     if(!m_GC) {
         LOG(Fatal, LogEngine, "Failed to retrive pointer to Garbage Collector service. Is it registered?");
+    }
+}
+
+void Engine::StartLifecycle()
+{
+    if constexpr(!IS_EDITOR) {
+        RecordPtr<EntryRecord> entryRecord = GetService<RecordLibrary>()->LoadRecord<EntryRecord>(ENTRY_RECORD);
+        if(!entryRecord.IsBound()) {
+            LOG(Fatal, LogEngine, "Failed to start engine: EntryRecord not found!");
+            return;
+        }
+
+        LOG(Log, LogEngine, "EntryRecord found");
+        
     }
 }
 

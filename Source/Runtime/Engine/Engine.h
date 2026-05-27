@@ -4,6 +4,7 @@
 #include <memory>
 
 #include <World/World.h>
+#include <UI/UINode.h>
 
 class GarbageCollector;
 
@@ -17,10 +18,12 @@ protected:
     std::unique_ptr<World> m_world = nullptr;
     std::unique_ptr<World> m_travelWorld = nullptr;
 
-    // std::unique_ptr<UINode*> m_uiRootNode = nullptr;
+    std::unique_ptr<UINode> m_rootUINode = nullptr;
 
 public:
     Engine();
+
+    void StartLifecycle();
 
     // Starts a process of traveling to the new world
     void TravelTo(std::unique_ptr<World> travelWorld);

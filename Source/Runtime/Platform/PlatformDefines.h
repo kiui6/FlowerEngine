@@ -9,3 +9,11 @@
 #elif __APPLE__
 #   define PLATFORM_MAC
 #endif
+
+#ifdef EDITOR
+    constexpr bool IS_EDITOR = true;
+#else
+    constexpr bool IS_EDITOR = false;
+#endif
+
+constexpr bool IS_VERBOSE = true;

@@ -81,6 +81,9 @@ void Application::StartLifecycle()
 {
     // Allow running
     m_bRunning.store(true);
+
+    // Initialize Engine's essential and start game mode
+    m_engine->StartLifecycle();
     
     auto frame_lifetime_start = std::chrono::high_resolution_clock::now();
 	auto frame_lifetime_end = std::chrono::high_resolution_clock::now();

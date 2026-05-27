@@ -70,7 +70,7 @@ int GuardedMain(int argc, char* argv[])
     RecordPtr<TextureRecord> gcRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     }
 
-    RecordPtr<EntryRecord> loadedRec = GetService<RecordLibrary>()->LoadRecord<EntryRecord>(2);
+    RecordPtr<EntryRecord> loadedRec = GetService<RecordLibrary>()->LoadRecord<EntryRecord>(3);
 
     // This should trigger GC
     GetService<GarbageCollector>()->RequestGCPass();
