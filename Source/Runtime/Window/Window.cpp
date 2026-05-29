@@ -2,6 +2,8 @@
 
 #include <Log/Log.h>
 
+#include <Debug/Tracer/Tracer.h>
+
 Window::Window(std::string_view title, uint32_t width, uint32_t height)
 {
     m_title = title;
@@ -26,6 +28,7 @@ void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface)
 
 void Window::Update()
 {
+	PUSH_TRACE_SCOPE("Window::Update()");
 	while(SDL_PollEvent(&m_event))
 	{
 		OnSDLEvent.Broadcast(m_event);
@@ -57,5 +60,5 @@ void Window::Update()
 				break;
 		}
 	}
-	
+	POP_TRACE_SCOPE();
 }

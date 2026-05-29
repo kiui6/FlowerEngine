@@ -9,6 +9,7 @@
 #include <mutex>
 
 #include "PluginReader.h"
+#include "PluginOrderError.h"
 
 #ifdef EDITOR
 #   include "PluginWriter.h"
@@ -26,4 +27,6 @@ public:
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;
+
+    bool LoadDefaultPlugins(PluginOrderError& error);
 };

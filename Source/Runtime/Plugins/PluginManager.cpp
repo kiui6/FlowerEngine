@@ -12,6 +12,15 @@ bool PluginManager::bIsInitialized = RegisterService<PluginManager>({Config::Get
 
 void PluginManager::Initialize()
 {
+}
+
+void PluginManager::Deinitialize()
+{
+}
+
+// TODO: Implement proper PluginOrderError returns
+bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
+{
     DataManager* dataMgr = GetService<DataManager>();
     Config* config = GetService<Config>();
 
@@ -37,7 +46,7 @@ void PluginManager::Initialize()
     // Just in case check for load order vector to be smaller than size of uint16_t
     if(m_loadedPlugins.size() >= static_cast<uint16_t>(-1)) {
         LOGF(Fatal, LogPlugin, "Too many plugins enabled, maximum supported is %u", static_cast<uint16_t>(-1));
-        return;
+        return false;
     }
     
     // TODO: Load order resolution
@@ -69,8 +78,6 @@ void PluginManager::Initialize()
             continue;
         }
     }
-}
 
-void PluginManager::Deinitialize()
-{
+    return true;
 }

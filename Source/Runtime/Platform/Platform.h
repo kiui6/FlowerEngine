@@ -30,5 +30,5 @@ public:
     std::string GetLocalDirectory();
 
     std::shared_ptr<File> OpenFile(std::string path, FileAccess access);
-    std::shared_ptr<IMappedFile> MapFile(std::string path, FileAccess access);
+    std::shared_ptr<MappedFile> MapFile(std::string path, FileAccess access);
 };

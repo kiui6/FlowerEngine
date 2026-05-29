@@ -19,22 +19,33 @@ RenderObject *RenderView::GetDynamicRenderObject(uint64_t id)
     return pair.first->second.get();
 }
 
-std::weak_ptr<RenderObject> RenderView::GetStaticRenderObject(uint64_t id)
+RenderObject* RenderView::GetStaticRenderObject(uint64_t id)
 {
     auto it = m_staticRenderObjects.find(id);
     if(it != m_staticRenderObjects.end()) {
-        it->second.lastReferencedFrames = 0;
-        return it->second.object;
+        it->second.lastReferencedFramesAgo = 0;
+        return it->second.object.get();
     }
-    StaticRenderObjectHandle handle;
+    
+    return nullptr;
+}
+
+bool RenderView::HasStaticRenderObject(uint64_t id)
+{
+    return m_staticRenderObjects.find(id) != m_staticRenderObjects.end();
+}
+
+RenderObject *RenderView::AddStaticRenderObject(uint64_t id)
+{
+    RenderObjectHandle handle;
     handle.object = std::make_shared<RenderObject>();
-    handle.lastReferencedFrames = 0;
+    handle.lastReferencedFramesAgo = 0;
 
     const auto& pair = m_staticRenderObjects.emplace(id, handle);
 
     m_staticRenderObjectsDirty = true;
 
-    return pair.first->second.object;
+    return pair.first->second.object.get();
 }
 
 void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
@@ -46,17 +57,19 @@ void RenderView::Reset()
 {
     m_staticRenderObjectsDirty = false;
     
-    auto staticIt = m_staticRenderObjects.begin();
-    while (staticIt != m_staticRenderObjects.end()) {
-        if (staticIt->second.lastReferencedFrames > STATIC_OBJECTS_TIMEOUT_FRAMES) {
-            staticIt = m_staticRenderObjects.erase(staticIt);
-            m_staticRenderObjectsDirty = true;
+    size_t staticRObjectsCountBeforeReset = m_staticRenderObjects.size();
+
+    auto staticRObjectsIt = m_staticRenderObjects.begin();
+    while (staticRObjectsIt != m_staticRenderObjects.end()) {
+        if (staticRObjectsIt->second.lastReferencedFramesAgo > STATIC_OBJECTS_TIMEOUT_FRAMES) {
+            staticRObjectsIt = m_staticRenderObjects.erase(staticRObjectsIt);
         } else {
-            staticIt->second.lastReferencedFrames++;
-            ++staticIt;
+            staticRObjectsIt->second.lastReferencedFramesAgo++;
+            ++staticRObjectsIt;
         }
     }
 
+    m_staticRenderObjectsDirty = staticRObjectsCountBeforeReset != m_staticRenderObjects.size();
 
     // Dynamic Render Objects should be recreated every frame.
     m_dynamicRenderObjects.clear();

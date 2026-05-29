@@ -6,6 +6,7 @@
 #include <Graphics/RenderEngine/RenderUtils.h>
 
 #include <Log/Log.h>
+#include <Debug/Tracer/Tracer.h>
 
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
     : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>()), globalState(stateStore.Get<GlobalRenderState>())
@@ -50,11 +51,11 @@ OpaqueRenderPass::~OpaqueRenderPass()
     SDL_ReleaseGPUTexture(m_gpu.device, m_albedo);
 }
 
-void OpaqueRenderPass::Assemble(RenderResourceCompiler &resourceCompiler, RenderObject *object, RenderElement *element)
+void OpaqueRenderPass::Compile(RenderResourceCompiler &resourceCompiler, RenderObject *object, RenderElement *element)
 {
     switch(element->GetRenderElementType()) {
         case RenderElementType::Sprite:
-            AssembleOpaqueSpriteRenderElement(resourceCompiler, object, static_cast<OpaqueSpriteRenderElement*>(element));
+            CompileOpaqueSpriteRenderElement(resourceCompiler, object, static_cast<OpaqueSpriteRenderElement*>(element));
             break;
         default:
             assert(!"Unsupported render element.");
@@ -62,7 +63,7 @@ void OpaqueRenderPass::Assemble(RenderResourceCompiler &resourceCompiler, Render
     }
 }
 
-void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass)
+void OpaqueRenderPass::Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass)
 {
     BeginGPULabel(cmd, "Opaque");
 
@@ -108,8 +109,6 @@ void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
         };
 
         SDL_UploadToGPUBuffer(copyPass, &tbBufferLocation, &vBufferLocation, false);
-
-        sprites.assembly.clear();
     }
     EndGPULabel(cmd); // Dynamic Sprites
 
@@ -118,6 +117,7 @@ void OpaqueRenderPass::Compile(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
 
 void OpaqueRenderPass::Render(FrameContext &ctx)
 {
+    PUSH_TRACE_SCOPE("OpaqueRenderPass::Render()");
     ctx.attachments[(uint8_t)RenderAttachment::Albedo] = m_albedo;
 
     BeginGPULabel(ctx.cmd, "Opaque");
@@ -144,7 +144,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
         };
         SDL_BindGPUFragmentSamplers(pass, /*first slot*/ 0, &atlasBinding, 1);
 
-        SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 1, &sprites.uniformBuffer[m_gpu.currentFrame], 1);
+        SDL_BindGPUVertexStorageBuffers(pass, /*second slot*/ 1, &sprites.uniformBuffer[m_gpu.currentFrame], 1);
     }
 
     EndGPULabel(ctx.cmd);
@@ -152,9 +152,18 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     SDL_EndGPURenderPass(pass);
 
     EndGPULabel(ctx.cmd);
+    
+    POP_TRACE_SCOPE();
 }
 
-void OpaqueRenderPass::AssembleOpaqueSpriteRenderElement(RenderResourceCompiler &resourceCompiler, RenderObject *object, OpaqueSpriteRenderElement *element)
+void OpaqueRenderPass::Cleanup()
+{
+    for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements) {
+        sprites.assembly.clear();
+    }
+}
+
+void OpaqueRenderPass::CompileOpaqueSpriteRenderElement(RenderResourceCompiler &resourceCompiler, RenderObject *object, OpaqueSpriteRenderElement *element)
 {
     OpaqueSpriteElementBatch* compiled;
 
@@ -173,14 +182,11 @@ void OpaqueRenderPass::AssembleOpaqueSpriteRenderElement(RenderResourceCompiler 
         compiled = &m_dynamicOpaqueSpriteElements.emplace(element->texture->id, OpaqueSpriteElementBatch{}).first->second;
     }
 
-    OpaqueSpriteElementBatch::GPUBufferData entry {
-        .position = element->position,
-        .depth = element->depth,
-        .scale = element->scale,
-        .rotation = element->rotation,
-        .tint = element->tint,
-        .uv = element->uv
-    };
-
-    compiled->assembly.push_back(entry);
+    compiled->assembly.emplace_back(
+        element->position,
+        element->depth,
+        element->scale,
+        element->rotation,
+        element->tint,
+        element->uv);
 }

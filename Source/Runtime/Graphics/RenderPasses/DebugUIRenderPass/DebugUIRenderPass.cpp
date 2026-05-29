@@ -5,6 +5,7 @@
 #include <imgui/backends/imgui_impl_sdlgpu3.h>
 
 #include <Application/Application.h>
+#include <Debug/Tracer/Tracer.h>
 
 DebugUIRenderPass::DebugUIRenderPass(GPUContext &context, RenderStateStore& stateStore)
     : m_gpu(context), m_state(stateStore.Get<DebugUIRenderState>())
@@ -41,9 +42,8 @@ DebugUIRenderPass::~DebugUIRenderPass()
 
 void DebugUIRenderPass::Render(FrameContext &ctx)
 {
+    PUSH_TRACE_SCOPE("DebugUIRenderPass::Render()");
 #ifdef HAS_DEBUGUI
-
-
     ImGui_ImplSDLGPU3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     ImGui::NewFrame();
@@ -76,6 +76,7 @@ void DebugUIRenderPass::Render(FrameContext &ctx)
         //ImGui::RenderPlatformWindowsDefault();
     }
 #endif
+    POP_TRACE_SCOPE();
 }
 
 void DebugUIRenderPass::cbOnChange()

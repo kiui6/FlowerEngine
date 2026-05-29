@@ -4,6 +4,10 @@
 #include <Log/Log.h>
 #include <Graphics/RenderEngine/RenderUtils.h>
 
+// Shaders
+#include "FullscreenTriangle.vert.h"
+#include "FullscreenTriangle.frag.h"
+
 UpscaleRenderPass::UpscaleRenderPass(GPUContext &context)
 {
     m_triangleVertBuffer = RenderUtils::CreateBuffer(context.device, SDL_GPU_BUFFERUSAGE_VERTEX, (void*)(&Primitives::TRIANGLE), sizeof(Primitives::TRIANGLE) * sizeof(Vertex2D));

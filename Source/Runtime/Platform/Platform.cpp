@@ -35,11 +35,11 @@ std::shared_ptr<File> Platform::OpenFile(std::string path, FileAccess access)
     return file;
 }
 
-std::shared_ptr<IMappedFile> Platform::MapFile(std::string path, FileAccess access)
+std::shared_ptr<MappedFile> Platform::MapFile(std::string path, FileAccess access)
 {
     assert(m_impl != nullptr);
 
-    std::shared_ptr<IMappedFile> file = std::move(m_impl->CreateMappedFile());
+    std::shared_ptr<MappedFile> file = std::move(m_impl->CreateMappedFile());
     file->Open(path, access);
     return file;
 }

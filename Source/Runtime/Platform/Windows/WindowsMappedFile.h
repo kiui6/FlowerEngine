@@ -4,7 +4,7 @@
 
 #include "WinAPI.h"
 
-class WindowsMappedFile : public IMappedFile
+class WindowsMappedFile : public MappedFile
 {
     HANDLE m_hFile = INVALID_HANDLE_VALUE;
     HANDLE m_hMapping = nullptr;

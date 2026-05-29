@@ -33,11 +33,19 @@ void SpriteActor::Initialize()
 
 void SpriteActor::RecordRenderView(RenderView &renderView)
 {
-    RenderObject* ro = renderView.GetDynamicRenderObject(m_ref.GetID());
+    RenderObject* rendObj =  nullptr;
+    if(GetReference()->IsDynamic) {
+        rendObj = renderView.GetDynamicRenderObject(m_ref.GetID());
+    } else {
+        if(nullptr != renderView.GetStaticRenderObject(m_ref.GetID())) {
+            return;
+        }
+        rendObj = renderView.AddStaticRenderObject(m_ref.GetID());
+    }
 
     // Opaque Sprite Element
     if(m_albedo.IsBound() && m_albedoData.IsBound()) {
-        OpaqueSpriteRenderElement* opaque = ro->CreateRenderElement<OpaqueSpriteRenderElement>();
+        OpaqueSpriteRenderElement* opaque = rendObj->CreateRenderElement<OpaqueSpriteRenderElement>();
 
         opaque->position = m_transform.Location;
         opaque->depth = m_transform.Depth;
@@ -59,7 +67,7 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
 
     // Relief Sprite Element
     if(m_autogenRelief && m_albedo.IsBound() && m_albedoData.IsBound()) {
-        ReliefSpriteRenderElement* autogenRelief = ro->CreateRenderElement<ReliefSpriteRenderElement>();
+        ReliefSpriteRenderElement* autogenRelief = rendObj->CreateRenderElement<ReliefSpriteRenderElement>();
 
         // OnDemand Generate Relief Map Task
         if(m_reliefRenderResource.GetCompiledResource().expired()) {
@@ -87,7 +95,7 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         autogenRelief->texture = &m_reliefRenderResource;
     } else if(m_relief.IsBound() && m_reliefData.IsBound()) {
 
-        ReliefSpriteRenderElement* relief = ro->CreateRenderElement<ReliefSpriteRenderElement>();
+        ReliefSpriteRenderElement* relief = rendObj->CreateRenderElement<ReliefSpriteRenderElement>();
 
         relief->position = m_transform.Location;
         relief->depth = m_transform.Depth;

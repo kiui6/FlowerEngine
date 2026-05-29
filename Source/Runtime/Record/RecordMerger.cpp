@@ -8,7 +8,7 @@ bool RecordMerger::Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID r
         return source->FetchRecordMemory(recordId, result);
     }
 
-    return true;
+    return false;
 
     // TODO
     if(sources.size() == 0) {

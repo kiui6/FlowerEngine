@@ -5,10 +5,12 @@
 #include <Graphics/RenderPasses/OpaqueRenderPass/OpaqueRenderPass.h>
 #include <Graphics/RenderPasses/ReliefRenderPass.h>
 #include <Graphics/RenderPasses/LightingRenderPass.h>
-#include <Graphics/RenderPasses/UpscaleRenderPass.h>
+#include <Graphics/RenderPasses/UpscaleRenderPass/UpscaleRenderPass.h>
 #include <Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.h>
 
 #include "RenderUtils.h"
+
+#include <Debug/Tracer/Tracer.h>
 
 RenderEngine::RenderEngine()
     : m_stateStore(m_ctx)
@@ -64,40 +66,58 @@ void RenderEngine::Initialize(SDL_Window* window)
 
 void RenderEngine::Render(float deltaTime, RenderView &renderView)
 {
+    PUSH_TRACE_SCOPE("RenderEngine::Render()");
     // Execute Render Jobs
+    PUSH_TRACE_SCOPE("Execute Jobs");
     for(const auto& job : renderView.m_renderJobs) {
         job->Execute();
     }
+    POP_TRACE_SCOPE();
 
-    // Assemble elements
+    // Compile elements
+    PUSH_TRACE_SCOPE("Compile Elements");
     RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
-    for(const auto& [id, rendObject] : renderView.m_staticRenderObjects) {
-        if(rendObject.lastReferencedFrames != 0) continue;
+    if(renderView.m_staticRenderObjectsDirty) {
+        for(const auto& [id, rendObject] : renderView.m_staticRenderObjects) {
+            if(rendObject.lastReferencedFramesAgo != 0) continue;
 
-        for(const auto& rendElement : rendObject.object->GetElements()) {
-            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.object.get(), rendElement.get());
+            for(const auto& rendElement : rendObject.object->GetElements()) {
+                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.object.get(), rendElement.get());
+            }
         }
     }
 
     for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
         for(const auto& rendElement : rendObject->GetElements()) {
-            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Assemble(resourceCompiler, rendObject.get(), rendElement.get());
+            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
         }
     }
+    POP_TRACE_SCOPE();
 
     // Start recording main command buffer
     SDL_GPUCommandBuffer *cmd = SDL_AcquireGPUCommandBuffer(m_ctx.device);
 
+    // Perform State Updates
+    PUSH_TRACE_SCOPE("State Update");
+    BeginGPULabel(cmd, "State Update");
+    for(const auto& updateObj : renderView.m_stateUpdates) {
+        updateObj->Apply(m_ctx, m_stateStore);
+    }
+    EndGPULabel(cmd);
+    POP_TRACE_SCOPE();
+
     // After all data is assembled into batches, it can be compiled into GPU resources
-    BeginGPULabel(cmd, "Compilation");
+    PUSH_TRACE_SCOPE("Prepare Frame");
+    BeginGPULabel(cmd, "Prepare Frame");
     SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
 
     for(const auto& pass : m_renderPasses) {
-        pass->Compile(cmd, copyPass);
+        pass->Prepare(cmd, copyPass);
     }
 
     SDL_EndGPUCopyPass(copyPass);
     EndGPULabel(cmd);
+    POP_TRACE_SCOPE();
 
     SDL_GPUTexture *swapchainTexture = NULL;
     uint32_t swapchainTextureW, swapchainTextureH;
@@ -110,14 +130,8 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         return;
     }
 
-    // Perform State Changes
-    BeginGPULabel(cmd, "State Changes");
-    for(const auto& updateObj : renderView.m_stateUpdates) {
-        updateObj->Apply(m_ctx, m_stateStore);
-    }
-    EndGPULabel(cmd);
-
     // Render Frame
+    PUSH_TRACE_SCOPE("Render");
     BeginGPULabel(cmd, "Frame");
 
     FrameContext frameCtx;
@@ -130,13 +144,19 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     frameCtx.previousPass = nullptr;
     frameCtx.resources = &m_compiledRes;
 
-    for(size_t passIdx = 0; passIdx < m_renderPasses.size(); passIdx++) {
-        m_renderPasses[passIdx]->Render(frameCtx);
-        frameCtx.previousPass = m_renderPasses[passIdx].get();
+    for(std::unique_ptr<RenderPass>& renderPass : m_renderPasses) {
+        renderPass->Render(frameCtx);
+        frameCtx.previousPass = renderPass.get();
+    }
+
+    for(std::unique_ptr<RenderPass>& renderPass : m_renderPasses) {
+        renderPass->Cleanup();
     }
 
     EndGPULabel(cmd);
+    POP_TRACE_SCOPE();
 
+    PUSH_TRACE_SCOPE("Submit");
     SDL_SubmitGPUCommandBuffer(cmd);
 
     SDL_WaitForGPUSwapchain(m_ctx.device, m_ctx.window);
@@ -145,4 +165,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     renderView.Reset();
 
     m_ctx.currentFrame = (m_ctx.currentFrame + 1) % FRAMES_IN_FLIGHT;
+    POP_TRACE_SCOPE();
+
+    POP_TRACE_SCOPE();
 }

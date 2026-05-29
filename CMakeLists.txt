@@ -109,7 +109,7 @@ set(SrcRender
     "Source/Runtime/Graphics/RenderPasses/OpaqueRenderPass/OpaqueRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/ReliefRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/LightingRenderPass.cpp"
-    "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass.cpp"
+    "Source/Runtime/Graphics/RenderPasses/UpscaleRenderPass/UpscaleRenderPass.cpp"
     "Source/Runtime/Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.cpp"
     
     # Render States

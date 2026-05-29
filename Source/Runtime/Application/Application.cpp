@@ -17,6 +17,8 @@
 
 #include <SDL3/SDL.h>
 
+#include <Debug/Tracer/Tracer.h>
+
 Application* Application::Singleton = nullptr;
 
 Application::Application()
@@ -82,8 +84,8 @@ void Application::StartLifecycle()
     // Allow running
     m_bRunning.store(true);
 
-    // Initialize Engine's essential and start game mode
-    m_engine->StartLifecycle();
+    // Initialize Engine's essentials and start game mode
+    m_engine->Initialize();
     
     auto frame_lifetime_start = std::chrono::high_resolution_clock::now();
 	auto frame_lifetime_end = std::chrono::high_resolution_clock::now();
@@ -97,16 +99,19 @@ void Application::StartLifecycle()
 
 	while(!m_window->ShouldClose() && m_bRunning)
 	{
+        PUSH_TRACE_SCOPE("Application::StartLifecycle()");
         m_deltaTime = std::chrono::duration<float, std::milli>(frame_lifetime_end-frame_lifetime_start).count() / 1000;
 
 		frame_lifetime_start = std::chrono::high_resolution_clock::now();
 
+        PUSH_TRACE_SCOPE("Minimal DeltaTime");
 		if (m_deltaTime < MinimalDeltaTime)
         {
             std::chrono::duration<double, std::milli> delta_ms(MinimalDeltaTime - m_deltaTime);
             auto delta_ms_duration = std::chrono::duration_cast<std::chrono::milliseconds>(delta_ms);
             std::this_thread::sleep_for(std::chrono::milliseconds(delta_ms_duration.count()));
         }
+        POP_TRACE_SCOPE();
 
 		m_window->Update();
 
@@ -123,6 +128,8 @@ void Application::StartLifecycle()
         m_render->Render(m_deltaTime, renderView);
 
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
+        POP_TRACE_SCOPE();
+        FLUSH_TRACE_FRAME();
 	}
 
     LOG(Log, LogApplication, "Game Thread is stopping");

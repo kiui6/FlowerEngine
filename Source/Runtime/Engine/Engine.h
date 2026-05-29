@@ -23,7 +23,7 @@ protected:
 public:
     Engine();
 
-    void StartLifecycle();
+    void Initialize();
 
     // Starts a process of traveling to the new world
     void TravelTo(std::unique_ptr<World> travelWorld);

@@ -38,7 +38,7 @@ static_assert(sizeof(MasterFileHeader) == 96 && "Unexpected master file header s
 class MasterFile
 {
     MasterFileHeader m_header;
-    std::unique_ptr<IMappedFile> m_file;
+    std::unique_ptr<MappedFile> m_file;
 public:
     
 };

@@ -9,5 +9,5 @@ struct IPlatformImpl
 {
     virtual std::string_view GetPlatformName() const {return "Unknown";}
 
-    virtual std::unique_ptr<IMappedFile> CreateMappedFile() {return nullptr;}
+    virtual std::unique_ptr<MappedFile> CreateMappedFile() {return nullptr;}
 };

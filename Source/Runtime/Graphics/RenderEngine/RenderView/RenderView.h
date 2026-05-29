@@ -18,16 +18,16 @@ class RenderView
 {
     friend class RenderEngine;
 
-    struct StaticRenderObjectHandle {
+    struct RenderObjectHandle {
         std::shared_ptr<RenderObject> object;
         // How many frames ago was this object referenced. 0 meaning it's referenced in current frame and should be rendered
-        uint32_t lastReferencedFrames = 0;
+        uint32_t lastReferencedFramesAgo = 0;
     };
 protected:
     Float4x4 m_viewMatrix;
     Float4x4 m_projMatrix;
 
-    std::unordered_map<uint64_t, StaticRenderObjectHandle> m_staticRenderObjects;
+    std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects;
     bool m_staticRenderObjectsDirty = false;
     std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
 
@@ -41,9 +41,12 @@ public:
     void SubmitJob(RenderJob* job);
 
     RenderObject* GetDynamicRenderObject(uint64_t id);
-    std::weak_ptr<RenderObject> GetStaticRenderObject(uint64_t id);
 
-    void RemoveStaticRenderObject(uint64_t id, std::unique_ptr<RenderObject> pRendObj);
+    RenderObject* AddStaticRenderObject(uint64_t id);
+    RenderObject* GetStaticRenderObject(uint64_t id);
+    bool HasStaticRenderObject(uint64_t id);
+
+    void RemoveStaticRenderObject(uint64_t id);
 
     void Reset();
 };

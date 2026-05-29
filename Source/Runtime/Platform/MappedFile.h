@@ -2,7 +2,7 @@
 
 #include "FileBase.h"
 
-class IMappedFile : public FileBase
+class MappedFile : public FileBase
 {
 
 };
