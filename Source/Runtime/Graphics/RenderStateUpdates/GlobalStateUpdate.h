@@ -8,7 +8,7 @@
 #include <Math/Vectors.h>
 #include <Graphics/RenderStates/GlobalRenderState.h>
 
-struct GlobalStateUpdate : public RenderStateUpdate
+struct GlobalStateUpdate : public RenderStateUpdate, public StaticallyTyped<MakeID32("GLOB")>
 {
     uint32_t canvasWidth, canvasHeight;
     Float3 cameraPosition;
@@ -16,6 +16,8 @@ struct GlobalStateUpdate : public RenderStateUpdate
     bool projectionMatrixDirty = false;
     bool cameraPositionDirty = false;
 
-    virtual void Apply(GPUContext& gpu, RenderStateStore& store) override;
+    virtual void Apply(RenderStateUpdateContext& ctx) override;
 
+protected:
+    SDL_GPUTransferBuffer* transferBuffer = nullptr;
 };

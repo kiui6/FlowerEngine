@@ -1,9 +1,12 @@
 #pragma once
 
 #include <Graphics/RenderEngine/RenderState/RenderState.h>
+#include <Graphics/RenderEngine/RenderConstants.h>
 
 #include <Math/Matrix.h>
 #include <Math/Vectors.h>
+
+#include <array>
 
 struct alignas(16) GPUWorldData {
     Float4x4 projectionView;
@@ -28,5 +31,5 @@ struct GlobalRenderState : public RenderState
     uint32_t canvasWidth, canvasHeight;
     Float3 cameraPosition;
 
-    SDL_GPUBuffer* worldBuffer = nullptr;
+    std::array<SDL_GPUBuffer*, FRAMES_IN_FLIGHT> worldBuffer;
 };

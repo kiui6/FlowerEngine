@@ -48,11 +48,6 @@ RenderObject *RenderView::AddStaticRenderObject(uint64_t id)
     return pair.first->second.object.get();
 }
 
-void RenderView::SubmitStateUpdate(RenderStateUpdate *stateUpdate)
-{
-    m_stateUpdates.emplace(std::unique_ptr<RenderStateUpdate>(stateUpdate));
-}
-
 void RenderView::Reset()
 {
     m_staticRenderObjectsDirty = false;
@@ -73,6 +68,5 @@ void RenderView::Reset()
 
     // Dynamic Render Objects should be recreated every frame.
     m_dynamicRenderObjects.clear();
-    m_stateUpdates.clear();
     m_renderJobs.clear();
 }

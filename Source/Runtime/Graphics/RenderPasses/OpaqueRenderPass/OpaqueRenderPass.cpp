@@ -154,7 +154,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     ctx.attachments[(uint8_t)RenderAttachment::Albedo] = m_albedo;
 
     // Can't render without world buffer
-    if(globalState.worldBuffer == nullptr) {
+    if(globalState.worldBuffer[ctx.frameIndex] == nullptr) {
         POP_TRACE_SCOPE();
         return;
     }
@@ -180,7 +180,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     SDL_GPUBufferBinding vertBufferBindings{.buffer=m_quadVertexBuffer, .offset=0};
     SDL_BindGPUVertexBuffers(pass, 0, &vertBufferBindings, 1);
 
-    SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 0, &globalState.worldBuffer, 1);
+    SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 0, &globalState.worldBuffer[ctx.frameIndex], 1);
 
     for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements)
     {

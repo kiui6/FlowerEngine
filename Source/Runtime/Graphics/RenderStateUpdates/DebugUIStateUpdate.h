@@ -5,11 +5,9 @@
 
 #include <memory>
 
-struct DebugUIStateUpdate : public RenderStateUpdate
+struct DebugUIStateUpdate : public RenderStateUpdate, public StaticallyTyped<MakeID32("DBUI")>
 {
-    DebugUIStateUpdate(const std::shared_ptr<DebugWindow>& win) : window(win) {}
-
     std::weak_ptr<DebugWindow> window;
 
-    virtual void Apply(GPUContext& gpu, RenderStateStore& store) override;
+    virtual void Apply(RenderStateUpdateContext& ctx) override;
 };

@@ -100,8 +100,16 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // Perform State Updates
     PUSH_TRACE_SCOPE("State Update");
     BeginGPULabel(cmd, "State Update");
-    for(const auto& updateObj : renderView.m_stateUpdates) {
-        updateObj->Apply(m_ctx, m_stateStore);
+    RenderStateUpdateContext renderStateUpdateContext {
+        .gpu = m_ctx,
+        .store = m_stateStore,
+        .cmd = cmd
+    };
+    for(auto& [id, updateObj] : renderView.m_stateUpdates) {
+        if(updateObj.isReferenced) {
+            updateObj.object->Apply(renderStateUpdateContext);
+            updateObj.isReferenced = false;
+        }
     }
     EndGPULabel(cmd);
     POP_TRACE_SCOPE();

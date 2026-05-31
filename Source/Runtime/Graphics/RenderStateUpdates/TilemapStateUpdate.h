@@ -4,5 +4,4 @@
 
 struct TilemapStateUpdate : public RenderStateUpdate
 {
-    TilemapStateUpdate() {}
 };

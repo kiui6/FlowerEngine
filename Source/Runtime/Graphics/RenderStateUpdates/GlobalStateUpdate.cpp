@@ -4,13 +4,13 @@
 
 #include <Graphics/RenderEngine/RenderUtils.h>
 
-void GlobalStateUpdate::Apply(GPUContext &gpu, RenderStateStore &store)
+void GlobalStateUpdate::Apply(RenderStateUpdateContext& ctx)
 {
     if(!projectionMatrixDirty && !cameraPositionDirty) {
         return;
     }
 
-    GlobalRenderState& state = store.GetMutable<GlobalRenderState>();
+    GlobalRenderState& state = ctx.store.GetMutable<GlobalRenderState>();
 
     if(projectionMatrixDirty) {
         state.canvasWidth = canvasWidth;
@@ -31,11 +31,18 @@ void GlobalStateUpdate::Apply(GPUContext &gpu, RenderStateStore &store)
         .position = state.cameraPosition
     };
 
-    if(state.worldBuffer == nullptr) {
-        state.worldBuffer = RenderUtils::CreateBuffer(gpu.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, &worldData, sizeof(worldData));
-    } else {
-        RenderUtils::UpdateBuffer(gpu.device, state.worldBuffer, &worldData, sizeof(worldData));
+    
+    if(state.worldBuffer[ctx.gpu.currentFrame] == nullptr) {
+        state.worldBuffer[ctx.gpu.currentFrame] = RenderUtils::CreateBuffer(ctx.gpu.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, &worldData, sizeof(worldData));
+        state.NotifyChanged();
+        return;    
     }
+
+    if(transferBuffer == nullptr) {
+        transferBuffer = RenderUtils::CreateTransferBuffer(ctx.gpu.device, sizeof(worldData));
+    }
+
+    RenderUtils::UpdateBufferWithTransferBuffer(ctx.gpu.device, ctx.cmd, transferBuffer, state.worldBuffer[ctx.gpu.currentFrame], &worldData, sizeof(worldData));
     
     state.NotifyChanged();
 }

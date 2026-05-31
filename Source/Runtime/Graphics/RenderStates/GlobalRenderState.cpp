@@ -9,4 +9,9 @@ GlobalRenderState::GlobalRenderState(GPUContext &gpu)
 
     canvasWidth = config->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 640);
     canvasHeight = config->GetNamespace("Game").GetInt("Render.DefaultCanvasHeight", 360);
+
+    // Nullptr initialize buffer
+    for(int i = 0; i < worldBuffer.size(); ++i) {
+        worldBuffer[i] = nullptr;
+    }
 }

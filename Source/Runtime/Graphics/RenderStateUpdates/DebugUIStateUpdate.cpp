@@ -2,9 +2,9 @@
 
 #include <Graphics/RenderStates/DebugUIRenderState.h>
 
-void DebugUIStateUpdate::Apply(GPUContext& gpu, RenderStateStore &store)
+void DebugUIStateUpdate::Apply(RenderStateUpdateContext& ctx)
 {
-    DebugUIRenderState& state = store.GetMutable<DebugUIRenderState>();
+    DebugUIRenderState& state = ctx.store.GetMutable<DebugUIRenderState>();
 
     state.window = window;
     

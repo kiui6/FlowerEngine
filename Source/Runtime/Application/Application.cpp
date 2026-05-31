@@ -143,11 +143,7 @@ void Application::Stop()
 void Application::RecordRenderStateUpdates(RenderView & view)
 {
     if(m_dbgWindowUpdated) {
-        view.SubmitStateUpdate(new DebugUIStateUpdate(m_dbgWindow));
+        view.GetStateUpdate<DebugUIStateUpdate>()->window = m_dbgWindow;
         m_dbgWindowUpdated = false;
-    }
-
-    if(m_window->SizeChanged()){
-
     }
 }
