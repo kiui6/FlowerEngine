@@ -8,6 +8,8 @@
 #include <chrono>
 #include <deque>
 
+#include <Delegate/Delegate.h>
+
 class Tracer {
     struct TracerScope
     {

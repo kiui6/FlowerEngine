@@ -12,13 +12,14 @@ struct OpaqueSpriteRenderElement : public RenderElement
 {
     OpaqueSpriteRenderElement() : RenderElement(RenderPassType::Opaque, RenderElementType::Sprite) {}
 
-    Float2 position;
-    uint32_t depth;
-    Float2 scale;
-    float rotation;
-    Float3 tint = {1, 1, 1};
+    // minU, minV, maxU, maxV
+    Float4 uv = {0, 0, 1, 1};
+    Float4 tint = {1, 1, 1, 1};
+    Float2 position = {0, 0};
+    Float2 size = {1, 1};
+    Float2 pivot = {0.5, 0.5};
+    uint32_t depth = 0;
+    float rotation = 0;
 
     Texture2DResource* texture = nullptr;
-    // minU, minV, maxU, maxV
-    Float4 uv;
 };

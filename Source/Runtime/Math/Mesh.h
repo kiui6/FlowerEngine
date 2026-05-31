@@ -3,13 +3,13 @@
 #include "Vectors.h"
 
 struct Vertex2D {
-    Float2 x, y;
-    Float2 u, v;
+    Float2 pos;
+    Float2 uv;
 };
 
 struct Vertex3D {
-    Float3 x, y, z;
-    Float3 u, v;
+    Float3 pos;
+    Float2 uv;
 };
 
 struct Primitives {
@@ -18,9 +18,9 @@ struct Primitives {
                                              {{1, 0}, {0, 1}}};
 
     constexpr static Vertex2D SQUARE[6] = {{{0, 0}, {0, 0}}, 
-                                           {{0, 1}, {0, 1}},
                                            {{1, 0}, {1, 0}},
                                            {{0, 1}, {0, 1}},
+                                           {{1, 0}, {1, 0}},
                                            {{1, 1}, {1, 1}},
-                                           {{1, 0}, {0, 1}}};
+                                           {{0, 1}, {0, 1}}};
 };

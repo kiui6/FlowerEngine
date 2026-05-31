@@ -2,13 +2,21 @@
 import sys
 
 def main():
-    if len(sys.argv) != 3:
-        print(f"Usage: {sys.argv[0]} input.bin output.h")
+    if len(sys.argv) > 3 or len(sys.argv) < 2:
+        print(f"Usage: bin2h.py\n")
+        print(f"\t [Output] - accepts stdin as input file\n")
+        print(f"\t [Input] [Output] - accepts input file\n")
         sys.exit(1)
 
-    in_path, out_path = sys.argv[1], sys.argv[2]
-    with open(in_path, "rb") as f:
-        data = f.read()
+    out_path = ""
+    if len(sys.argv) == 3:
+        in_path = sys.argv[1]
+        out_path = sys.argv[2]
+        with open(in_path, "rb") as f:
+            data = f.read()
+    else:
+        out_path = sys.argv[1]
+        data = sys.stdin.buffer.read()
 
     var_name = out_path.replace(".", "_").replace("/", "_")
 

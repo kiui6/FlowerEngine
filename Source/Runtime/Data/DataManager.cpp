@@ -62,7 +62,7 @@ DataView DataManager::OpenDataView(std::string_view relativePath)
     handle.file = file;
     handle.isMapped = false;
 
-    m_fileHandles.emplace(relativePath, handle);
+    m_fileHandles.emplace(relativePath, std::move(handle));
 
     return DataView(file);
 }
@@ -82,7 +82,7 @@ DataView DataManager::MapDataView(std::string_view relativePath)
     handle.file = file;
     handle.isMapped = true;
 
-    m_fileHandles.emplace(relativePath, handle);
+    m_fileHandles.emplace(relativePath, std::move(handle));
     
     return DataView(file);
 }
@@ -158,8 +158,11 @@ std::string DataManager::CanonizePathSandboxed(std::string_view path)
         return {};
     }
 
+    // Check if path is relative to the base.
     std::filesystem::path relativePath = finalPath.lexically_relative(base);
 
+    // If result is empty, they're not relative
+    // If relative path starts from '..', path is leaving sandboxed base
     if(relativePath.empty() || *relativePath.begin() == "..") {
         LOGF(Assert, LogData, "Illegal file path: \"%.*s\"! Path is outside of sandbox.", path.length(), path.data());
         return {};

@@ -13,4 +13,15 @@
 struct RenderUtils {
     static SDL_GPUBuffer* CreateBuffer(SDL_GPUDevice* device, SDL_GPUBufferUsageFlags usage, void* data, uint32_t size);
     static bool UpdateBuffer(SDL_GPUDevice* device, SDL_GPUBuffer* buffer, void* data, uint32_t size);
+
+    static SDL_GPUShader* CreateShader( SDL_GPUDevice* device, 
+                                        SDL_GPUShaderStage stage,
+                                        const unsigned char*  data, uint32_t size, 
+                                        uint32_t numSamplers,
+                                        uint32_t numStorageTextures,
+                                        uint32_t numStorageBuffers,
+                                        uint32_t numUniformBuffers);
+
+    // TODO
+    static SDL_GPUGraphicsPipeline* CreatePipeline(SDL_GPUDevice* device);
 };

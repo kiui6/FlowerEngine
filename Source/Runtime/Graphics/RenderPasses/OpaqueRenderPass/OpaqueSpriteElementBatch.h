@@ -10,13 +10,14 @@
 
 struct OpaqueSpriteElementBatch
 {
-    struct GPUBufferData {
-        Float2 position;
-        uint32_t depth;
-        Float2 scale;
-        float rotation;
-        Float3 tint;
+    struct alignas(16) GPUBufferData {
         Float4 uv;
+        Float4 tint;
+        Float2 position;
+        Float2 size;
+        Float2 pivot;
+        uint32_t depth;
+        float rotation;
     };
 public:
     constexpr static size_t elementSize = sizeof(GPUBufferData);
@@ -30,3 +31,5 @@ public:
     std::array<SDL_GPUTransferBuffer*, FRAMES_IN_FLIGHT> transferBuffer = {};
     std::array<size_t, FRAMES_IN_FLIGHT> bufferSize = {};
 };
+
+static_assert(sizeof(OpaqueSpriteElementBatch::GPUBufferData) == 64, "Sprite data size mismatch");

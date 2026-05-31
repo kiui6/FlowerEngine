@@ -8,6 +8,7 @@
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 #include <Entry/EntryRecord.h>
+#include <Config/Config.h>
 
 #ifdef HAS_DEBUGUI
 #   ifdef EDITOR
@@ -52,6 +53,8 @@ int GuardedMain(int argc, char* argv[])
     RecordPtr<WorldRecord> worldRec = GetService<RecordLibrary>()->CreateRecord<WorldRecord>();
     worldRec->EditorID = "TestWorld";
     worldRec->DisplayName = "Test World";
+    worldRec->CanvasWidth = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 360);
+    worldRec->CanvasHeight = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasHeight", 180);
 
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 

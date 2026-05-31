@@ -108,3 +108,19 @@ bool RenderUtils::UpdateBuffer(SDL_GPUDevice *device, SDL_GPUBuffer* buffer, voi
 
     return true;
 }
+
+SDL_GPUShader *RenderUtils::CreateShader(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const unsigned char* data, uint32_t size, uint32_t numSamplers, uint32_t numStorageTextures, uint32_t numStorageBuffers, uint32_t numUniformBuffers)
+{
+    SDL_GPUShaderCreateInfo createInfo{
+        .code                   = reinterpret_cast<const Uint8*>(data),
+        .code_size              = size,
+        .entrypoint             = "main",
+        .format                 = SDL_GPU_SHADERFORMAT_SPIRV,
+        .stage                  = stage,
+        .num_samplers           = numSamplers,
+        .num_storage_buffers    = numStorageBuffers,
+        .num_storage_textures   = numStorageTextures,
+        .num_uniform_buffers    = numUniformBuffers
+    };
+    return SDL_CreateGPUShader(device, &createInfo);
+}

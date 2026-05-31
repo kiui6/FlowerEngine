@@ -49,3 +49,11 @@ struct Texture2DResource : public RenderResource {
     unsigned char* data;
     size_t dataSize;
 };
+
+struct ShaderResource : public RenderResource {
+    ShaderResource() : RenderResource(RenderResourceType::Shader) {}
+    
+    // Byte data for SPIRV. Can be not set if object is not dirty
+    unsigned char* data;
+    size_t dataSize;
+};

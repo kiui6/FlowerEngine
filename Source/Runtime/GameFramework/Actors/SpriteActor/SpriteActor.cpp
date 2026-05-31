@@ -50,7 +50,7 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         opaque->position = m_transform.Location;
         opaque->depth = m_transform.Depth;
         opaque->rotation = m_transform.Rotation;
-        opaque->scale = m_transform.Scale;
+        opaque->size = m_transform.Scale * Float2{m_albedoData->GetWidth(), m_albedoData->GetHeight()};
 
         if(m_albedoRenderResource.GetCompiledResource().expired()) {
             m_albedoRenderResource.components = Texture2DComponents::R8G8B8A8_UNORM;

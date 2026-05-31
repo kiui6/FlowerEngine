@@ -5,8 +5,8 @@
 #include <Graphics/RenderEngine/RenderUtils.h>
 
 // Shaders
-#include "FullscreenTriangle.vert.h"
-#include "FullscreenTriangle.frag.h"
+#include "Shaders/FullscreenTriangle.vert.h"
+#include "Shaders/FullscreenTriangle.frag.h"
 
 UpscaleRenderPass::UpscaleRenderPass(GPUContext &context)
 {

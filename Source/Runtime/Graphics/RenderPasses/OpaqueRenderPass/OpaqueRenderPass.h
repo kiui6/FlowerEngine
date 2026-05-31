@@ -17,8 +17,11 @@ class OpaqueRenderPass : public RenderPass
 {
     SDL_GPUTexture* m_albedo;
     GPUContext& m_gpu;
+
     const GlobalRenderState& globalState;
     const TilemapRenderState& tilemapState;
+
+    SDL_GPUBuffer* m_quadVertexBuffer;
 
     SDL_GPUShader* m_opaqueSpritePipelineVertexShader;
     SDL_GPUShader* m_opaqueSpritePipelineFragmentShader;
@@ -36,6 +39,7 @@ public:
     virtual void Render(FrameContext& ctx) override;
     virtual void Cleanup() override;
 protected:
+    void CreateOpaqueSpritePipeline();
 
     void CompileOpaqueSpriteRenderElement(RenderResourceCompiler& resourceCompiler, RenderObject* object, OpaqueSpriteRenderElement* element);
 };

@@ -48,5 +48,5 @@ public:
     void Stop();
 protected:
     //void OnWindowEvent(Window* win, WindowEventPayload* payload);
-
+    void RecordRenderStateUpdates(RenderView& view);
 };

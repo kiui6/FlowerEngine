@@ -29,6 +29,8 @@ void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface)
 void Window::Update()
 {
 	PUSH_TRACE_SCOPE("Window::Update()");
+	m_sizeIsDirty = false;
+
 	while(SDL_PollEvent(&m_event))
 	{
 		OnSDLEvent.Broadcast(m_event);
@@ -42,6 +44,7 @@ void Window::Update()
         	    if(!m_bShouldClose) {
 					m_width = m_event.window.data1;
 					m_height = m_event.window.data2;
+					m_sizeIsDirty = true;
 				    OnWindowEvent.Broadcast(this, new WindowEventPayloadResize(m_event.window.data1, m_event.window.data2));
 					SDL_FlushEvent(SDL_EVENT_WINDOW_RESIZED);
         	    }

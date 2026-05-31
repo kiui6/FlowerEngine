@@ -7,6 +7,10 @@
 
 #include <Log/Log.h>
 #include <Debug/Tracer/Tracer.h>
+#include <Math/Mesh.h>
+
+#include "Shaders/OpaqueSpriteQuad.frag.h"
+#include "Shaders/OpaqueSpriteQuad.vert.h"
 
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
     : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>()), globalState(stateStore.Get<GlobalRenderState>())
@@ -24,6 +28,27 @@ OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateS
         LOG(Fatal, LogOpaqueRenderPass, "Failed to create Albedo Color Render Target");
         return;
     }
+
+    // Create Qaud Vertex Buffer
+    m_quadVertexBuffer = RenderUtils::CreateBuffer(m_gpu.device, SDL_GPU_BUFFERUSAGE_VERTEX, (void*)Primitives::SQUARE, 6 * sizeof(Vertex2D));
+
+    // Create Shaders
+    m_opaqueSpritePipelineVertexShader = RenderUtils::CreateShader(
+        m_gpu.device, 
+        SDL_GPU_SHADERSTAGE_VERTEX, 
+        OpaqueSpriteQuad_vert_h,
+        sizeof(OpaqueSpriteQuad_vert_h),
+        0, 0, 2, 0);
+
+    m_opaqueSpritePipelineFragmentShader = RenderUtils::CreateShader(
+        m_gpu.device, 
+        SDL_GPU_SHADERSTAGE_FRAGMENT, 
+        OpaqueSpriteQuad_frag_h,
+        sizeof(OpaqueSpriteQuad_frag_h),
+        1, 0, 0, 0);
+
+    // Create Graphics Pipeline
+    CreateOpaqueSpritePipeline();
 
     // Create Sampler
     SDL_GPUSamplerCreateInfo samplerInfo = {};
@@ -48,7 +73,15 @@ OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateS
 
 OpaqueRenderPass::~OpaqueRenderPass()
 {
+    SDL_ReleaseGPUBuffer(m_gpu.device, m_quadVertexBuffer);
+
     SDL_ReleaseGPUTexture(m_gpu.device, m_albedo);
+    SDL_ReleaseGPUSampler(m_gpu.device, m_opaqueSpriteSampler);
+
+    SDL_ReleaseGPUShader(m_gpu.device, m_opaqueSpritePipelineVertexShader);
+    SDL_ReleaseGPUShader(m_gpu.device, m_opaqueSpritePipelineFragmentShader);
+    
+    SDL_ReleaseGPUGraphicsPipeline(m_gpu.device, m_opaqueSpritePipeline);
 }
 
 void OpaqueRenderPass::Compile(RenderResourceCompiler &resourceCompiler, RenderObject *object, RenderElement *element)
@@ -120,6 +153,12 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     PUSH_TRACE_SCOPE("OpaqueRenderPass::Render()");
     ctx.attachments[(uint8_t)RenderAttachment::Albedo] = m_albedo;
 
+    // Can't render without world buffer
+    if(globalState.worldBuffer == nullptr) {
+        POP_TRACE_SCOPE();
+        return;
+    }
+
     BeginGPULabel(ctx.cmd, "Opaque");
 
     SDL_GPUColorTargetInfo colorTarget = {
@@ -136,6 +175,13 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     // Render sprites
     BeginGPULabel(ctx.cmd, "Sprites");
 
+    SDL_BindGPUGraphicsPipeline(pass, m_opaqueSpritePipeline);
+
+    SDL_GPUBufferBinding vertBufferBindings{.buffer=m_quadVertexBuffer, .offset=0};
+    SDL_BindGPUVertexBuffers(pass, 0, &vertBufferBindings, 1);
+
+    SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 0, &globalState.worldBuffer, 1);
+
     for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements)
     {
         SDL_GPUTextureSamplerBinding atlasBinding = {
@@ -145,6 +191,8 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
         SDL_BindGPUFragmentSamplers(pass, /*first slot*/ 0, &atlasBinding, 1);
 
         SDL_BindGPUVertexStorageBuffers(pass, /*second slot*/ 1, &sprites.uniformBuffer[m_gpu.currentFrame], 1);
+
+        SDL_DrawGPUPrimitives(pass, 6, sprites.assembly.size(), 0, 0);
     }
 
     EndGPULabel(ctx.cmd);
@@ -160,6 +208,86 @@ void OpaqueRenderPass::Cleanup()
 {
     for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements) {
         sprites.assembly.clear();
+    }
+}
+
+void OpaqueRenderPass::CreateOpaqueSpritePipeline()
+{
+    SDL_GPUVertexBufferDescription vertexBindings[] = {{
+        .slot       = 0,
+        .pitch      = sizeof(Vertex2D),
+        .input_rate = SDL_GPU_VERTEXINPUTRATE_VERTEX,
+        .instance_step_rate = 0
+    }};
+
+    SDL_GPUVertexAttribute vertexAttribs[] = {
+        {.location = 0, .buffer_slot = 0, .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, .offset = offsetof(Vertex2D, pos)},
+        {.location = 1, .buffer_slot = 0, .format = SDL_GPU_VERTEXELEMENTFORMAT_FLOAT2, .offset = offsetof(Vertex2D, uv)}
+    };
+
+    SDL_GPUVertexInputState vertexInput = {
+        .vertex_buffer_descriptions = vertexBindings,
+        .num_vertex_buffers = 1,
+        .vertex_attributes = vertexAttribs,
+        .num_vertex_attributes = 2
+    };
+
+    SDL_GPUGraphicsPipelineTargetInfo targetInfo = {};
+    targetInfo.num_color_targets = 1;
+
+    SDL_GPUColorTargetDescription colorTargetDesc = {};
+    colorTargetDesc.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+    colorTargetDesc.blend_state = {
+        .src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA,
+        .dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+        .color_blend_op        = SDL_GPU_BLENDOP_ADD,
+        .src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE,
+        .dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO,
+        .alpha_blend_op        = SDL_GPU_BLENDOP_ADD,
+        .color_write_mask      = SDL_GPU_COLORCOMPONENT_R | SDL_GPU_COLORCOMPONENT_G |
+                                SDL_GPU_COLORCOMPONENT_B | SDL_GPU_COLORCOMPONENT_A,
+        .enable_blend          = true,
+    };
+
+    targetInfo.color_target_descriptions = &colorTargetDesc;
+
+    SDL_GPUGraphicsPipelineCreateInfo pipelineDesc = {
+        .vertex_shader   = m_opaqueSpritePipelineVertexShader,
+        .fragment_shader = m_opaqueSpritePipelineFragmentShader,
+        .vertex_input_state = vertexInput,
+        .primitive_type  = SDL_GPU_PRIMITIVETYPE_TRIANGLELIST,
+
+        .rasterizer_state = {
+            .fill_mode              = SDL_GPU_FILLMODE_FILL,
+            .cull_mode              = SDL_GPU_CULLMODE_NONE,
+            .front_face             = SDL_GPU_FRONTFACE_COUNTER_CLOCKWISE,
+            .depth_bias_constant_factor    = 0.0f,
+            .depth_bias_clamp       = 0.0f,
+            .depth_bias_slope_factor = 0.0f,
+            .enable_depth_clip      = true
+        },
+
+        .multisample_state = {
+            .sample_count = SDL_GPU_SAMPLECOUNT_1,
+            .sample_mask  = 0
+        },
+
+        .depth_stencil_state = {
+            .compare_op         = SDL_GPU_COMPAREOP_ALWAYS,
+            .back_stencil_state = {},
+            .front_stencil_state= {},
+            .enable_depth_test  = false,
+            .enable_depth_write = false,
+            .enable_stencil_test= false
+        },
+
+
+        .target_info = targetInfo,
+    };
+
+    m_opaqueSpritePipeline = SDL_CreateGPUGraphicsPipeline(m_gpu.device, &pipelineDesc);
+    if (!m_opaqueSpritePipeline) {
+        LOG(Fatal, LogOpaqueRenderPass, "Failed to create opaque sprite graphics pipeline");
     }
 }
 
@@ -183,10 +311,11 @@ void OpaqueRenderPass::CompileOpaqueSpriteRenderElement(RenderResourceCompiler &
     }
 
     compiled->assembly.emplace_back(
-        element->position,
-        element->depth,
-        element->scale,
-        element->rotation,
+        element->uv,
         element->tint,
-        element->uv);
+        element->position,
+        element->size,
+        element->pivot,
+        element->depth,
+        element->rotation);
 }

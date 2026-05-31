@@ -117,6 +117,7 @@ set(SrcRender
 
     # Render State Updates
     "Source/Runtime/Graphics/RenderStateUpdates/DebugUIStateUpdate.cpp"
+    "Source/Runtime/Graphics/RenderStateUpdates/GlobalStateUpdate.cpp"
   )
 
 set(SrcGameFramework

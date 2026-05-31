@@ -7,6 +7,8 @@
 
 #include <ranges>
 
+#include <Graphics/RenderStateUpdates/GlobalStateUpdate.h>
+
 void World::SpawnDefaultActors()
 {
 }
@@ -100,6 +102,15 @@ void World::BeginDestroy()
 
 void World::RecordRenderView(RenderView &renderView)
 {
+    // FIXME: This is unreasonably expensive
+    GlobalStateUpdate* globalStateUpdate = new GlobalStateUpdate;
+    globalStateUpdate->projectionMatrixDirty = true;
+    globalStateUpdate->cameraPositionDirty = true;
+    globalStateUpdate->cameraPosition = {0, 0, 0};
+    globalStateUpdate->canvasWidth = m_canvasWidth;
+    globalStateUpdate->canvasHeight = m_canvasHeight;
+    renderView.SubmitStateUpdate(globalStateUpdate);
+
     for(auto& [key, value] : m_dynamicActors) {
         value->RecordRenderView(renderView);
     }

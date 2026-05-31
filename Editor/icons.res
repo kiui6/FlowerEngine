@@ -1,1 +1,1 @@
-IconSave32="UI/Icons/",32,32
+IconSave32="UI/Icons/Save32.png",32,32

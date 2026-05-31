@@ -8,4 +8,5 @@ enum class RenderResourceType : uint16_t {
     UniformBuffer,
     StorageBuffer,
     Texture2D,
+    Shader,
 };

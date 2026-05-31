@@ -10,6 +10,7 @@
 #include <Platform/Platform.h>
 
 #include <Graphics/RenderStateUpdates/DebugUIStateUpdate.h>
+#include <Graphics/RenderStateUpdates/GlobalStateUpdate.h>
 
 //#include <Asset/AssetLoader.h>
 //#include <Record/ObjectLibrary.h>
@@ -119,10 +120,7 @@ void Application::StartLifecycle()
         
         RenderView& renderView = m_render->GetFrameRenderView();
         // Record state changes
-        if(m_dbgWindowUpdated) {
-            renderView.SubmitStateUpdate(new DebugUIStateUpdate(m_dbgWindow));
-            m_dbgWindowUpdated = false;
-        }
+        RecordRenderStateUpdates(renderView);
         // Record from engine
         m_engine->RecordRenderView(renderView);
         m_render->Render(m_deltaTime, renderView);
@@ -140,4 +138,16 @@ void Application::StartLifecycle()
 
 void Application::Stop()
 {
+}
+
+void Application::RecordRenderStateUpdates(RenderView & view)
+{
+    if(m_dbgWindowUpdated) {
+        view.SubmitStateUpdate(new DebugUIStateUpdate(m_dbgWindow));
+        m_dbgWindowUpdated = false;
+    }
+
+    if(m_window->SizeChanged()){
+
+    }
 }

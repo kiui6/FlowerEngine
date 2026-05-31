@@ -16,6 +16,9 @@ public:
     Field<StringField> DisplayName = {FIELDID(DISP)};
     Field<UInt16Field> TimeSpeedMultiplier = {FIELDID(KTIM)};
 
+    Field<UInt32Field> CanvasWidth = {FIELDID(CVSW)};
+    Field<UInt32Field> CanvasHeight = {FIELDID(CVSH)};
+
     WorldRecord() {SetType(WorldRecord::StaticType());}
     static ID32 StaticType() {return MakeID32("WRLD");}
 };

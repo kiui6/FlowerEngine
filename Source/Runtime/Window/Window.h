@@ -18,6 +18,7 @@ class Window
 
     std::string m_title;
     unsigned int m_width, m_height;
+    bool m_sizeIsDirty = false;
 
     bool m_bShouldClose = false;
 protected:
@@ -30,6 +31,10 @@ public:
     void CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface);
 
     inline bool ShouldClose() const {return m_bShouldClose;}
+
+    inline bool SizeChanged() const {return m_sizeIsDirty;}
+    inline unsigned int GetWidth() const {return m_width;}
+    inline unsigned int GetHeight() const {return m_height;}
 
     void Update();
 
