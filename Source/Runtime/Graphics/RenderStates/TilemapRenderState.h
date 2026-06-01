@@ -2,11 +2,10 @@
 
 #include <Graphics/RenderEngine/RenderState/RenderState.h>
 
-class TilemapRenderState : public RenderState
+class TilemapRenderState : public RenderState, public StaticallyTyped<MakeID32("TLMP")>
 {
 
 public:
     TilemapRenderState(GPUContext& gpu) : RenderState(gpu) {}
 
-    static ID32 StaticType() {return MakeID32("TLMP");} 
 };

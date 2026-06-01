@@ -21,11 +21,10 @@ static_assert(sizeof(GPUWorldData) == 80, "WorldBuffer must be 80 bytes");
 static_assert(offsetof(GPUWorldData, projectionView) == 0,  "projectionView offset wrong");
 static_assert(offsetof(GPUWorldData, position) == 64,       "position offset wrong");
 
-struct GlobalRenderState : public RenderState
+struct GlobalRenderState : public RenderState, public StaticallyTyped<MakeID32("GLOB")>
 {
     GlobalRenderState(GPUContext& gpu);
-
-    static ID32 StaticType() {return MakeID32("GLOB");} 
+    ~GlobalRenderState();
 
     Float4x4 projectionMatrix;
     uint32_t canvasWidth, canvasHeight;

@@ -53,12 +53,14 @@ void RenderEngine::Initialize(SDL_Window* window)
     }
 
     SDL_SetGPUSwapchainParameters(m_ctx.device, m_ctx.window, SDL_GPU_SWAPCHAINCOMPOSITION_SDR, SDL_GPU_PRESENTMODE_VSYNC);
+    
+    m_ctx.swapchainFormat = SDL_GetGPUSwapchainTextureFormat(m_ctx.device, m_ctx.window);
 
     // Initialize Render Passes
     m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>(m_ctx, m_stateStore);
     m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>(m_ctx);
     m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>(m_ctx);
-    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx);
+    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx, m_stateStore);
     m_renderPasses[(uint32_t)RenderPassType::DebugUI] = std::make_unique<DebugUIRenderPass>(m_ctx, m_stateStore);
 
     LOG(Log, LogRender, "Render Engine initialization complete");

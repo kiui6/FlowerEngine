@@ -3,7 +3,7 @@
 layout(location = 0) in vec2 inPos;
 layout(location = 1) in vec2 inUV;
 
-layout(binding = 0) buffer WorldBuffer { 
+layout(binding = 0) readonly buffer WorldBuffer { 
     mat4 projectionView;
     vec3 position;
 } worldData;
@@ -18,7 +18,7 @@ struct Sprite {
         float rotation;
 };
 
-layout(binding = 1) buffer SpriteBuffer { Sprite sprites[]; } spriteData;
+layout(binding = 1) readonly buffer SpriteBuffer { Sprite sprites[]; } spriteData;
 
 layout(location = 0) out vec2 fragUV;
 layout(location = 1) out vec3 fragTint;

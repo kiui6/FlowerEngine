@@ -15,6 +15,8 @@ Window::Window(std::string_view title, uint32_t width, uint32_t height)
 	m_surface = SDL_GetWindowSurface(m_window);
 
 	SDL_UpdateWindowSurface(m_window);
+
+	m_sizeIsDirty = true;
 }
 
 void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface)
@@ -29,7 +31,6 @@ void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface)
 void Window::Update()
 {
 	PUSH_TRACE_SCOPE("Window::Update()");
-	m_sizeIsDirty = false;
 
 	while(SDL_PollEvent(&m_event))
 	{
@@ -64,4 +65,9 @@ void Window::Update()
 		}
 	}
 	POP_TRACE_SCOPE();
+}
+
+void Window::ClearFlags()
+{
+	m_sizeIsDirty = false;
 }

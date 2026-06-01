@@ -31,13 +31,6 @@ void GlobalStateUpdate::Apply(RenderStateUpdateContext& ctx)
         .position = state.cameraPosition
     };
 
-    
-    if(state.worldBuffer[ctx.gpu.currentFrame] == nullptr) {
-        state.worldBuffer[ctx.gpu.currentFrame] = RenderUtils::CreateBuffer(ctx.gpu.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, &worldData, sizeof(worldData));
-        state.NotifyChanged();
-        return;    
-    }
-
     if(transferBuffer == nullptr) {
         transferBuffer = RenderUtils::CreateTransferBuffer(ctx.gpu.device, sizeof(worldData));
     }

@@ -15,6 +15,7 @@ struct RenderUtils {
     static SDL_GPUTransferBuffer* CreateTransferBuffer(SDL_GPUDevice* device, uint32_t size);
     static bool UpdateBuffer(SDL_GPUDevice* device, SDL_GPUBuffer* buffer, void* data, uint32_t size);
     static bool UpdateBufferWithTransferBuffer(SDL_GPUDevice *device, SDL_GPUCommandBuffer* cmd, SDL_GPUTransferBuffer* transfer, SDL_GPUBuffer* buffer, void* data, uint32_t size);
+    static bool UpdateBufferWithTransferBufferAndPass(SDL_GPUDevice *device, SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* pass, SDL_GPUTransferBuffer* transfer, SDL_GPUBuffer* buffer, void* data, uint32_t size);
 
     static SDL_GPUShader* CreateShader( SDL_GPUDevice* device, 
                                         SDL_GPUShaderStage stage,

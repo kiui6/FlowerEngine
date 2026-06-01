@@ -37,6 +37,7 @@ public:
     inline unsigned int GetHeight() const {return m_height;}
 
     void Update();
+    void ClearFlags();
 
     inline SDL_Window* GetSDLWindowHandle() const {return m_window;}
 

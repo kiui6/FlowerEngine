@@ -10,6 +10,10 @@
 #include <Entry/EntryRecord.h>
 
 #include <Platform/PlatformDefines.h>
+#include <Config/Config.h>
+
+#include <Graphics/RenderStateUpdates/GlobalStateUpdate.h>
+#include <Graphics/RenderStateUpdates/UpscaleStateUpdate.h>
 
 #include <Debug/Tracer/Tracer.h>
 
@@ -42,6 +46,12 @@ Engine::Engine()
     if(!m_GC) {
         LOG(Fatal, LogEngine, "Failed to retrive pointer to Garbage Collector service. Is it registered?");
     }
+
+    Config* config = GetService<Config>();
+
+    m_gameCanvasWidth = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 640);
+    m_gameCanvasHeight = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 360);
+    m_gameCanvasDirty = true;
 }
 
 void Engine::Initialize()
@@ -107,6 +117,19 @@ void Engine::Tick(float DeltaTime)
 void Engine::RecordRenderView(RenderView &renderView)
 {
     PUSH_TRACE_SCOPE("Engine::RecordRenderView");
+    if(m_gameCanvasDirty) {
+        GlobalStateUpdate* globalStateUpdate = renderView.GetStateUpdate<GlobalStateUpdate>();
+        globalStateUpdate->canvasWidth = m_gameCanvasWidth;
+        globalStateUpdate->canvasHeight = m_gameCanvasHeight;
+        globalStateUpdate->projectionMatrixDirty = true;
+
+        UpscaleStateUpdate* upscaleUpdate = renderView.GetStateUpdate<UpscaleStateUpdate>();
+        upscaleUpdate->gameCanvasWidth = m_gameCanvasWidth;
+        upscaleUpdate->gameCanvasHeight = m_gameCanvasHeight;
+
+        m_gameCanvasDirty = false;
+    }
+
     if(m_world) {
         m_world->RecordRenderView(renderView);
     }

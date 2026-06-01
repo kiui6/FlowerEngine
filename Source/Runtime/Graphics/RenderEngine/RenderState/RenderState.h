@@ -4,13 +4,12 @@
 #include <Graphics/RenderEngine/GPUContext.h>
 
 #include <Delegate/Delegate.h>
+#include <Mixin/StaticallyTyped.h>
 
 #include <concepts>
 
 struct RenderState
 {
-    static ID32 StaticType() {return MakeID32("NONE");} 
-
     RenderState() = delete;
     RenderState(GPUContext& gpu) : m_gpu(gpu) {}
     virtual ~RenderState() = default;
@@ -25,4 +24,6 @@ protected:
 };
 
 template<typename T>
-concept RenderStateClass = std::is_base_of<RenderState, T>::value;
+concept RenderStateClass = std::is_base_of_v<RenderState, T> && requires {
+    { T::StaticType() } -> std::same_as<ID32>;
+};

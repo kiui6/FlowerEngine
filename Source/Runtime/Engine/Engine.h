@@ -20,6 +20,8 @@ protected:
 
     std::unique_ptr<UINode> m_rootUINode = nullptr;
 
+    uint32_t m_gameCanvasWidth, m_gameCanvasHeight;
+    bool m_gameCanvasDirty;
 public:
     Engine();
 
@@ -44,6 +46,7 @@ public:
     // Only works when called outside of Renderer
     void LoadWorld(RecordID worldID);
     inline World* GetWorld() const {return m_world.get();}
+    inline bool HasWorld() const {return m_world.get() != nullptr;}
 
     void Tick(float DeltaTime);
 

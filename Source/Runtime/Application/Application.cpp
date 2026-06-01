@@ -11,6 +11,7 @@
 
 #include <Graphics/RenderStateUpdates/DebugUIStateUpdate.h>
 #include <Graphics/RenderStateUpdates/GlobalStateUpdate.h>
+#include <Graphics/RenderStateUpdates/UpscaleStateUpdate.h>
 
 //#include <Asset/AssetLoader.h>
 //#include <Record/ObjectLibrary.h>
@@ -125,6 +126,10 @@ void Application::StartLifecycle()
         m_engine->RecordRenderView(renderView);
         m_render->Render(m_deltaTime, renderView);
 
+        // Clear window event flags after we record render state updates
+        // Otherwise resized flag will be cleared on first frame
+        m_window->ClearFlags();
+
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
         POP_TRACE_SCOPE();
         FLUSH_TRACE_FRAME();
@@ -145,5 +150,11 @@ void Application::RecordRenderStateUpdates(RenderView & view)
     if(m_dbgWindowUpdated) {
         view.GetStateUpdate<DebugUIStateUpdate>()->window = m_dbgWindow;
         m_dbgWindowUpdated = false;
+    }
+
+    if(m_window->SizeChanged()) {
+        UpscaleStateUpdate* update = view.GetStateUpdate<UpscaleStateUpdate>();
+        update->viewportWidth = m_window->GetWidth();
+        update->viewportHeight = m_window->GetHeight();
     }
 }

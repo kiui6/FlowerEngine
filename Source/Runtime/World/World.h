@@ -18,8 +18,6 @@
 
 class World
 {
-    uint32_t m_canvasWidth, m_canvasHeight;
-
     std::unordered_map<RecordID, std::unique_ptr<Actor>> m_staticActors;
     std::unordered_map<RecordID, std::unique_ptr<Actor>> m_dynamicActors;
     std::vector<WorldChunk> m_chunks;
@@ -29,9 +27,7 @@ class World
     Quadtree<ActorSpatialInstance> m_quadtree;
 public:
     World(const RecordPtr<WorldRecord>& worldRec) 
-        : m_worldRef(worldRec), 
-        m_canvasWidth(worldRec.Get()->CanvasWidth),
-        m_canvasHeight(worldRec.Get()->CanvasHeight)
+        : m_worldRef(worldRec)
         {}
     World(RecordPtr<WorldRecord>&& worldRec) : m_worldRef(worldRec) {}
 

@@ -102,13 +102,9 @@ void World::BeginDestroy()
 
 void World::RecordRenderView(RenderView &renderView)
 {
-    // FIXME: This is unreasonably expensive
     GlobalStateUpdate* globalStateUpdate = renderView.GetStateUpdate<GlobalStateUpdate>();
-    globalStateUpdate->projectionMatrixDirty = true;
     globalStateUpdate->cameraPositionDirty = true;
     globalStateUpdate->cameraPosition = {0, 0, 0};
-    globalStateUpdate->canvasWidth = m_canvasWidth;
-    globalStateUpdate->canvasHeight = m_canvasHeight;
 
     for(auto& [key, value] : m_dynamicActors) {
         value->RecordRenderView(renderView);

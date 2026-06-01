@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.21)
 
 project ("Flower")
 
+add_subdirectory("Tools")
+
 set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
 set(SDL_STATIC ON)
 
@@ -114,9 +116,11 @@ set(SrcRender
     
     # Render States
     "Source/Runtime/Graphics/RenderStates/GlobalRenderState.cpp"
+    "Source/Runtime/Graphics/RenderStates/UpscaleRenderState.cpp"
 
     # Render State Updates
     "Source/Runtime/Graphics/RenderStateUpdates/DebugUIStateUpdate.cpp"
+    "Source/Runtime/Graphics/RenderStateUpdates/UpscaleStateUpdate.cpp"
     "Source/Runtime/Graphics/RenderStateUpdates/GlobalStateUpdate.cpp"
   )
 
@@ -215,4 +219,4 @@ endif()
 #set(CMAKE_EXE_LINKER_FLAGS "/subsystem:console ${CMAKE_EXE_LINKER_FLAGS} /subsystem:console")
 
 # Shaders
-add_shaders(Shaders "Shaders/FullscreenTriangle/FullscreenTriangle.vert" "Shaders/FullscreenTriangle/FullscreenTriangle.frag")
+# add_shaders(Shaders "Shaders/FullscreenTriangle/FullscreenTriangle.vert" "Shaders/FullscreenTriangle/FullscreenTriangle.frag")

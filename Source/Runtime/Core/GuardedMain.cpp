@@ -53,8 +53,6 @@ int GuardedMain(int argc, char* argv[])
     RecordPtr<WorldRecord> worldRec = GetService<RecordLibrary>()->CreateRecord<WorldRecord>();
     worldRec->EditorID = "TestWorld";
     worldRec->DisplayName = "Test World";
-    worldRec->CanvasWidth = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 640);
-    worldRec->CanvasHeight = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasHeight", 360);
 
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 

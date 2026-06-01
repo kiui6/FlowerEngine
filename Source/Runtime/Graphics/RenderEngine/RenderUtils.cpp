@@ -145,6 +145,27 @@ bool RenderUtils::UpdateBufferWithTransferBuffer(SDL_GPUDevice *device, SDL_GPUC
     return true;
 }
 
+bool RenderUtils::UpdateBufferWithTransferBufferAndPass(SDL_GPUDevice *device, SDL_GPUCommandBuffer *cmd, SDL_GPUCopyPass *pass, SDL_GPUTransferBuffer *transfer, SDL_GPUBuffer *buffer, void *data, uint32_t size)
+{
+        void* mapped = SDL_MapGPUTransferBuffer(device, transfer, false);
+    memcpy(mapped, data, size);
+    SDL_UnmapGPUTransferBuffer(device, transfer);
+
+    const SDL_GPUTransferBufferLocation tbBufferLocation = {
+        .transfer_buffer = transfer,
+        .offset = 0
+    };
+    const SDL_GPUBufferRegion vBufferLocation = {
+        .buffer = buffer,
+        .offset = 0,
+        .size = size
+    };
+
+    SDL_UploadToGPUBuffer(pass, &tbBufferLocation, &vBufferLocation, false);
+
+    return true;
+}
+
 SDL_GPUShader *RenderUtils::CreateShader(SDL_GPUDevice *device, SDL_GPUShaderStage stage, const unsigned char* data, uint32_t size, uint32_t numSamplers, uint32_t numStorageTextures, uint32_t numStorageBuffers, uint32_t numUniformBuffers)
 {
     SDL_GPUShaderCreateInfo createInfo{
