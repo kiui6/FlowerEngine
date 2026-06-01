@@ -4,3 +4,5 @@ Build/
 
 CMakeFiles/
 CMakeCache.txt
+
+*.spv
