@@ -16,6 +16,7 @@ void PrintUsage()
 int main(int argc, char* argv[]) {
     #ifdef _WIN32
     _setmode(_fileno(stdin), _O_BINARY);
+    _setmode(_fileno(stdout), _O_BINARY);
     #endif
 
     FILE* in = stdin;
@@ -27,44 +28,50 @@ int main(int argc, char* argv[]) {
             if(argv[1][1] == 'h') {
                 PrintUsage();
                 return 0;
+            } else {
+                if (isatty(fileno(in))) {
+                    fprintf(stderr, "Error: Can't read from terminal.");
+                    return 1;
+                }
             }
         } else {
             out = fopen(argv[1], "wb");
         }
     } else if(argc == 3) {
         in = fopen(argv[1], "rb");
+        if (!in) {
+            fprintf(stderr, "bin2h: Invalid input file name");
+            return 1;
+        }
+
         // '-' specifies a pipe
         if(argv[2][0] != '-') {
             out = fopen(argv[2], "wb");
+            if(!out) {
+                fprintf(stderr, "bin2h: Unable to open output file");
+                return 1;
+            }
         }
-        if (!in) return 1;
         closeIn = 255;
     } else {
         PrintUsage();
         return 0;
     }
 
-    unsigned char *data;
-    long dataSize;
+    // Write as C array
+    int c, i = 0;
 
-    // Find file size
-    long originalPos = ftell(in);
-    fseek(in, 0, SEEK_END);
-    dataSize = ftell(in);
-    data = (unsigned char*)malloc(dataSize);
-    fseek(in, originalPos, SEEK_SET);
+    fprintf(out, "static const unsigned char data[] = {\n");
+    while ((c = fgetc(in)) != EOF) {
+        fprintf(out, "0x%02x, ", c);
+        if ((i + 1) % 12 == 0) fprintf(out, "\n");
 
-    fread(data, 1, dataSize, in);
+        ++i;
+    }
+    fprintf(out, "\n};");
 
     // Close if it's not an std file stream
     if (closeIn) fclose(in);
 
-    // Write as C array
-    fprintf(out, "static const unsigned char data[%ld] = {\n", dataSize);
-    for (size_t i = 0; i < dataSize; ++i) {
-        fprintf(out, "0x%02x, ", data[i]);
-        if ((i + 1) % 12 == 0) fprintf(out, "\n");
-    }
-    fprintf(out, "\n};");
     return 0;
 }
