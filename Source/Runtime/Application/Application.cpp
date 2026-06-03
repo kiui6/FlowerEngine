@@ -154,6 +154,7 @@ void Application::RecordRenderStateUpdates(RenderView & view)
 
     if(m_window->SizeChanged()) {
         UpscaleStateUpdate* update = view.GetStateUpdate<UpscaleStateUpdate>();
+        update->viewportDirty = true;
         update->viewportWidth = m_window->GetWidth();
         update->viewportHeight = m_window->GetHeight();
     }

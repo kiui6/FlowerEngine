@@ -13,9 +13,7 @@ UpscaleRenderPass::UpscaleRenderPass(GPUContext &context, RenderStateStore& stat
 {
     m_state.SubscribeToChange(this, &UpscaleRenderPass::OnStateChange);
 
-    for(int i = 0; i < m_upscaleBuffer.size(); ++i) {
-        m_upscaleBuffer[i] = RenderUtils::CreateBuffer(context.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, (void*)&m_state.compensationCalculation, sizeof(m_state.compensationCalculation));
-    }
+    m_upscaleBuffer = RenderUtils::CreateBuffer(context.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, (void*)&m_state.compensationCalculation, sizeof(m_state.compensationCalculation));
 
     m_upscaleTransferBuffer = RenderUtils::CreateTransferBuffer(context.device, sizeof(m_state.compensationCalculation));
 
@@ -57,16 +55,16 @@ UpscaleRenderPass::UpscaleRenderPass(GPUContext &context, RenderStateStore& stat
 
 UpscaleRenderPass::~UpscaleRenderPass()
 {
-    for(int i = 0; i < m_upscaleBuffer.size(); ++i) {
-        SDL_ReleaseGPUBuffer(m_gpu.device, m_upscaleBuffer[i]);
-    }
+    SDL_ReleaseGPUBuffer(m_gpu.device, m_upscaleBuffer);
 }
 
 void UpscaleRenderPass::Prepare(SDL_GPUCommandBuffer *cmd, SDL_GPUCopyPass *copyPass)
 {
     if(m_upscaleBufferDirty) {
-        RenderUtils::UpdateBufferWithTransferBufferAndPass(m_gpu.device, cmd, copyPass, m_upscaleTransferBuffer, 
-                                        m_upscaleBuffer[m_gpu.currentFrame], 
+        SDL_WaitForGPUIdle(m_gpu.device);
+
+        RenderUtils::UpdateBufferWithTransferBufferAndPass(m_gpu.device, cmd, copyPass, 
+                                        m_upscaleTransferBuffer, m_upscaleBuffer, 
                                         (void*)(&m_state.compensationCalculation), sizeof(m_state.compensationCalculation));
 
         m_upscaleBufferDirty = false;
@@ -98,7 +96,7 @@ void UpscaleRenderPass::Render(FrameContext &ctx)
         
     SDL_BindGPUFragmentSamplers(pass, /*first slot*/ 0, &atlasBinding, 1);
 
-    SDL_BindGPUVertexStorageBuffers(pass, /*second slot*/ 0, &m_upscaleBuffer[ctx.frameIndex], 1);
+    SDL_BindGPUVertexStorageBuffers(pass, /*second slot*/ 0, &m_upscaleBuffer, 1);
 
     SDL_DrawGPUPrimitives(pass, 3, 1, 0, 0);
 

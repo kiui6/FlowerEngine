@@ -11,5 +11,8 @@ struct UpscaleRenderState : public RenderState, public StaticallyTyped<MakeID32(
 {
     UpscaleRenderState(GPUContext& gpu) : RenderState(gpu) {}
 
-   Float2 compensationCalculation = {1, 1};
+    uint32_t gameCanvasWidth = 0, gameCanvasHeight = 0;
+    uint32_t viewportWidth = 0, viewportHeight = 0;
+
+    Float2 compensationCalculation = {1, 1};
 };

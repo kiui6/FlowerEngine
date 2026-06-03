@@ -11,7 +11,7 @@ class UpscaleRenderPass : public RenderPass
     GPUContext& m_gpu;
     const UpscaleRenderState& m_state;
 
-    std::array<SDL_GPUBuffer*, FRAMES_IN_FLIGHT> m_upscaleBuffer;
+    SDL_GPUBuffer* m_upscaleBuffer;
     SDL_GPUTransferBuffer* m_upscaleTransferBuffer = nullptr;
     bool m_upscaleBufferDirty = false;
 
