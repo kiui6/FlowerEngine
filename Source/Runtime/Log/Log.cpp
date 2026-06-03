@@ -125,11 +125,8 @@ void Logger::Fatal(const char* Namespace, const char* message)
 {
 	InternalLog(Namespace, message, "\x1B[31m");
 
-#if !defined(NDEBUG) || defined(EDITOR)
-	throw std::runtime_error(message);
-#else
+	assert(!"Fatal");
 	std::abort();
-#endif
 }
 
 void Logger::FatalFormat(const char* Namespace, const char* message, ...)
@@ -150,11 +147,8 @@ void Logger::FatalFormat(const char* Namespace, const char* message, ...)
 	delete[] buffer;
 	va_end(varg_ptr);
 
-#if !defined(NDEBUG) || defined(EDITOR)
-	throw std::runtime_error(message);
-#else
+	assert(!"Fatal");
 	std::abort();
-#endif
 }
 
 void Logger::Assert(const char *Namespace, const char *message)
