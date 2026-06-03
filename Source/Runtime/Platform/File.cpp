@@ -21,7 +21,8 @@ void File::Open(std::string path, FileAccess access)
 
     Sint64 bytesRead = SDL_ReadIO(m_stream, m_data, m_size);
     if (bytesRead != m_size) {
-        delete m_data;
+        SDL_CloseIO(m_stream);
+        delete[] m_data;
         m_data = nullptr;
         LOG(Error, LogFile, "Partial read");
     }
@@ -30,6 +31,7 @@ void File::Open(std::string path, FileAccess access)
 void File::Close()
 {
     SDL_CloseIO(m_stream);
+    delete[] m_data;
 }
 
 size_t File::WriteBytes(std::span<const std::byte> buffer, size_t offset)
