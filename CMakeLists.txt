@@ -33,17 +33,15 @@ FetchContent_MakeAvailable(sdl glm json)
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-add_library(no_rtti INTERFACE)
+add_library(disable_cxx_features INTERFACE)
 
-target_compile_options(no_rtti INTERFACE
-    # MSVC (including clang-cl)
-    $<$<OR:$<CXX_COMPILER_ID:MSVC>,$<AND:$<CXX_COMPILER_ID:Clang>,$<STREQUAL:$<CXX_COMPILER_FRONTEND_VARIANT>,MSVC>>>:/GR->
-    # GCC
-    $<$<CXX_COMPILER_ID:GNU>:-fno-rtti>
-    # Clang & AppleClang (non-MSVC mode)
-    $<$<CXX_COMPILER_ID:AppleClang>:-fno-rtti>
-    $<$<AND:$<CXX_COMPILER_ID:Clang>,$<NOT:$<STREQUAL:$<CXX_COMPILER_FRONTEND_VARIANT>,MSVC>>>:-fno-rtti>
-)
+target_compile_options(disable_cxx_features INTERFACE
+    #   GCC / Clang
+    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Release>>:-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-rtti -flto=thin>
+    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Debug>>:-fno-exceptions -fno-rtti -flto=thin>
+    #   MSVC
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/GR- /GL /EHs- _HAS_EXCEPTIONS=0->
+) 
 
 # Third Party Sources
 set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
@@ -155,19 +153,12 @@ endif()
 
 add_executable(Game ${Sources})
 
-target_link_libraries(Game no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Game disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(Game PRIVATE "Source/Runtime")
 target_include_directories(Game PRIVATE "Source/ThirdParty")
 
 set_property(TARGET Game PROPERTY CXX_STANDARD 23)
-
-target_compile_options(Game PRIVATE
-#   GCC / Clang
-    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Release>>:-fno-exceptions>
-#   MSVC
-    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/EHs _HAS_EXCEPTIONS=0->
-)
 
 # Include HAS_DEBUGUI define to the game in Debug build
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -180,7 +171,7 @@ set(EditorSources ${SrcImgui})
 
 add_executable(Editor ${Sources} ${EditorSources})
 
-target_link_libraries(Editor no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Editor disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
 
@@ -195,7 +186,7 @@ set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
 
 add_executable(EditorASAN ${Sources} ${EditorSources})
 
-target_link_libraries(EditorASAN no_rtti SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(EditorASAN disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
 
 target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
 
