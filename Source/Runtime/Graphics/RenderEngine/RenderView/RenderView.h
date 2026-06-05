@@ -31,8 +31,8 @@ class RenderView
         bool isReferenced = false;
     };
 protected:
-    Float4x4 m_viewMatrix;
     Float4x4 m_projMatrix;
+    Float3 m_cameraPosition;
 
     std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects;
     bool m_staticRenderObjectsDirty = false;
@@ -41,6 +41,9 @@ protected:
     std::unordered_map<uint64_t, RenderStateUpdateHandle> m_stateUpdates;
     std::set<std::unique_ptr<RenderJob>> m_renderJobs;
 public:
+    void SetCameraPosition(Float3 position) {m_cameraPosition = position;}
+    Float3 GetCameraPosition() const {return m_cameraPosition;}
+
     // Creates or retrieves RenderStateUpdate object and references it. Render state updates are performed before any job, compilation or rendering.
     template <RenderStateUpdateClass T>
     T* GetStateUpdate();

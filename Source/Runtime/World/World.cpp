@@ -102,9 +102,7 @@ void World::BeginDestroy()
 
 void World::RecordRenderView(RenderView &renderView)
 {
-    GlobalStateUpdate* globalStateUpdate = renderView.GetStateUpdate<GlobalStateUpdate>();
-    globalStateUpdate->cameraPositionDirty = true;
-    globalStateUpdate->cameraPosition = {0, 0, 0};
+    renderView.SetCameraPosition({0, 0, 0});
 
     for(auto& [key, value] : m_dynamicActors) {
         value->RecordRenderView(renderView);

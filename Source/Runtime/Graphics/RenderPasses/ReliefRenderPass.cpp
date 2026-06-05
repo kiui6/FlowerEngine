@@ -25,7 +25,7 @@ ReliefRenderPass::~ReliefRenderPass()
 
 void ReliefRenderPass::Render(FrameContext &ctx)
 {
-    ctx.attachments[(uint8_t)RenderAttachment::Relief] = m_relief;
+    ctx.imageAttachments[ImageRenderAttachment::Relief] = m_relief;
 
     BeginGPULabel(ctx.cmd, "Relief");
 

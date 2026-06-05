@@ -121,12 +121,9 @@ void Engine::RecordRenderView(RenderView &renderView)
         GlobalStateUpdate* globalStateUpdate = renderView.GetStateUpdate<GlobalStateUpdate>();
         globalStateUpdate->canvasWidth = m_gameCanvasWidth;
         globalStateUpdate->canvasHeight = m_gameCanvasHeight;
-        globalStateUpdate->projectionMatrixDirty = true;
+        globalStateUpdate->canvasDirty = true;
 
-        UpscaleStateUpdate* upscaleUpdate = renderView.GetStateUpdate<UpscaleStateUpdate>();
-        upscaleUpdate->gameCanvasDirty = true;
-        upscaleUpdate->gameCanvasWidth = m_gameCanvasWidth;
-        upscaleUpdate->gameCanvasHeight = m_gameCanvasHeight;
+        renderView.GetStateUpdate<UpscaleStateUpdate>()->SetGameCanvas(m_gameCanvasWidth, m_gameCanvasHeight);
 
         m_gameCanvasDirty = false;
     }

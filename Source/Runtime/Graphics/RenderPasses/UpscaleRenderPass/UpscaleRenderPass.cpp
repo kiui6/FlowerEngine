@@ -90,7 +90,7 @@ void UpscaleRenderPass::Render(FrameContext &ctx)
 
     SDL_GPUTextureSamplerBinding atlasBinding = {
             // TODO: Change to Final once Lightning pass is operational
-            .texture =  ctx.attachments[(uint8_t)RenderAttachment::Albedo],
+            .texture =  ctx.imageAttachments[ImageRenderAttachment::Albedo],
             .sampler = m_sampler
         };
         

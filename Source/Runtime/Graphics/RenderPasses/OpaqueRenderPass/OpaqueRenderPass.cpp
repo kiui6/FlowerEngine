@@ -15,18 +15,20 @@
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
     : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>()), globalState(stateStore.Get<GlobalRenderState>())
 {
-    SDL_GPUTextureCreateInfo texInfo = {};
-    texInfo.type = SDL_GPU_TEXTURETYPE_2D;
-    texInfo.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
-    texInfo.width = globalState.canvasWidth;
-    texInfo.height = globalState.canvasHeight;
-    texInfo.layer_count_or_depth = 1;
-    texInfo.num_levels = 1;
-    texInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
-    m_albedo = SDL_CreateGPUTexture(m_gpu.device, &texInfo);
-    if(!m_albedo) { 
-        LOG(Fatal, LogOpaqueRenderPass, "Failed to create Albedo Color Render Target");
-        return;
+    for(auto& albedoTex : m_albedo) {
+        SDL_GPUTextureCreateInfo texInfo = {};
+        texInfo.type = SDL_GPU_TEXTURETYPE_2D;
+        texInfo.format = SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM;
+        texInfo.width = globalState.canvasWidth;
+        texInfo.height = globalState.canvasHeight;
+        texInfo.layer_count_or_depth = 1;
+        texInfo.num_levels = 1;
+        texInfo.usage = SDL_GPU_TEXTUREUSAGE_COLOR_TARGET | SDL_GPU_TEXTUREUSAGE_SAMPLER;
+        albedoTex = SDL_CreateGPUTexture(m_gpu.device, &texInfo);
+        if(!albedoTex) { 
+            LOG(Fatal, LogOpaqueRenderPass, "Failed to create Albedo Color Render Target");
+            return;
+        }
     }
 
     // Create Qaud Vertex Buffer
@@ -75,7 +77,10 @@ OpaqueRenderPass::~OpaqueRenderPass()
 {
     SDL_ReleaseGPUBuffer(m_gpu.device, m_quadVertexBuffer);
 
-    SDL_ReleaseGPUTexture(m_gpu.device, m_albedo);
+    for(const auto& albedoTex : m_albedo) {
+        SDL_ReleaseGPUTexture(m_gpu.device, albedoTex);
+    }
+
     SDL_ReleaseGPUSampler(m_gpu.device, m_opaqueSpriteSampler);
 
     SDL_ReleaseGPUShader(m_gpu.device, m_opaqueSpritePipelineVertexShader);
@@ -151,10 +156,10 @@ void OpaqueRenderPass::Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
 void OpaqueRenderPass::Render(FrameContext &ctx)
 {
     PUSH_TRACE_SCOPE("OpaqueRenderPass::Render()");
-    ctx.attachments[(uint8_t)RenderAttachment::Albedo] = m_albedo;
+    ctx.imageAttachments[ImageRenderAttachment::Albedo] = m_albedo[ctx.frameIndex];
 
     // Can't render without world buffer
-    if(globalState.worldBuffer[ctx.frameIndex] == nullptr) {
+    if(ctx.bufferAttachments[BufferRenderAttachment::WorldData] == nullptr) {
         POP_TRACE_SCOPE();
         return;
     }
@@ -162,7 +167,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     BeginGPULabel(ctx.cmd, "Opaque");
 
     SDL_GPUColorTargetInfo colorTarget = {
-        .texture     = m_albedo,
+        .texture     = m_albedo[ctx.frameIndex],
         .mip_level   = 0,
         .layer_or_depth_plane = 0,
         .clear_color = (SDL_FColor){ 0.88f, 0.722f, 0.23f, 1.0f },
@@ -180,7 +185,7 @@ void OpaqueRenderPass::Render(FrameContext &ctx)
     SDL_GPUBufferBinding vertBufferBindings{.buffer=m_quadVertexBuffer, .offset=0};
     SDL_BindGPUVertexBuffers(pass, 0, &vertBufferBindings, 1);
 
-    SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 0, &globalState.worldBuffer[ctx.frameIndex], 1);
+    SDL_BindGPUVertexStorageBuffers(pass, /*first slot*/ 0, &ctx.bufferAttachments[BufferRenderAttachment::WorldData], 1);
 
     for(auto& [atlasId, sprites] : m_dynamicOpaqueSpriteElements)
     {

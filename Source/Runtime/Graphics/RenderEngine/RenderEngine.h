@@ -20,16 +20,19 @@
 #include "ResourceCompiler.h"
 #include "RenderUtils.h"
 #include "RenderConstants.h"
+#include "BufferAttachmentUpdateHandler.h"
 
 #include "RenderState/RenderStateStore.h"
 
 class RenderEngine
 {
     std::array<RenderView, FRAMES_IN_FLIGHT> m_renderViews;
+    std::array<FrameContext, FRAMES_IN_FLIGHT> m_frameContexts;
 
     SDL_GPUCommandBuffer *m_renderBuffer, *m_onDemandBuffer;
 
-    std::array<std::unique_ptr<RenderPass>, (uint32_t)RenderPassType::MAX> m_renderPasses;
+    EnumClassArray<std::unique_ptr<IBufferAttachmentUpdateHandler>, BufferRenderAttachment> m_frameBufferAttachmentUpdateHandlers;
+    EnumClassArray<std::unique_ptr<RenderPass>, RenderPassType> m_renderPasses;
 
     GPUContext m_ctx;
 
@@ -46,4 +49,26 @@ public:
     void Render(float deltaTime, RenderView& renderView);
 
 protected:
+    template<typename T>
+    std::unique_ptr<T> MakeRenderModule();
 };
+
+template<typename T>
+inline std::unique_ptr<T> RenderEngine::MakeRenderModule()
+{
+    if constexpr (std::is_constructible_v<T, const GPUContext&, const RenderStateStore&>) {
+        return std::make_unique<T>(m_ctx, m_stateStore);
+    } else if constexpr (std::is_constructible_v<T, GPUContext&, const RenderStateStore&>) {
+        return std::make_unique<T>(m_ctx, m_stateStore);
+    } else if constexpr (std::is_constructible_v<T, const GPUContext&, RenderStateStore&>) {
+        return std::make_unique<T>(m_ctx, m_stateStore);
+    } else if constexpr (std::is_constructible_v<T, GPUContext&, RenderStateStore&>) {
+        return std::make_unique<T>(m_ctx, m_stateStore);
+    } else if constexpr (std::is_constructible_v<T, const GPUContext&>) {
+        return std::make_unique<T>(m_ctx);
+    } else if constexpr (std::is_constructible_v<T, GPUContext&>) {
+        return std::make_unique<T>(m_ctx);
+    } else {
+        static_assert(false, "T has no suitable constructor");
+    }
+}

@@ -15,7 +15,7 @@
 
 class OpaqueRenderPass : public RenderPass
 {
-    SDL_GPUTexture* m_albedo;
+    std::array<SDL_GPUTexture*, FRAMES_IN_FLIGHT> m_albedo;
     GPUContext& m_gpu;
 
     const GlobalRenderState& globalState;

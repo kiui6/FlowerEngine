@@ -6,7 +6,7 @@
 
 #include <Log/Log.h>
 
-void UpscaleStateUpdate::Apply(RenderStateUpdateContext& ctx)
+void UpscaleStateUpdate::Apply(RenderStateUpdateContext &ctx)
 {
     UpscaleRenderState& state = ctx.store.GetMutable<UpscaleRenderState>();
 
@@ -41,6 +41,8 @@ void UpscaleStateUpdate::Apply(RenderStateUpdateContext& ctx)
     float OriginalViewportAspect = ((float)state.gameCanvasWidth / (float)state.gameCanvasHeight);
     float CurrentViewportAspect =  (float)state.viewportWidth / (float)state.viewportHeight;
     
+    // TODO: Add compensation for down-scaling(game canvas > viewport).
+    // In case of down-scaling, compensation should happen for both size, to preserve sprite sizes, and ratio.
     if(CurrentViewportAspect > OriginalViewportAspect) {
         // Compensate for lack of Y
         state.compensationCalculation.x = 1;

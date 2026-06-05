@@ -127,7 +127,7 @@ void Application::StartLifecycle()
         m_render->Render(m_deltaTime, renderView);
 
         // Clear window event flags after we record render state updates
-        // Otherwise resized flag will be cleared on first frame
+        // Otherwise resized flag will be cleared on first frame, preventing upscale state initialization
         m_window->ClearFlags();
 
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
@@ -153,9 +153,6 @@ void Application::RecordRenderStateUpdates(RenderView & view)
     }
 
     if(m_window->SizeChanged()) {
-        UpscaleStateUpdate* update = view.GetStateUpdate<UpscaleStateUpdate>();
-        update->viewportDirty = true;
-        update->viewportWidth = m_window->GetWidth();
-        update->viewportHeight = m_window->GetHeight();
+        view.GetStateUpdate<UpscaleStateUpdate>()->SetViewport(m_window->GetWidth(), m_window->GetHeight());
     }
 }

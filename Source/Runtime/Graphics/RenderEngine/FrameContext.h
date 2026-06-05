@@ -2,9 +2,10 @@
 
 #include <SDL3/SDL_gpu.h>
 
-#include "Attachment.h"
+#include "ImageAttachment.h"
+#include "BufferAttachment.h"
 
-#include <array>
+#include <Utility/EnumClassArray.h>
 
 class CompiledRenderResources;
 class RenderPass;
@@ -18,5 +19,6 @@ struct FrameContext {
     CompiledRenderResources* resources;
     RenderPass* previousPass;
 
-    std::array<SDL_GPUTexture*, (uint8_t)RenderAttachment::MAX> attachments;
+    EnumClassArray<SDL_GPUTexture*, ImageRenderAttachment> imageAttachments{};
+    EnumClassArray<SDL_GPUBuffer*, BufferRenderAttachment> bufferAttachments{};
 };

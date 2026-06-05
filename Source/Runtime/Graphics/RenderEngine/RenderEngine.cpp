@@ -8,6 +8,8 @@
 #include <Graphics/RenderPasses/UpscaleRenderPass/UpscaleRenderPass.h>
 #include <Graphics/RenderPasses/DebugUIRenderPass/DebugUIRenderPass.h>
 
+#include <Graphics/BufferAttachmentUpdateHandlers/WorldBufferAttachmentUpdateHandler.h>
+
 #include "RenderUtils.h"
 
 #include <Debug/Tracer/Tracer.h>
@@ -56,12 +58,15 @@ void RenderEngine::Initialize(SDL_Window* window)
     
     m_ctx.swapchainFormat = SDL_GetGPUSwapchainTextureFormat(m_ctx.device, m_ctx.window);
 
+    // Initialize Buffer Attachment Update Handlers
+    m_frameBufferAttachmentUpdateHandlers[BufferRenderAttachment::WorldData] = MakeRenderModule<WorldBufferAttachmentUpdateHandler>();
+
     // Initialize Render Passes
-    m_renderPasses[(uint32_t)RenderPassType::Opaque] = std::make_unique<OpaqueRenderPass>(m_ctx, m_stateStore);
-    m_renderPasses[(uint32_t)RenderPassType::Relief] = std::make_unique<ReliefRenderPass>(m_ctx);
-    m_renderPasses[(uint32_t)RenderPassType::Lighting] = std::make_unique<LightingRenderPass>(m_ctx);
-    m_renderPasses[(uint32_t)RenderPassType::Upscale] = std::make_unique<UpscaleRenderPass>(m_ctx, m_stateStore);
-    m_renderPasses[(uint32_t)RenderPassType::DebugUI] = std::make_unique<DebugUIRenderPass>(m_ctx, m_stateStore);
+    m_renderPasses[RenderPassType::Opaque] = MakeRenderModule<OpaqueRenderPass>();
+    m_renderPasses[RenderPassType::Relief] = MakeRenderModule<ReliefRenderPass>();
+    m_renderPasses[RenderPassType::Lighting] = MakeRenderModule<LightingRenderPass>();
+    m_renderPasses[RenderPassType::Upscale] = MakeRenderModule<UpscaleRenderPass>();
+    m_renderPasses[RenderPassType::DebugUI] = MakeRenderModule<DebugUIRenderPass>();
 
     LOG(Log, LogRender, "Render Engine initialization complete");
 }
@@ -84,14 +89,14 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
             if(rendObject.lastReferencedFramesAgo != 0) continue;
 
             for(const auto& rendElement : rendObject.object->GetElements()) {
-                m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.object.get(), rendElement.get());
+                m_renderPasses[rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.object.get(), rendElement.get());
             }
         }
     }
 
     for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
         for(const auto& rendElement : rendObject->GetElements()) {
-            m_renderPasses[(uint32_t)rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
+            m_renderPasses[rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
         }
     }
     POP_TRACE_SCOPE();
@@ -116,19 +121,6 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     EndGPULabel(cmd);
     POP_TRACE_SCOPE();
 
-    // After all data is assembled into batches, it can be compiled into GPU resources
-    PUSH_TRACE_SCOPE("Prepare Frame");
-    BeginGPULabel(cmd, "Prepare Frame");
-    SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
-
-    for(const auto& pass : m_renderPasses) {
-        pass->Prepare(cmd, copyPass);
-    }
-
-    SDL_EndGPUCopyPass(copyPass);
-    EndGPULabel(cmd);
-    POP_TRACE_SCOPE();
-
     SDL_GPUTexture *swapchainTexture = NULL;
     uint32_t swapchainTextureW, swapchainTextureH;
     SDL_AcquireGPUSwapchainTexture(cmd, m_ctx.window, &swapchainTexture, &swapchainTextureW, &swapchainTextureH);
@@ -140,11 +132,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         return;
     }
 
-    // Render Frame
-    PUSH_TRACE_SCOPE("Render");
-    BeginGPULabel(cmd, "Frame");
-
-    FrameContext frameCtx;
+    FrameContext& frameCtx = m_frameContexts[m_ctx.currentFrame];
     frameCtx.cmd = cmd;
     frameCtx.deltaTime = deltaTime;
     frameCtx.frameIndex = m_ctx.currentFrame;
@@ -153,6 +141,27 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     frameCtx.swapchainHeight = swapchainTextureH;
     frameCtx.previousPass = nullptr;
     frameCtx.resources = &m_compiledRes;
+
+    // After all data is assembled into batches, it can be compiled into GPU resources
+    PUSH_TRACE_SCOPE("Prepare Frame");
+    BeginGPULabel(cmd, "Prepare Frame");
+    SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
+
+    for(const auto& pass : m_renderPasses) {
+        pass->Prepare(cmd, copyPass);
+    }
+
+    for(std::unique_ptr<IBufferAttachmentUpdateHandler>& bufferAttachmentUpdateHandler : m_frameBufferAttachmentUpdateHandlers) {
+        bufferAttachmentUpdateHandler->Update(frameCtx, renderView, copyPass);
+    }
+
+    SDL_EndGPUCopyPass(copyPass);
+    EndGPULabel(cmd);
+    POP_TRACE_SCOPE();
+
+    // Render Frame
+    PUSH_TRACE_SCOPE("Render");
+    BeginGPULabel(cmd, "Frame");
 
     for(std::unique_ptr<RenderPass>& renderPass : m_renderPasses) {
         renderPass->Render(frameCtx);

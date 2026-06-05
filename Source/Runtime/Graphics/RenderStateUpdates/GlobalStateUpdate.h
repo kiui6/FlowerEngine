@@ -13,8 +13,7 @@ struct GlobalStateUpdate : public RenderStateUpdate, public StaticallyTyped<Make
     uint32_t canvasWidth, canvasHeight;
     Float3 cameraPosition;
 
-    bool projectionMatrixDirty = false;
-    bool cameraPositionDirty = false;
+    bool canvasDirty = false;
 
     virtual void Apply(RenderStateUpdateContext& ctx) override;
 

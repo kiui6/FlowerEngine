@@ -9,10 +9,10 @@ class RenderStateStore
 {
     GPUContext& m_gpu;
 
-    std::unordered_map<ID32, std::unique_ptr<RenderState>> m_states;
+    mutable std::unordered_map<ID32, std::unique_ptr<RenderState>> m_states;
 
     template <RenderStateClass T>
-    T* GetOrCreate() {
+    T* GetOrCreate() const {
         auto it = m_states.find(T::StaticType());
         if(it != m_states.end()) {
             return static_cast<T*>(it->second.get());
@@ -30,7 +30,7 @@ public:
     RenderStateStore(GPUContext& gpu) : m_gpu(gpu) {}
 
     template <RenderStateClass T>
-    const T& Get() {
+    const T& Get() const {
         return *GetOrCreate<T>();
     }
 

@@ -6,36 +6,12 @@
 
 void GlobalStateUpdate::Apply(RenderStateUpdateContext& ctx)
 {
-    if(!projectionMatrixDirty && !cameraPositionDirty) {
-        return;
-    }
-
     GlobalRenderState& state = ctx.store.GetMutable<GlobalRenderState>();
 
-    if(projectionMatrixDirty) {
+    if(canvasDirty) {
         state.canvasWidth = canvasWidth;
         state.canvasHeight = canvasHeight;
-
-        state.projectionMatrix = glm::ortho(  0.0f, static_cast<float>(canvasWidth),
-                                                static_cast<float>(canvasHeight), 0.0f,
-                                                -65536.0f, 65536.0f);
     }
-
-    if(cameraPositionDirty) {
-        state.cameraPosition = cameraPosition;
-    }
-
-
-    GPUWorldData worldData{
-        .projectionView = state.projectionMatrix,
-        .position = state.cameraPosition
-    };
-
-    if(transferBuffer == nullptr) {
-        transferBuffer = RenderUtils::CreateTransferBuffer(ctx.gpu.device, sizeof(worldData));
-    }
-
-    RenderUtils::UpdateBufferWithTransferBuffer(ctx.gpu.device, ctx.cmd, transferBuffer, state.worldBuffer[ctx.gpu.currentFrame], &worldData, sizeof(worldData));
     
     state.NotifyChanged();
 }
