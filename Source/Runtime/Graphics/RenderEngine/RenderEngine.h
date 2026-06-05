@@ -22,6 +22,7 @@
 #include "RenderConstants.h"
 #include "BufferAttachmentUpdateHandler.h"
 
+#include "RenderPass/RenderPassTypes.h"
 #include "RenderState/RenderStateStore.h"
 
 class RenderEngine

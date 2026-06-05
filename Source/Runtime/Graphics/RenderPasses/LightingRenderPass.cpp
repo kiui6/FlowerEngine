@@ -8,7 +8,7 @@ LightingRenderPass::~LightingRenderPass()
 {
 }
 
-void LightingRenderPass::Render(FrameContext &ctx)
+void LightingRenderPass::RenderFrame(FrameContext &ctx)
 {
     BeginGPULabel(ctx.cmd, "Lighting");
 

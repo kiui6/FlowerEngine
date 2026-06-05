@@ -23,7 +23,7 @@ ReliefRenderPass::~ReliefRenderPass()
     SDL_ReleaseGPUTexture(m_gpu.device, m_relief);
 }
 
-void ReliefRenderPass::Render(FrameContext &ctx)
+void ReliefRenderPass::RenderFrame(FrameContext &ctx)
 {
     ctx.imageAttachments[ImageRenderAttachment::Relief] = m_relief;
 

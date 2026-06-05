@@ -45,12 +45,12 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
 
     // Opaque Sprite Element
     if(m_albedo.IsBound() && m_albedoData.IsBound()) {
-        OpaqueSpriteRenderElement* opaque = rendObj->CreateRenderElement<OpaqueSpriteRenderElement>();
+        OpaqueSpriteRenderElement& opaque = rendObj->CreateOpaqueSpriteRenderElement();
 
-        opaque->position = m_transform.Location;
-        opaque->depth = m_transform.Depth;
-        opaque->rotation = m_transform.Rotation;
-        opaque->size = m_transform.Scale * Float2{m_albedoData->GetWidth(), m_albedoData->GetHeight()};
+        opaque.position = m_transform.Location;
+        opaque.depth = m_transform.Depth;
+        opaque.rotation = m_transform.Rotation;
+        opaque.size = m_transform.Scale * Float2{m_albedoData->GetWidth(), m_albedoData->GetHeight()};
 
         if(m_albedoRenderResource.GetCompiledResource().expired()) {
             m_albedoRenderResource.components = Texture2DComponents::R8G8B8A8_UNORM;
@@ -62,9 +62,10 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
             m_albedoRenderResource.isDirty = true;
         }
 
-        opaque->texture = &m_albedoRenderResource;
+        opaque.texture = &m_albedoRenderResource;
     }
-
+    
+    /* TODO
     // Relief Sprite Element
     if(m_autogenRelief && m_albedo.IsBound() && m_albedoData.IsBound()) {
         ReliefSpriteRenderElement* autogenRelief = rendObj->CreateRenderElement<ReliefSpriteRenderElement>();
@@ -112,5 +113,5 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
         }
 
         relief->texture = &m_reliefRenderResource;  
-    }
+    }*/
 }

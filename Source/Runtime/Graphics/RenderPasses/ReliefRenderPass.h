@@ -10,8 +10,9 @@ public:
     ReliefRenderPass(GPUContext& context);
     ~ReliefRenderPass();
 
-    virtual void Compile(RenderResourceCompiler& resourceCompiler, RenderObject* object, RenderElement* element) override {}
-    virtual void Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass) override {}
-    virtual void Render(FrameContext& ctx) override;
+    virtual void CompileStaticObject(RenderResourceCompiler& resourceCompiler, const RenderObject& object) override {}
+    virtual void CompileDynamicObject(RenderResourceCompiler& resourceCompiler, const RenderObject& object) override {}
+    virtual void PrepareFrame(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass) override {}
+    virtual void RenderFrame(FrameContext& ctx) override;
     virtual void Cleanup() override {}
 };

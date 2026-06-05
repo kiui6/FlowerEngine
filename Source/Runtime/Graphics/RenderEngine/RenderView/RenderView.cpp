@@ -11,12 +11,12 @@ RenderObject *RenderView::GetDynamicRenderObject(uint64_t id)
 {
     auto it = m_dynamicRenderObjects.find(id);
     if(it != m_dynamicRenderObjects.end()) {
-        return it->second.get();
+        return &it->second;
     }
 
-    const auto& pair = m_dynamicRenderObjects.emplace(id, std::make_unique<RenderObject>());
+    const auto& pair = m_dynamicRenderObjects.emplace(id, RenderObject{});
 
-    return pair.first->second.get();
+    return &pair.first->second;
 }
 
 RenderObject* RenderView::GetStaticRenderObject(uint64_t id)
@@ -24,7 +24,7 @@ RenderObject* RenderView::GetStaticRenderObject(uint64_t id)
     auto it = m_staticRenderObjects.find(id);
     if(it != m_staticRenderObjects.end()) {
         it->second.lastReferencedFramesAgo = 0;
-        return it->second.object.get();
+        return &it->second.object;
     }
     
     return nullptr;
@@ -38,14 +38,14 @@ bool RenderView::HasStaticRenderObject(uint64_t id)
 RenderObject *RenderView::AddStaticRenderObject(uint64_t id)
 {
     RenderObjectHandle handle;
-    handle.object = std::make_shared<RenderObject>();
+    handle.object = RenderObject{};
     handle.lastReferencedFramesAgo = 0;
 
     const auto& pair = m_staticRenderObjects.emplace(id, handle);
 
     m_staticRenderObjectsDirty = true;
 
-    return pair.first->second.object.get();
+    return &pair.first->second.object;
 }
 
 void RenderView::Reset()

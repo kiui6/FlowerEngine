@@ -88,15 +88,15 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         for(const auto& [id, rendObject] : renderView.m_staticRenderObjects) {
             if(rendObject.lastReferencedFramesAgo != 0) continue;
 
-            for(const auto& rendElement : rendObject.object->GetElements()) {
-                m_renderPasses[rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.object.get(), rendElement.get());
+            for(const auto& renderPass : m_renderPasses) {
+                renderPass->CompileStaticObject(resourceCompiler, rendObject.object);
             }
         }
     }
 
     for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
-        for(const auto& rendElement : rendObject->GetElements()) {
-            m_renderPasses[rendElement->GetRenderPassType()]->Compile(resourceCompiler, rendObject.get(), rendElement.get());
+        for(const auto& renderPass : m_renderPasses) {
+            renderPass->CompileDynamicObject(resourceCompiler, rendObject);
         }
     }
     POP_TRACE_SCOPE();
@@ -148,7 +148,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
 
     for(const auto& pass : m_renderPasses) {
-        pass->Prepare(cmd, copyPass);
+        pass->PrepareFrame(cmd, copyPass);
     }
 
     for(std::unique_ptr<IBufferAttachmentUpdateHandler>& bufferAttachmentUpdateHandler : m_frameBufferAttachmentUpdateHandlers) {
@@ -160,11 +160,11 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     POP_TRACE_SCOPE();
 
     // Render Frame
-    PUSH_TRACE_SCOPE("Render");
+    PUSH_TRACE_SCOPE("RenderFrame");
     BeginGPULabel(cmd, "Frame");
 
     for(std::unique_ptr<RenderPass>& renderPass : m_renderPasses) {
-        renderPass->Render(frameCtx);
+        renderPass->RenderFrame(frameCtx);
         frameCtx.previousPass = renderPass.get();
     }
 

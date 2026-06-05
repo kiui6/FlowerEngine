@@ -58,7 +58,7 @@ UpscaleRenderPass::~UpscaleRenderPass()
     SDL_ReleaseGPUBuffer(m_gpu.device, m_upscaleBuffer);
 }
 
-void UpscaleRenderPass::Prepare(SDL_GPUCommandBuffer *cmd, SDL_GPUCopyPass *copyPass)
+void UpscaleRenderPass::PrepareFrame(SDL_GPUCommandBuffer *cmd, SDL_GPUCopyPass *copyPass)
 {
     if(m_upscaleBufferDirty) {
         SDL_WaitForGPUIdle(m_gpu.device);
@@ -71,7 +71,7 @@ void UpscaleRenderPass::Prepare(SDL_GPUCommandBuffer *cmd, SDL_GPUCopyPass *copy
     }
 }
 
-void UpscaleRenderPass::Render(FrameContext &ctx)
+void UpscaleRenderPass::RenderFrame(FrameContext &ctx)
 {
     BeginGPULabel(ctx.cmd, "Upscale");
 

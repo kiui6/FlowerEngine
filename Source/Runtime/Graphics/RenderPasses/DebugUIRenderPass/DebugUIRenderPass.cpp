@@ -40,7 +40,7 @@ DebugUIRenderPass::~DebugUIRenderPass()
 {
 }
 
-void DebugUIRenderPass::Render(FrameContext &ctx)
+void DebugUIRenderPass::RenderFrame(FrameContext &ctx)
 {
     PUSH_TRACE_SCOPE("DebugUIRenderPass::Render()");
 #ifdef HAS_DEBUGUI

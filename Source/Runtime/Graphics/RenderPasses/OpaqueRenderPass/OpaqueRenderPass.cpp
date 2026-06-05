@@ -3,6 +3,7 @@
 #include <SDL3/SDL_gpu.h>
 
 #include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
+#include <Graphics/RenderEngine/RenderView/RenderObject.h>
 #include <Graphics/RenderEngine/RenderUtils.h>
 
 #include <Log/Log.h>
@@ -89,19 +90,18 @@ OpaqueRenderPass::~OpaqueRenderPass()
     SDL_ReleaseGPUGraphicsPipeline(m_gpu.device, m_opaqueSpritePipeline);
 }
 
-void OpaqueRenderPass::Compile(RenderResourceCompiler &resourceCompiler, RenderObject *object, RenderElement *element)
+void OpaqueRenderPass::CompileStaticObject(RenderResourceCompiler &resourceCompiler, const RenderObject &object)
 {
-    switch(element->GetRenderElementType()) {
-        case RenderElementType::Sprite:
-            CompileOpaqueSpriteRenderElement(resourceCompiler, object, static_cast<OpaqueSpriteRenderElement*>(element));
-            break;
-        default:
-            assert(!"Unsupported render element.");
-            return;
+}
+
+void OpaqueRenderPass::CompileDynamicObject(RenderResourceCompiler &resourceCompiler, const RenderObject &object)
+{
+    for(const auto& opaqueSpriteElement : object.GetOpaqueSpriteElements()) {
+        CompileOpaqueSpriteRenderElement(resourceCompiler, opaqueSpriteElement, m_dynamicOpaqueSpriteElements);
     }
 }
 
-void OpaqueRenderPass::Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass)
+void OpaqueRenderPass::PrepareFrame(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyPass)
 {
     BeginGPULabel(cmd, "Opaque");
 
@@ -119,6 +119,7 @@ void OpaqueRenderPass::Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
         if(sprites.bufferSize[m_gpu.currentFrame] < (sprites.assembly.size() * sprites.elementSize)) {
             // Recreate buffer
             SDL_ReleaseGPUBuffer(m_gpu.device, sprites.uniformBuffer[m_gpu.currentFrame]);
+            SDL_ReleaseGPUTransferBuffer(m_gpu.device, sprites.transferBuffer[m_gpu.currentFrame]);
 
             sprites.uniformBuffer[m_gpu.currentFrame] = RenderUtils::CreateBuffer(m_gpu.device, SDL_GPU_BUFFERUSAGE_GRAPHICS_STORAGE_READ, nullptr, sprites.assembly.size() * sprites.elementSize);
             sprites.bufferSize[m_gpu.currentFrame] = sprites.assembly.size() * sprites.elementSize;
@@ -153,7 +154,7 @@ void OpaqueRenderPass::Prepare(SDL_GPUCommandBuffer* cmd, SDL_GPUCopyPass* copyP
     EndGPULabel(cmd); // Opaque
 }
 
-void OpaqueRenderPass::Render(FrameContext &ctx)
+void OpaqueRenderPass::RenderFrame(FrameContext &ctx)
 {
     PUSH_TRACE_SCOPE("OpaqueRenderPass::Render()");
     ctx.imageAttachments[ImageRenderAttachment::Albedo] = m_albedo[ctx.frameIndex];
@@ -296,31 +297,34 @@ void OpaqueRenderPass::CreateOpaqueSpritePipeline()
     }
 }
 
-void OpaqueRenderPass::CompileOpaqueSpriteRenderElement(RenderResourceCompiler &resourceCompiler, RenderObject *object, OpaqueSpriteRenderElement *element)
+void OpaqueRenderPass::CompileOpaqueSpriteRenderElement(RenderResourceCompiler& resourceCompiler, const OpaqueSpriteRenderElement& element, std::unordered_map<uint64_t, OpaqueSpriteElementBatch>& container)
 {
+    if(element.texture == nullptr) {
+        assert(!"Opaque Sprite Render Element's texture is nullptr");
+        return;
+    }
+
     OpaqueSpriteElementBatch* compiled;
 
     // Check if element already exists for the atlas texture
-    auto it = m_dynamicOpaqueSpriteElements.find(element->texture->id);
-    if(it != m_dynamicOpaqueSpriteElements.end()) {
+    auto it = container.find(element.texture->id);
+    if(it != container.end()) {
         compiled = &it->second;
     } else {
-        if(!element->texture) {
-            assert(!"element->texture == nullptr");
+        if(resourceCompiler.CompileTexture2D(*element.texture)) {
+            assert(!"Error while compiling texture");
             return;
         }
-    
-        resourceCompiler.CompileTexture2D(*element->texture);
 
-        compiled = &m_dynamicOpaqueSpriteElements.emplace(element->texture->id, OpaqueSpriteElementBatch{}).first->second;
+        compiled = &container.emplace(element.texture->id, OpaqueSpriteElementBatch{}).first->second;
     }
 
     compiled->assembly.emplace_back(
-        element->uv,
-        element->tint,
-        element->position,
-        element->size,
-        element->pivot,
-        element->depth,
-        element->rotation);
+        element.uv,
+        element.tint,
+        element.position,
+        element.size,
+        element.pivot,
+        element.depth,
+        element.rotation);
 }

@@ -19,7 +19,7 @@ class RenderView
     friend class RenderEngine;
 
     struct RenderObjectHandle {
-        std::shared_ptr<RenderObject> object;
+        RenderObject object;
         // How many frames ago was this object referenced. 0 meaning it's referenced in current frame and should be rendered
         uint32_t lastReferencedFramesAgo = 0;
     };
@@ -36,7 +36,7 @@ protected:
 
     std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects;
     bool m_staticRenderObjectsDirty = false;
-    std::unordered_map<uint64_t, std::unique_ptr<RenderObject>> m_dynamicRenderObjects;
+    std::unordered_map<uint64_t, RenderObject> m_dynamicRenderObjects;
 
     std::unordered_map<uint64_t, RenderStateUpdateHandle> m_stateUpdates;
     std::set<std::unique_ptr<RenderJob>> m_renderJobs;

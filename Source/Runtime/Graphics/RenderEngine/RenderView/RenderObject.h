@@ -5,30 +5,26 @@
 
 #include <Math/Vectors.h>
 
-#include "RenderElement.h"
+#include <Graphics/RenderElements/OpaqueSpriteRenderElement.h>
+#include <Graphics/RenderElements/ReliefSpriteRenderElement.h>
 
 class RenderObject
 {
     glm::mat4x4 m_identityMatrix;
-    std::vector<std::unique_ptr<RenderElement>> m_elements;
+    std::vector<OpaqueSpriteRenderElement> m_opaqueSpriteRenderElements;
+    std::vector<ReliefSpriteRenderElement> m_reliefSpriteRenderElements;
 public:
 
     void SetIdentityMatrix(glm::mat4x4&& matrix) { m_identityMatrix = matrix; }
-
-    size_t GetElementsCount() const { return m_elements.size(); }
-    std::vector<std::unique_ptr<RenderElement>>& GetElements() { return m_elements; }
 
     /*
      * Creates RenderElement of specified type, gets ownership over it and returns raw pointer
      * Caller doesn't own the created RenderElement and must not assume ownership
      * Constructed RenderElement will be invalidated by the end of the frame and should not be stored outside of caller function scope
      */
-    template <RenderElementClass T>
-    T* CreateRenderElement() {
-        // TODO: Make memory reusable
-        T* element = new T();
-        m_elements.emplace_back(std::unique_ptr<RenderElement>(element));
-        return element;
+    OpaqueSpriteRenderElement& CreateOpaqueSpriteRenderElement() {
+        return m_opaqueSpriteRenderElements.emplace_back(OpaqueSpriteRenderElement{});
     }
+    const std::vector<OpaqueSpriteRenderElement>& GetOpaqueSpriteElements() const {return m_opaqueSpriteRenderElements;}
 
 };

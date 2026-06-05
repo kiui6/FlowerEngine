@@ -1,13 +1,10 @@
 #pragma once
 
-#include <Graphics/RenderEngine/RenderView/RenderElement.h>
 #include <Graphics/RenderEngine/RenderView/RenderResource.h>
 #include <Math/Vectors.h>
 
-struct ReliefSpriteRenderElement : public RenderElement
+struct ReliefSpriteRenderElement
 {
-    ReliefSpriteRenderElement() : RenderElement(RenderPassType::Relief, RenderElementType::Sprite) {}
-
     Float2 position;
     uint32_t depth;
     Float2 scale;
@@ -19,10 +16,8 @@ struct ReliefSpriteRenderElement : public RenderElement
     Float4 uv;
 };
 
-struct AutogenReliefSpriteRenderElement : public RenderElement
+struct AutogenReliefSpriteRenderElement
 {
-    AutogenReliefSpriteRenderElement() : RenderElement(RenderPassType::Relief, RenderElementType::Sprite) {}
-
     Float2 position;
     uint32_t depth;
     Float2 scale;
