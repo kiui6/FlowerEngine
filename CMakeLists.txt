@@ -7,7 +7,7 @@ add_subdirectory("Tools")
 set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
 set(SDL_STATIC ON)
 
-include("CMake/VulkanCompileShaders.cmake")
+#include("CMake/VulkanCompileShaders.cmake")
 include(FetchContent)
 
 FetchContent_Declare(
@@ -120,6 +120,9 @@ set(SrcRender
     "Source/Runtime/Graphics/RenderStateUpdates/DebugUIStateUpdate.cpp"
     "Source/Runtime/Graphics/RenderStateUpdates/UpscaleStateUpdate.cpp"
     "Source/Runtime/Graphics/RenderStateUpdates/GlobalStateUpdate.cpp"
+    
+    # Buffer Attachment Update Handlers
+    "Source/Runtime/Graphics/BufferAttachmentUpdateHandlers/WorldBufferAttachmentUpdateHandler.cpp"
   )
 
 set(SrcGameFramework
