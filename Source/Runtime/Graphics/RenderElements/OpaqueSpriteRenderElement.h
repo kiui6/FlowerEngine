@@ -15,8 +15,9 @@ struct OpaqueSpriteRenderElement
     Float2 position = {0, 0};
     Float2 size = {1, 1};
     Float2 pivot = {0.5, 0.5};
+    Texture2DResource* texture = nullptr;
     uint32_t depth = 0;
     float rotation = 0;
-
-    Texture2DResource* texture = nullptr;
 };
+
+static_assert(sizeof(OpaqueSpriteRenderElement) == 72);

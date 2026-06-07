@@ -2,21 +2,16 @@
 
 #include <Graphics/RenderEngine/RenderConstants.h>
 
+#include <Debug/Tracer/Tracer.h>
+
 void RenderView::SubmitJob(RenderJob *job)
 {
     m_renderJobs.emplace(std::unique_ptr<RenderJob>(job));
 }
 
-RenderObject *RenderView::GetDynamicRenderObject(uint64_t id)
+RenderObject& RenderView::AddDynamicRenderObject(uint64_t id)
 {
-    auto it = m_dynamicRenderObjects.find(id);
-    if(it != m_dynamicRenderObjects.end()) {
-        return &it->second;
-    }
-
-    const auto& pair = m_dynamicRenderObjects.emplace(id, RenderObject{});
-
-    return &pair.first->second;
+    return m_dynamicRenderObjects.emplace_back(RenderObject{});
 }
 
 RenderObject* RenderView::GetStaticRenderObject(uint64_t id)
@@ -35,7 +30,7 @@ bool RenderView::HasStaticRenderObject(uint64_t id)
     return m_staticRenderObjects.find(id) != m_staticRenderObjects.end();
 }
 
-RenderObject *RenderView::AddStaticRenderObject(uint64_t id)
+RenderObject& RenderView::AddStaticRenderObject(uint64_t id)
 {
     RenderObjectHandle handle;
     handle.object = RenderObject{};
@@ -45,11 +40,13 @@ RenderObject *RenderView::AddStaticRenderObject(uint64_t id)
 
     m_staticRenderObjectsDirty = true;
 
-    return &pair.first->second.object;
+    return pair.first->second.object;
 }
 
 void RenderView::Reset()
 {
+    PUSH_TRACE_SCOPE("RenderView::Reset()");
+
     m_staticRenderObjectsDirty = false;
     
     size_t staticRObjectsCountBeforeReset = m_staticRenderObjects.size();
@@ -69,4 +66,6 @@ void RenderView::Reset()
     // Dynamic Render Objects should be recreated every frame.
     m_dynamicRenderObjects.clear();
     m_renderJobs.clear();
+
+    POP_TRACE_SCOPE();
 }

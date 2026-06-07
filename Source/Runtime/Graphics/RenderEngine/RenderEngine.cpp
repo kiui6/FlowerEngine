@@ -94,7 +94,7 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
         }
     }
 
-    for(const auto& [id, rendObject] : renderView.m_dynamicRenderObjects) {
+    for(const auto& rendObject : renderView.m_dynamicRenderObjects) {
         for(const auto& renderPass : m_renderPasses) {
             renderPass->CompileDynamicObject(resourceCompiler, rendObject);
         }

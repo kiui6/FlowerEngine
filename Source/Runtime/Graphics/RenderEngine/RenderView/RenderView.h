@@ -36,7 +36,7 @@ protected:
 
     std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects;
     bool m_staticRenderObjectsDirty = false;
-    std::unordered_map<uint64_t, RenderObject> m_dynamicRenderObjects;
+    std::vector<RenderObject> m_dynamicRenderObjects;
 
     std::unordered_map<uint64_t, RenderStateUpdateHandle> m_stateUpdates;
     std::set<std::unique_ptr<RenderJob>> m_renderJobs;
@@ -51,9 +51,9 @@ public:
     // Submits render job to the render view. Render jobs are executed before any compilation or rendering.
     void SubmitJob(RenderJob* job);
 
-    RenderObject* GetDynamicRenderObject(uint64_t id);
+    RenderObject& AddDynamicRenderObject(uint64_t id);
 
-    RenderObject* AddStaticRenderObject(uint64_t id);
+    RenderObject& AddStaticRenderObject(uint64_t id);
     RenderObject* GetStaticRenderObject(uint64_t id);
     bool HasStaticRenderObject(uint64_t id);
 

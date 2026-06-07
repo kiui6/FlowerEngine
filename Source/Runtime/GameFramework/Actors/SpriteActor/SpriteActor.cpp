@@ -35,12 +35,12 @@ void SpriteActor::RecordRenderView(RenderView &renderView)
 {
     RenderObject* rendObj =  nullptr;
     if(GetReference()->IsDynamic) {
-        rendObj = renderView.GetDynamicRenderObject(m_ref.GetID());
+        rendObj = &renderView.AddDynamicRenderObject(m_ref.GetID());
     } else {
         if(nullptr != renderView.GetStaticRenderObject(m_ref.GetID())) {
             return;
         }
-        rendObj = renderView.AddStaticRenderObject(m_ref.GetID());
+        rendObj = &renderView.AddStaticRenderObject(m_ref.GetID());
     }
 
     // Opaque Sprite Element
