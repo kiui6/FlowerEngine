@@ -128,7 +128,7 @@ void Application::StartLifecycle()
 
         // Clear window event flags after we record render state updates
         // Otherwise resized flag will be cleared on first frame, preventing upscale state initialization
-        m_window->ClearFlags();
+        m_window->Cleanup();
 
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
         POP_TRACE_SCOPE();

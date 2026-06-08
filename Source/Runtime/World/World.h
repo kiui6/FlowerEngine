@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Input/InputEvent.h>
+#include <Input/InputView.h>
 
 //#include <Object/ObjectRef.h>
 #include "Actor/Actor.h"
@@ -58,9 +58,9 @@ public:
 
     void BeginPlay();
 
-    void Tick(float DeltaTime);
+    void ProcessInput(const InputView& input);
 
-    void PushInputEvent(InputEvent &input);
+    void Tick(float DeltaTime);
 
     void BeginDestroy();
 

@@ -12,6 +12,7 @@
 
 #include <Window/Window.h>
 #include <Engine/Engine.h>
+#include <Input/InputManager.h>
 
 #include <Debug/DebugWindow.h>
 
@@ -21,8 +22,11 @@ class Application
 protected:
     std::unique_ptr<Window> m_window;
 
+    InputManager m_inputMgr;
+
     std::unique_ptr<RenderEngine> m_render;
     std::unique_ptr<Engine> m_engine;
+
     std::shared_ptr<DebugWindow> m_dbgWindow;
     bool m_dbgWindowUpdated = false;
 

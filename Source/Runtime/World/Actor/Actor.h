@@ -4,6 +4,8 @@
 #include <Record/RecordPtr.h>
 #include <World/Actor/ReferenceRecord.h>
 
+#include <Input/InputView.h>
+
 #include <Math/Transform.h>
 #include <Math/Bounds.h>
 
@@ -56,6 +58,8 @@ public:
     virtual void Initialize(){}
     virtual void PostInit(){}
     virtual void BeginPlay() {}
+
+    virtual void OnInput(const InputView& input) {}
     virtual void Tick(float deltaTime);
 
     virtual Transform2D GetTransform();

@@ -1,27 +1,19 @@
 #pragma once
 #include <cstdint>
+#include <array>
 
-enum WindowEventType
+enum class WindowEventType : uint8_t
 {
-    WINDOW_EVENT_RESIZE,
-    WINDOW_EVENT_MINIMIZE,
-    WINDOW_EVENT_MAXIMIZE,
-    WINDOW_EVENT_HIDDEN,
-    WINDOW_EVENT_EXPOSED,
-    WINDOW_EVENT_FULLSCREEN
+    None,
+    Resize,
+    Minimize,
+    Maximize,
+    Hidden,
+    Exposed,
+    Fullscreen,
 };
 
-class WindowEventPayload {public: WindowEventType type; WindowEventPayload(){} WindowEventPayload(WindowEventType ntype){type = ntype;}};
-
-class WindowEventPayloadResize : public WindowEventPayload {
-public:
-    WindowEventPayloadResize(uint32_t w, uint32_t h) : width(w), height(h) {type=WINDOW_EVENT_RESIZE;}
-    uint32_t width, height;
-};
-
-class WindowEventPayloadFullscreen : public WindowEventPayload {
-public:
-    WindowEventPayloadFullscreen(bool is, uint32_t w, uint32_t h) : isFullscreen(is), width(w), height(h) {type=WINDOW_EVENT_RESIZE;}
-    bool isFullscreen;
-    uint32_t width, height;
+struct WindowEvent { 
+    WindowEventType type = WindowEventType::None; 
+    std::array<uint64_t, 8> parameters{};
 };

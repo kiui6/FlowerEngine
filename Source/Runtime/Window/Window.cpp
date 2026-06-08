@@ -32,33 +32,43 @@ void Window::Update()
 {
 	PUSH_TRACE_SCOPE("Window::Update()");
 
-	while(SDL_PollEvent(&m_event))
+	while(SDL_PollEvent(&m_SDLEvent))
 	{
-		OnSDLEvent.Broadcast(m_event);
+		OnSDLEvent.Broadcast(m_SDLEvent);
 
-		switch(m_event.window.type)
+		if(m_SDLEvent.window.type == SDL_EVENT_WINDOW_CLOSE_REQUESTED) {
+			m_bShouldClose = true;
+			return;
+		}
+
+		switch(m_SDLEvent.window.type)
 		{
-        	case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
-        	    m_bShouldClose = true;
-				break;
 			case SDL_EVENT_WINDOW_RESIZED:
-        	    if(!m_bShouldClose) {
-					m_width = m_event.window.data1;
-					m_height = m_event.window.data2;
-					m_sizeIsDirty = true;
-				    OnWindowEvent.Broadcast(this, new WindowEventPayloadResize(m_event.window.data1, m_event.window.data2));
-					SDL_FlushEvent(SDL_EVENT_WINDOW_RESIZED);
-        	    }
+				m_width = m_SDLEvent.window.data1;
+				m_height = m_SDLEvent.window.data2;
+				m_sizeIsDirty = true;
+
+				OnWindowEvent.Broadcast(this, 
+					m_winEvents.emplace_back(WindowEvent{
+						.type = WindowEventType::Resize,
+						.parameters = { m_width, m_height }
+					})
+				);
+				SDL_FlushEvent(SDL_EVENT_WINDOW_RESIZED);
 				break;
 			case SDL_EVENT_WINDOW_MINIMIZED:
-				if(!m_bShouldClose) {
-				    OnWindowEvent.Broadcast(this, new WindowEventPayload(WINDOW_EVENT_HIDDEN));
-        	    }
+				OnWindowEvent.Broadcast(this, 
+					m_winEvents.emplace_back(WindowEvent{
+						.type = WindowEventType::Minimize
+					})
+				);
 				break;
 			case SDL_EVENT_WINDOW_RESTORED:
-				if(!m_bShouldClose) {
-				    OnWindowEvent.Broadcast(this, new WindowEventPayloadResize(m_width, m_height));
-        	    }
+				OnWindowEvent.Broadcast(this, 
+					m_winEvents.emplace_back(WindowEvent{
+						.type = WindowEventType::Exposed
+					})
+				);
 				break;
 			default:
 				break;
@@ -67,7 +77,9 @@ void Window::Update()
 	POP_TRACE_SCOPE();
 }
 
-void Window::ClearFlags()
+void Window::Cleanup()
 {
 	m_sizeIsDirty = false;
+
+	m_winEvents.clear();
 }

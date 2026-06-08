@@ -2,6 +2,7 @@
 
 #include <string>
 #include <cstdint>
+#include <vector>
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_vulkan.h>
@@ -14,7 +15,9 @@ class Window
 {    
     SDL_Window* m_window;
 	SDL_Surface* m_surface;
-    SDL_Event m_event;
+    SDL_Event m_SDLEvent;
+
+    std::vector<WindowEvent> m_winEvents{};
 
     std::string m_title;
     unsigned int m_width, m_height;
@@ -36,8 +39,10 @@ public:
     inline unsigned int GetWidth() const {return m_width;}
     inline unsigned int GetHeight() const {return m_height;}
 
+    inline const std::vector<WindowEvent>& GetEvents() const {return m_winEvents;}
+
     void Update();
-    void ClearFlags();
+    void Cleanup();
 
     inline SDL_Window* GetSDLWindowHandle() const {return m_window;}
 
@@ -47,7 +52,7 @@ public:
      * Window Event handler
      * Handles resize, minmax, repos scenarios
     */
-    MulticastDelegate<Window*, WindowEventPayload*> OnWindowEvent;
+    MulticastDelegate<Window*, const WindowEvent&> OnWindowEvent;
 
         /*
      * SDL Event Handler

@@ -91,7 +91,7 @@ for(auto& [record, actor] : m_dynamicActors) {
     }
 }
 
-void World::PushInputEvent(InputEvent &input)
+void World::ProcessInput(const InputView& input)
 {
 }
 
