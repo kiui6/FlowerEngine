@@ -20,12 +20,12 @@ class Application
 {
     static Application* Singleton;
 protected:
-    std::unique_ptr<Window> m_window;
+    Window m_window;
 
     InputManager m_inputMgr;
 
-    std::unique_ptr<RenderEngine> m_render;
-    std::unique_ptr<Engine> m_engine;
+    RenderEngine m_render;
+    Engine m_engine;
 
     std::shared_ptr<DebugWindow> m_dbgWindow;
     bool m_dbgWindowUpdated = false;
@@ -39,9 +39,9 @@ public:
 
     static Application* Get() {return Singleton;}
 
-    Window* GetWindow() {return m_window.get();}
-    Engine* GetEngine() {return m_engine.get();}
-    RenderEngine* GetRenderEngine() {return m_render.get();}
+    Window& GetWindow() {return m_window;}
+    Engine& GetEngine() {return m_engine;}
+    RenderEngine& GetRenderEngine() {return m_render;}
 
     void SetDebugWindow(DebugWindow* window);
 

@@ -40,7 +40,7 @@ void Engine::InternalTravel()
     m_travelWorld = nullptr;
 }
 
-Engine::Engine()
+void Engine::Initialize()
 {
     m_GC = GetService<GarbageCollector>();
     if(!m_GC) {
@@ -52,10 +52,7 @@ Engine::Engine()
     m_gameCanvasWidth = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 640);
     m_gameCanvasHeight = GetService<Config>()->GetNamespace("Game").GetInt("Render.DefaultCanvasWidth", 360);
     m_gameCanvasDirty = true;
-}
 
-void Engine::Initialize()
-{
     if constexpr(IS_EDITOR) {
         return;
     }

@@ -4,9 +4,9 @@
 
 #include <Debug/Tracer/Tracer.h>
 
-Window::Window(std::string_view title, uint32_t width, uint32_t height)
+void Window::Initialize(std::string_view title, uint32_t width, uint32_t height)
 {
-    m_title = title;
+	m_title = title;
     m_width = width;
     m_height = height;
 
@@ -19,7 +19,7 @@ Window::Window(std::string_view title, uint32_t width, uint32_t height)
 	m_sizeIsDirty = true;
 }
 
-void Window::CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface)
+void Window::CreateSurface(VkInstance instance, VkSurfaceKHR *vksurface)
 {
     if(SDL_Vulkan_CreateSurface(m_window, instance, nullptr, vksurface) == false)
 	{

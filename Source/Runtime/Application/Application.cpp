@@ -53,12 +53,6 @@ void Application::Initialize()
 {
     ServiceProvider::Get().Initialize();
 
-    // Create Engine
-    m_engine = std::make_unique<Engine>();
-    
-    // Create Render Engine object
-    m_render = std::make_unique<RenderEngine>();
-
     // Initialize SDL framework
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD) == false)
 	{
@@ -66,9 +60,9 @@ void Application::Initialize()
 	}
 
     // Create window
-    m_window = std::make_unique<Window>("Flower++", 1280, 720);
+    m_window.Initialize("Flower++", 1280, 720);
 	
-	m_render->Initialize(m_window->GetSDLWindowHandle());
+	m_render.Initialize(m_window.GetSDLWindowHandle());
 
 	// SDL_Vulkan_CreateSurface(m_window->GetSDLWindowHandle(), Render->GetInstance(), nullptr, &dummySurface);
 
@@ -87,7 +81,7 @@ void Application::StartLifecycle()
     m_bRunning.store(true);
 
     // Initialize Engine's essentials and start game mode
-    m_engine->Initialize();
+    m_engine.Initialize();
     
     auto frame_lifetime_start = std::chrono::high_resolution_clock::now();
 	auto frame_lifetime_end = std::chrono::high_resolution_clock::now();
@@ -99,7 +93,7 @@ void Application::StartLifecycle()
 	// float MinimalDeltaTime = 1000.0f/static_cast<float>(GetService<SettingsManager>()->GetOrDefault<GameSettings>()->MaxFPS);
 #	endif
 
-	while(!m_window->ShouldClose() && m_bRunning)
+	while(!m_window.ShouldClose() && m_bRunning)
 	{
         PUSH_TRACE_SCOPE("Application::StartLifecycle()");
         m_deltaTime = std::chrono::duration<float, std::milli>(frame_lifetime_end-frame_lifetime_start).count() / 1000;
@@ -115,20 +109,20 @@ void Application::StartLifecycle()
         }
         POP_TRACE_SCOPE();
 
-		m_window->Update();
+		m_window.Update();
 
-        m_engine->Tick(m_deltaTime);
+        m_engine.Tick(m_deltaTime);
         
-        RenderView& renderView = m_render->GetFrameRenderView();
+        RenderView& renderView = m_render.GetFrameRenderView();
         // Record state changes
         RecordRenderStateUpdates(renderView);
         // Record from engine
-        m_engine->RecordRenderView(renderView);
-        m_render->Render(m_deltaTime, renderView);
+        m_engine.RecordRenderView(renderView);
+        m_render.Render(m_deltaTime, renderView);
 
         // Clear window event flags after we record render state updates
         // Otherwise resized flag will be cleared on first frame, preventing upscale state initialization
-        m_window->Cleanup();
+        m_window.Cleanup();
 
         frame_lifetime_end = std::chrono::high_resolution_clock::now();
         POP_TRACE_SCOPE();
@@ -152,7 +146,7 @@ void Application::RecordRenderStateUpdates(RenderView & view)
         m_dbgWindowUpdated = false;
     }
 
-    if(m_window->SizeChanged()) {
-        view.GetStateUpdate<UpscaleStateUpdate>()->SetViewport(m_window->GetWidth(), m_window->GetHeight());
+    if(m_window.SizeChanged()) {
+        view.GetStateUpdate<UpscaleStateUpdate>()->SetViewport(m_window.GetWidth(), m_window.GetHeight());
     }
 }

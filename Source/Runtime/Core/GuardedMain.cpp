@@ -65,7 +65,7 @@ int GuardedMain(int argc, char* argv[])
     acinfo2.displayName = Text("Test.Actor.Name"); 
     Actor* act2 = myWorld->SpawnActor(acinfo2);
 
-    application.GetEngine()->TravelTo(std::move(myWorld));
+    application.GetEngine().TravelTo(std::move(myWorld));
 
     {
     RecordPtr<TextureRecord> gcRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();

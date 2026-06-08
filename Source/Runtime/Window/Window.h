@@ -24,12 +24,8 @@ class Window
     bool m_sizeIsDirty = false;
 
     bool m_bShouldClose = false;
-protected:
-    uint32_t m_rendererCompositionID;
-
-    friend class Application;
 public:
-    Window(std::string_view title, uint32_t width, uint32_t height);
+    void Initialize(std::string_view title, uint32_t width, uint32_t height);
 
     void CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface);
 
@@ -45,8 +41,6 @@ public:
     void Cleanup();
 
     inline SDL_Window* GetSDLWindowHandle() const {return m_window;}
-
-    uint32_t GetCompositionID() const {return m_rendererCompositionID;}
 
     /*
      * Window Event handler

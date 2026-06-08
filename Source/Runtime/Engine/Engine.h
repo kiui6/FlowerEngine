@@ -23,8 +23,6 @@ protected:
     uint32_t m_gameCanvasWidth, m_gameCanvasHeight;
     bool m_gameCanvasDirty;
 public:
-    Engine();
-
     void Initialize();
 
     // Starts a process of traveling to the new world
