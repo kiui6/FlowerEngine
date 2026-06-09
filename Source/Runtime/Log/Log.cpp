@@ -1,16 +1,17 @@
 #pragma warning(disable : 4996)
 
 #include "Log.h"
+
 #include <iostream>
 #include <sstream>
 #include <chrono>
 #include <ctime>
 #include <stdexcept>
-
-#include <Platform/Platform.h>
 #include <cstdarg>
 #include <ctime>
 #include <cassert>
+
+#include <Platform/Platform.h>
 
 MulticastDelegate<const char*, const char*, const char*> Logger::OnLogMessage = MulticastDelegate<const char*, const char*, const char*>();
 

@@ -17,8 +17,6 @@
 //#include <Record/ObjectLibrary.h>
 //#include <Thread/ThreadManager.h>
 
-#include <SDL3/SDL.h>
-
 #include <Debug/Tracer/Tracer.h>
 
 Application* Application::Singleton = nullptr;
@@ -55,25 +53,10 @@ void Application::Initialize()
 
     m_inputDev = GetService<Platform>()->Input()->CreateRawInputDevice();
 
-    // TODO: Move all SDL related code into Platform module
-    // Initialize SDL framework
-    if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD) == false)
-	{
-		LOG(Fatal, SDL, "SDL Initialization failed");
-	}
-
     // Create window
     m_window.Initialize("Flower++", 1280, 720);
 	
 	m_render.Initialize(m_window.GetSDLWindowHandle());
-
-	// SDL_Vulkan_CreateSurface(m_window->GetSDLWindowHandle(), Render->GetInstance(), nullptr, &dummySurface);
-
-	// Render->UpdateQueueFamilies(dummySurface);
-
-    // Render->CreateDevice();
-
-    // IRenderUtility::CreateSingleTimeCommandPool();
 
 	LOG(Log, LogApplication, "Successfully initialized Application's Essentials");
 }

@@ -2,6 +2,8 @@
 
 #include "RawInputDevice.h"
 
+#include <memory>
+
 class PlatformInput
 {
 public:

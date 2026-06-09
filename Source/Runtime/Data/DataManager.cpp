@@ -7,7 +7,8 @@
 #include "Formats/MasterFile/MasterFile.h"
 #include "Formats/PluginFile/PluginFile.h"
 
-#include <SDL3/SDL.h>
+#include <Platform/Platform.h>
+
 #include <Log/Log.h>
 
 #include <filesystem>
@@ -26,7 +27,7 @@ void DataManager::Deinitialize()
 const std::filesystem::path& DataManager::GetBasePath()
 {
     if(m_basePath.empty()) {
-        m_basePath = (std::filesystem::absolute(SDL_GetBasePath()) / "Data").lexically_normal();
+        m_basePath = (std::filesystem::absolute(GetService<Platform>()->Filesystem()->GetBaseDirectory()) / "Data").lexically_normal();
     }
 
     return m_basePath;
@@ -36,7 +37,7 @@ const std::filesystem::path &DataManager::GetPrefPath()
 {
     // TODO: Set pref path namespaces
     if(m_prefPath.empty()) {
-        m_prefPath = std::filesystem::absolute(SDL_GetPrefPath("TODO", "TODO")).lexically_normal();
+        m_prefPath = std::filesystem::absolute(GetService<Platform>()->Filesystem()->GetPreferencesDirectory("TODO", "TODO")).lexically_normal();
     }
 
     return m_prefPath;

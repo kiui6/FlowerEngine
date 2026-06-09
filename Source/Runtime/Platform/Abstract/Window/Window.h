@@ -25,6 +25,8 @@ class Window
 
     bool m_bShouldClose = false;
 public:
+    Window() = default;
+    Window(std::string_view title, uint32_t width, uint32_t height) {Initialize(title, width, height);}
     void Initialize(std::string_view title, uint32_t width, uint32_t height);
 
     void CreateSurface(VkInstance instance, VkSurfaceKHR* vksurface);

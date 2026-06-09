@@ -60,8 +60,6 @@ set(SrcService "Source/Runtime/Service/Service.cpp")
 
 set(SrcLog "Source/Runtime/Log/Log.cpp")
 
-set(SrcWindow "Source/Runtime/Window/Window.cpp")
-
 set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 
 set(SrcInput )
@@ -91,7 +89,10 @@ set(SrcPlatform "Source/Runtime/Platform/Platform.cpp"
     # Abstract Filesystem
     "Source/Runtime/Platform/Abstract/Filesystem/PlatformFilesystem.cpp"
     "Source/Runtime/Platform/Abstract/Filesystem/File.cpp"
-)
+
+    # Abstract Window
+    "Source/Runtime/Platform/Abstract/Window/Window.cpp"
+  )
 
 set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
 
@@ -145,7 +146,7 @@ set(SrcGameFramework
     "Source/Runtime/GameFramework/Assets/Texture2DAsset/Texture2DAsset.cpp"
 )
 
-set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog} ${SrcWindow}
+set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
     ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin}
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
