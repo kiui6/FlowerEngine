@@ -4,5 +4,4 @@
 
 class MappedFile : public FileBase
 {
-
 };

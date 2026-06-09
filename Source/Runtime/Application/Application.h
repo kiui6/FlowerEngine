@@ -12,20 +12,20 @@
 
 #include <Window/Window.h>
 #include <Engine/Engine.h>
-#include <Input/InputManager.h>
 
 #include <Debug/DebugWindow.h>
+
+#include <Platform/Platform.h>
 
 class Application
 {
     static Application* Singleton;
 protected:
     Window m_window;
-
-    InputManager m_inputMgr;
-
     RenderEngine m_render;
     Engine m_engine;
+
+    std::unique_ptr<RawInputDevice> m_inputDev;
 
     std::shared_ptr<DebugWindow> m_dbgWindow;
     bool m_dbgWindowUpdated = false;

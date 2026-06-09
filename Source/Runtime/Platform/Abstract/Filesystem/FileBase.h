@@ -25,17 +25,19 @@ inline bool operator!(FileAccess a) {
 }
 
 class FileBase {
+protected:
+    FileBase() = default;
 public:
     virtual ~FileBase() = default;
 
-    virtual void Open(std::string path, FileAccess access) = 0;
+    virtual void Open(const std::string& path, FileAccess access) = 0;
     virtual bool IsOpen() const = 0;
     virtual void Close() = 0;
 
     virtual size_t GetSize() const = 0;
     virtual const std::byte* GetData() const = 0;
 
-    virtual size_t WriteBytes(std::span<const std::byte> buffer, size_t offset = 0) = 0;
+    virtual size_t WriteBytes(const std::span<const std::byte>& buffer, size_t offset = 0) = 0;
     virtual size_t ReadBytes(std::span<std::byte> &buffer, size_t offset = 0) const = 0;
 
     virtual std::byte ReadByte(size_t pos) const = 0;

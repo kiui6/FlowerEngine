@@ -53,6 +53,9 @@ void Application::Initialize()
 {
     ServiceProvider::Get().Initialize();
 
+    m_inputDev = GetService<Platform>()->Input()->CreateRawInputDevice();
+
+    // TODO: Move all SDL related code into Platform module
     // Initialize SDL framework
     if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS | SDL_INIT_GAMEPAD) == false)
 	{

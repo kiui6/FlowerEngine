@@ -6,7 +6,7 @@ WindowsMappedFile::~WindowsMappedFile()
 {
 }
 
-void WindowsMappedFile::Open(std::string path, FileAccess access)
+void WindowsMappedFile::Open(const std::string& path, FileAccess access)
 {
     DWORD dwAccess = 0;
     DWORD dwShareMode = 0;
@@ -65,7 +65,7 @@ void WindowsMappedFile::Close()
     CloseHandle(m_hFile);
 }
 
-size_t WindowsMappedFile::WriteBytes(std::span<const std::byte> buffer, size_t offset)
+size_t WindowsMappedFile::WriteBytes(const std::span<const std::byte>& buffer, size_t offset)
 {
     return size_t();
 }

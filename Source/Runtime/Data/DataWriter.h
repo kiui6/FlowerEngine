@@ -4,7 +4,7 @@
 #include <vector>
 #include <cassert>
 
-#include <Platform/FileBase.h>
+#include <Platform/Abstract/Filesystem/FileBase.h>
 
 class DataWriter {
     std::shared_ptr<FileBase> m_file = nullptr;

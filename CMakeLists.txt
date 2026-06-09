@@ -64,7 +64,7 @@ set(SrcWindow "Source/Runtime/Window/Window.cpp")
 
 set(SrcWorld "Source/Runtime/World/World.cpp" "Source/Runtime/World/Actor/Actor.cpp" "Source/Runtime/World/Actor/ReferenceRecordFactory.cpp" "Source/Runtime/World/SceneView.cpp")
 
-set(SrcInput "Source/Runtime/Input/InputManager.cpp")
+set(SrcInput )
 
 set(SrcEngine "Source/Runtime/Engine/Engine.cpp" "Source/Runtime/Engine/EngineDelegates.cpp")
 
@@ -82,7 +82,16 @@ set(SrcData "Source/Runtime/Data/DataManager.cpp" "Source/Runtime/Data/DataReade
 
 set(SrcAsset "Source/Runtime/Assets/AssetLibrary.cpp" "Source/Runtime/Assets/Asset.cpp" "Source/Runtime/Assets/RawAsset.cpp")
 
-set(SrcPlatform "Source/Runtime/Platform/Platform.cpp" "Source/Runtime/Platform/File.cpp")
+set(SrcPlatform "Source/Runtime/Platform/Platform.cpp" 
+
+    # Abstract Input
+    "Source/Runtime/Platform/Abstract/Input/PlatformInput.cpp"
+    "Source/Runtime/Platform/Abstract/Input/RawInputDevice.cpp"
+
+    # Abstract Filesystem
+    "Source/Runtime/Platform/Abstract/Filesystem/PlatformFilesystem.cpp"
+    "Source/Runtime/Platform/Abstract/Filesystem/File.cpp"
+)
 
 set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
 
@@ -142,7 +151,16 @@ set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService
     "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
 
 if(WIN32)
-    set(Sources WIN32 ${Sources} "Editor/Platforms/Windows/resources.rc" "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" "Source/Runtime/Platform/Windows/WindowsMappedFile.cpp")
+    set(WindowsPlatform "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" 
+
+      # Filesystem
+      "Source/Runtime/Platform/Windows/Filesystem/WindowsMappedFile.cpp"
+
+      # System
+      "Source/Runtime/Platform/Windows/System/WindowsPlatformSystem.cpp"
+    )
+
+    set(Sources WIN32 ${Sources} ${WindowsPlatform} "Editor/Platforms/Windows/resources.rc" )
 endif()
 if(CMAKE_HOST_SYSTEM MATCHES Linux)
   set(Sources ${Sources} "Source/Runtime/Platform/Linux/LinuxPlatform.cpp")

@@ -3,32 +3,30 @@
 #include <Service/Service.h>
 
 #include "PlatformDefines.h"
-#include "PlatformImpl.h"
-
-#include "File.h"
-#include "MappedFile.h"
 
 #include <string>
 #include <memory>
+
+#include "Abstract/Input/PlatformInput.h"
+#include "Abstract/Filesystem/PlatformFilesystem.h"
+#include "Abstract/System/PlatformSystem.h"
 
 class Platform : public IService
 {
     static bool bIsInitialized;
 
-    std::string m_basePath;
-    std::string m_prefPath;
-    
-    std::unique_ptr<IPlatformImpl> m_impl;
+    std::unique_ptr<PlatformInput> m_input;
+    std::unique_ptr<PlatformFilesystem> m_fs;
+    std::unique_ptr<PlatformSystem> m_sys;
 public:
-    static void DebugPrint(const char* string);
-
     static std::string_view GetStaticName() {return "Platform";}
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    std::string GetLocalDirectory();
+    static void DebugPrint(const char* string);
 
-    std::shared_ptr<File> OpenFile(std::string path, FileAccess access);
-    std::shared_ptr<MappedFile> MapFile(std::string path, FileAccess access);
+    PlatformInput* Input()              { return m_input.get();}
+    PlatformFilesystem* Filesystem()    { return m_fs.get();}
+    PlatformSystem* System()            { return m_sys.get();}
 };

@@ -3,7 +3,7 @@
 #include <memory>
 #include <cassert>
 
-#include <Platform/FileBase.h>
+#include <Platform/Abstract/Filesystem/FileBase.h>
 
 class DataView {
     friend class DataManager;

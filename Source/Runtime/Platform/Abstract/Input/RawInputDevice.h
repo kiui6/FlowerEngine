@@ -8,8 +8,7 @@
 
 #include "InputAction.h"
 
-
-class InputManager
+class RawInputDevice
 {
 
 };

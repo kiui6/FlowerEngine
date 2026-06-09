@@ -6,7 +6,7 @@ File::~File()
 {
 }
 
-void File::Open(std::string path, FileAccess access)
+void File::Open(const std::string& path, FileAccess access)
 {
     // TODO: Construct io mode from FileAccess
     m_stream = SDL_IOFromFile(path.c_str(), "rb");
@@ -34,7 +34,7 @@ void File::Close()
     delete[] m_data;
 }
 
-size_t File::WriteBytes(std::span<const std::byte> buffer, size_t offset)
+size_t File::WriteBytes(const std::span<const std::byte>& buffer, size_t offset)
 {
     return size_t();
 }

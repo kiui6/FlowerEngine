@@ -7,7 +7,9 @@
 bool Platform::bIsInitialized = RegisterService<Platform>();
 
 #ifdef PLATFORM_WINDOWS
-#   include "Windows/WindowsPlatform.h"
+#   include "Windows/Input/WindowsPlatformInput.h"
+#   include "Windows/Filesystem/WindowsPlatformFilesystem.h"
+#   include "Windows/System/WindowsPlatformSystem.h"
 #elifdef PLATFORM_LINUX
 
 #elifdef PLATFORM_UNIX
@@ -18,28 +20,16 @@ bool Platform::bIsInitialized = RegisterService<Platform>();
 
 void Platform::Initialize()
 {
-    m_impl = std::make_unique<PlatformImpl>();
+#ifdef PLATFORM_WINDOWS 
+    m_input = std::make_unique<WindowsPlatformInput>();
+    m_fs = std::make_unique<WindowsPlatformFilesystem>();
+    m_sys = std::make_unique<WindowsPlatformSystem>();
+#endif
 
-    LOGF(Log, LogPlatform, "Initialized platform: %s", m_impl->GetPlatformName().data());
+    LOGF(Log, LogPlatform, "Initialized platform: %s", m_sys->PlatformName().data());
 }
 
 void Platform::Deinitialize()
 {
     
-}
-
-std::shared_ptr<File> Platform::OpenFile(std::string path, FileAccess access)
-{
-    std::shared_ptr<File> file = std::make_shared<File>();
-    file->Open(path, access);
-    return file;
-}
-
-std::shared_ptr<MappedFile> Platform::MapFile(std::string path, FileAccess access)
-{
-    assert(m_impl != nullptr);
-
-    std::shared_ptr<MappedFile> file = std::move(m_impl->CreateMappedFile());
-    file->Open(path, access);
-    return file;
 }

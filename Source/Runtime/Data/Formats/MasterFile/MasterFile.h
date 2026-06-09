@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <vector>
 
-#include <Platform/MappedFile.h>
+#include <Platform/Abstract/Filesystem/MappedFile.h>
 
 #include "../../Serialisation/ObjectRecord.h"
 #include "../../Serialisation/ObjectField.h"
