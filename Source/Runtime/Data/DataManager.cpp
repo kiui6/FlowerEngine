@@ -45,7 +45,7 @@ const std::filesystem::path &DataManager::GetPrefPath()
 
 DataView DataManager::OpenDataView(std::string_view relativePath)
 {
-    std::string path = CanonizePathSandboxed(relativePath);
+    std::string path = CanonicalizePathSandboxed(relativePath);
 
     auto fileHandle = m_fileHandles.find(path);
     if(fileHandle != m_fileHandles.end()) {
@@ -70,7 +70,7 @@ DataView DataManager::OpenDataView(std::string_view relativePath)
 
 DataView DataManager::MapDataView(std::string_view relativePath)
 {
-    std::string path = CanonizePathSandboxed(relativePath);
+    std::string path = CanonicalizePathSandboxed(relativePath);
 
     std::shared_ptr<FileBase> file = GetService<Platform>()->Filesystem()->MapFile(path, FileAccess::Read | FileAccess::Binary);
 
@@ -97,7 +97,7 @@ DataWriter DataManager::OpenDataWriter(std::string_view relativePath)
     }
 #endif
 
-    std::string path = CanonizePathSandboxed(relativePath);
+    std::string path = CanonicalizePathSandboxed(relativePath);
 
     return DataWriter();
 }
@@ -116,12 +116,12 @@ DirectoryView DataManager::OpenDirectoryView(std::string_view relativePath)
         return {};
     }
 
-    std::string path = CanonizePathSandboxed(relativePath);
+    std::string path = CanonicalizePathSandboxed(relativePath);
 
     return DirectoryView(basePath, basePrefix, path);
 }
 
-std::string DataManager::CanonizePathSandboxed(std::string_view path)
+std::string DataManager::CanonicalizePathSandboxed(std::string_view path)
 {
     size_t firstDividerPos = path.find_first_of(":");
     if(firstDividerPos == std::string_view::npos) {

@@ -41,10 +41,15 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-
     DataView OpenDataView(std::string_view relativePath);
     DataView MapDataView(std::string_view relativePath);
 
+    /*
+     * Opens a file and provides a writer for it.
+     *
+     * @warning
+     * Calling with "Game/" prefix in Game build will fail, in Game build writing is only allowed to "Pref/" prefix.
+     */
     DataWriter OpenDataWriter(std::string_view relativePath);
 
     DirectoryView OpenDirectoryView(std::string_view relativePath);
@@ -52,5 +57,5 @@ protected:
     const std::filesystem::path& GetBasePath();
     const std::filesystem::path& GetPrefPath();
 
-    std::string CanonizePathSandboxed(std::string_view path);
+    std::string CanonicalizePathSandboxed(std::string_view path);
 };
