@@ -4,6 +4,8 @@ Per Frame code should focus on minimal overhead, but don't ignore readability an
 ## Return types
 For per-frame code it's highly adviced to minimize constructor/destructor calls and maximize reuse of objects.
 
+All or almost all code can be rewritten to reuse memory instead of recreating objects.
+
 ### std::optional
 Instead of `std::optional` using of `bool` returning function with a `&result` argument is recommended. This saves construction and destruction and allows code reuse and/or more efficient memory management. For consistency, at success such function shall return `true`, and `false` at failure.
 

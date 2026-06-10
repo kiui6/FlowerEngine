@@ -47,4 +47,4 @@ while(GetValueForElement(&value)) {
 // Later access using raw pointer access or iterators
 Element* element = m_arena.Get(m_arena.Size() - 1);
 ```
-Be aware: These allocators are designed for performance critical low level memory management and therefore don't provide any safety checks or iterators unlike STL containers do. Addresses are never invalidated, but they can point to garbage memory. Any interaction with such allocator after `Reset()` using old indices or pointers is an undefined behavior.
+Be aware: These allocators are designed for performance critical low level memory management and therefore don't provide any safety checks or iterators unlike STL containers. Addresses are never invalidated, but they can point to garbage memory. Any interaction with such allocator after `Reset()` using old indices or pointers is undefined behavior.
