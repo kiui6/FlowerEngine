@@ -160,11 +160,19 @@ if(WIN32)
       # System
       "Source/Runtime/Platform/Windows/System/WindowsPlatformSystem.cpp"
     )
-
+    
     set(Sources WIN32 ${Sources} ${WindowsPlatform} "Editor/Platforms/Windows/resources.rc" )
-endif()
-if(CMAKE_HOST_SYSTEM MATCHES Linux)
-  set(Sources ${Sources} "Source/Runtime/Platform/Linux/LinuxPlatform.cpp")
+elseif(UNIX)
+    set(LinuxPlatform "Source/Runtime/Platform/Linux/LinuxPlatform.cpp" 
+
+      # Filesystem
+      "Source/Runtime/Platform/Linux/Filesystem/LinuxMappedFile.cpp"
+
+      # System
+      "Source/Runtime/Platform/Linux/System/LinuxPlatformSystem.cpp"
+    )
+
+    set(Sources ${Sources} ${LinuxPlatform})
 endif()
 
 # Only include imgui in debug build
@@ -203,33 +211,6 @@ target_compile_definitions(Editor PUBLIC EDITOR)
 target_compile_definitions(Editor PUBLIC HAS_DEBUGUI)
 
 set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
-
-# Address Sanitizer Builds
-
-add_executable(EditorASAN ${Sources} ${EditorSources})
-
-target_link_libraries(EditorASAN disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
-
-target_include_directories(EditorASAN PRIVATE "Source/Runtime" "Source/Editor")
-
-target_include_directories(EditorASAN PRIVATE "Source/ThirdParty")
-
-target_compile_definitions(EditorASAN PUBLIC EDITOR)
-target_compile_definitions(EditorASAN PUBLIC HAS_DEBUGUI)
-
-set_property(TARGET EditorASAN PROPERTY CXX_STANDARD 23)
-
-if(MSVC)
-message(STATUS "ASAN: Detected MSVC")
-  target_compile_options(EditorASAN PUBLIC "/MTd" "/fsanitize=address" "/Zi" "/sdl" "/permissive-") 
-  target_link_options(EditorASAN PUBLIC "/INCREMENTAL:NO")
-  target_link_options(EditorASAN PUBLIC "/subsystem:console")
-else()
-  message(STATUS "ASAN: Detected GNU or LLVM")
-  target_compile_options(EditorASAN PUBLIC "-fsanitize=address") 
-  target_link_options(EditorASAN PUBLIC "-fsanitize=address")
-endif()
-#set(CMAKE_EXE_LINKER_FLAGS "/subsystem:console ${CMAKE_EXE_LINKER_FLAGS} /subsystem:console")
 
 # Shaders
 # add_shaders(Shaders "Shaders/FullscreenTriangle/FullscreenTriangle.vert" "Shaders/FullscreenTriangle/FullscreenTriangle.frag")
