@@ -31,14 +31,15 @@ class TaskQueue
 {
     std::deque<TaskDescriptor> m_queue;
     std::mutex m_queueLock;
-    std::condition_variable cvTaskAvailable;
+    std::mutex m_taskAvailableLock;
+    std::condition_variable m_cvTaskAvailable;
 public:
     void Push(std::unique_ptr<IAsyncTask>& task, uint8_t priority = 0);
     std::unique_ptr<IAsyncTask> Pop();
 
     size_t Size() const {return m_queue.size();}
 
-    std::condition_variable& TaskAvailableCV() {return cvTaskAvailable;}
+    std::condition_variable& TaskAvailableCV() {return m_cvTaskAvailable;}
 };
 
 class TaskPool
@@ -46,7 +47,6 @@ class TaskPool
     struct ThreadDescriptor {
         std::jthread thread;
         std::atomic_bool bInUse = false;
-        std::mutex mtxTaskAvailable;
 
         ThreadDescriptor(std::function<void(std::stop_token, ThreadDescriptor*, TaskQueue*)> threadCallback, TaskQueue* queue) : thread(threadCallback, this, queue) {}
     };

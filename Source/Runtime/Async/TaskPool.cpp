@@ -25,11 +25,7 @@ void TaskPool::mf_taskThreadFunc(std::stop_token stopToken, ThreadDescriptor* se
 {
     while(!stopToken.stop_requested()) {
         std::unique_ptr<IAsyncTask> task = std::move(queue->Pop());
-        if(task == nullptr) {
-            std::unique_lock<std::mutex> lock(self->mtxTaskAvailable);
-            queue->TaskAvailableCV().wait(lock, [queue](){return queue->Size();});
-            continue;
-        }
+        if(!task) continue;
 
         self->bInUse.store(true);
 
@@ -45,16 +41,17 @@ void TaskQueue::Push(std::unique_ptr<IAsyncTask> &task, uint8_t priority)
 
     m_queue.emplace_front(TaskDescriptor(task, priority));
 
-    cvTaskAvailable.notify_all();
+    m_cvTaskAvailable.notify_all();
 }
 
 std::unique_ptr<IAsyncTask> TaskQueue::Pop()
 {
-    std::lock_guard lock(m_queueLock);
-
-    if(m_queue.size() <= 0) {
-        return nullptr;
+    {
+        std::unique_lock taskAvailableLock(m_taskAvailableLock);
+        m_cvTaskAvailable.wait(taskAvailableLock, [this] { return !m_queue.empty(); });
     }
+
+    std::lock_guard lock(m_queueLock);
 
     std::unique_ptr<IAsyncTask> task = std::move(m_queue.front().task);
 
