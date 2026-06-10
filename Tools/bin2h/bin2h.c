@@ -35,6 +35,10 @@ int main(int argc, char* argv[]) {
                 }
             }
         } else {
+            if (isatty(fileno(in))) {
+                fprintf(stderr, "Error: Can't read from terminal.");
+                return 1;
+            }
             out = fopen(argv[1], "wb");
         }
     } else if(argc == 3) {
