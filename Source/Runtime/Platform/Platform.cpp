@@ -14,7 +14,9 @@ bool Platform::bIsInitialized = RegisterService<Platform>();
 #   include "Windows/Filesystem/WindowsPlatformFilesystem.h"
 #   include "Windows/System/WindowsPlatformSystem.h"
 #elifdef PLATFORM_LINUX
-
+#   include "Linux/Input/LinuxPlatformInput.h"
+#   include "Linux/Filesystem/LinuxPlatformFilesystem.h"
+#   include "Linux/System/LinuxPlatformSystem.h"
 #elifdef PLATFORM_UNIX
 
 #elifdef PLATFORM_MAC
@@ -35,8 +37,13 @@ void Platform::Initialize()
     m_input = std::make_unique<WindowsPlatformInput>();
     m_fs = std::make_unique<WindowsPlatformFilesystem>();
     m_sys = std::make_unique<WindowsPlatformSystem>();
+#elifdef PLATFORM_LINUX
+    m_input = std::make_unique<LinuxPlatformInput>();
+    m_fs = std::make_unique<LinuxPlatformFilesystem>();
+    m_sys = std::make_unique<LinuxPlatformSystem>();
+#else
+    static_assert(!"No platform implementation available!");
 #endif
-
 
     LOGF(Log, LogPlatform, "Initialized platform: %s", m_sys->PlatformName().data());
 }

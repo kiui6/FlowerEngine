@@ -30,7 +30,7 @@ class RenderEngine
     std::array<RenderView, FRAMES_IN_FLIGHT> m_renderViews;
     std::array<FrameContext, FRAMES_IN_FLIGHT> m_frameContexts;
 
-    SDL_GPUCommandBuffer *m_renderBuffer, *m_onDemandBuffer;
+    SDL_GPUCommandBuffer *m_renderBuffer, *m_computeBuffer;
 
     EnumClassArray<std::unique_ptr<IBufferAttachmentUpdateHandler>, BufferRenderAttachment> m_frameBufferAttachmentUpdateHandlers;
     EnumClassArray<std::unique_ptr<RenderPass>, RenderPassType> m_renderPasses;
@@ -51,7 +51,7 @@ public:
 
 protected:
     template<typename T>
-    std::unique_ptr<T> MakeRenderModule();
+    inline std::unique_ptr<T> MakeRenderModule();
 };
 
 template<typename T>
