@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 3.29)
 
 project ("Flower")
 
@@ -8,6 +8,7 @@ set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
 set(SDL_STATIC ON)
 
 #include("CMake/VulkanCompileShaders.cmake")
+include("CMake/EnableLTO.cmake")
 include(FetchContent)
 
 FetchContent_Declare(
@@ -37,10 +38,11 @@ add_library(disable_cxx_features INTERFACE)
 
 target_compile_options(disable_cxx_features INTERFACE
     #   GCC / Clang
-    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Release>>:-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-rtti -flto=thin>
-    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Debug>>:-fno-exceptions -fno-rtti -flto=thin>
+    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Release>>:-fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -fno-rtti>
+    $<$<AND:$<CXX_COMPILER_ID:GNU,Clang,AppleClang>,$<CONFIG:Debug>>:-fno-exceptions -fno-rtti>
     #   MSVC
-    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/GR- /GL /EHs- _HAS_EXCEPTIONS=0->
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Release>>:/GR- /EHs- _HAS_EXCEPTIONS=0->
+    $<$<AND:$<CXX_COMPILER_ID:MSVC>,$<CONFIG:Debug>>:/GR- /EHs- _HAS_EXCEPTIONS=0->
 ) 
 
 # Third Party Sources
