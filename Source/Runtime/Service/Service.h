@@ -25,6 +25,9 @@ class IService
     friend struct ServiceInstantiator;
     std::string_view m_name;
 public:
+    IService() = default;
+    virtual ~IService() = default;
+
     static std::string_view GetStaticName() {return "Service";}
     std::string_view GetName() const {return m_name;}
 

@@ -46,6 +46,9 @@ protected:
 
     World* m_world;
 public:
+    Actor() = default;
+    virtual ~Actor() = default;
+
     static uint32_t RecordType() {return FIELDID("ACT_");}
 
     void SetReference(ReferenceRecord* ref);
