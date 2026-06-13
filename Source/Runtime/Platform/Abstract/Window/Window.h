@@ -54,5 +54,5 @@ public:
      * SDL Event Handler
      * Used for global SDL events, not tied to windows
     */
-    MulticastDelegate<SDL_Event> OnSDLEvent;
+    MulticastDelegate<const SDL_Event&> OnSDLEvent;
 };

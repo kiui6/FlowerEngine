@@ -51,10 +51,10 @@ void Application::Initialize()
 {
     ServiceProvider::Get().Initialize();
 
-    m_inputDev = GetService<Platform>()->Input()->CreateRawInputDevice();
-
     // Create window
     m_window.Initialize("Flower++", 1280, 720);
+
+    m_inputDev = GetService<Platform>()->Input()->CreateRawInputDevice(m_window);
 	
 	m_render.Initialize(m_window.GetSDLWindowHandle());
 
@@ -96,6 +96,8 @@ void Application::StartLifecycle()
         POP_TRACE_SCOPE();
 
 		m_window.Update();
+
+        m_inputDev->Update();
 
         m_engine.Tick(m_deltaTime);
         

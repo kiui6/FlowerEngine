@@ -1,6 +1,6 @@
 #include "PlatformInput.h"
 
-std::unique_ptr<RawInputDevice> PlatformInput::CreateRawInputDevice()
+std::unique_ptr<RawInputDevice> PlatformInput::CreateRawInputDevice(Window& window)
 {
-    return std::unique_ptr<RawInputDevice>();
+    return std::make_unique<RawInputDevice>(window);
 }

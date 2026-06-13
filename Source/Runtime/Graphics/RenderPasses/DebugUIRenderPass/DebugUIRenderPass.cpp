@@ -15,7 +15,7 @@ DebugUIRenderPass::DebugUIRenderPass(GPUContext &context, RenderStateStore& stat
     #ifdef HAS_DEBUGUI
     
     // FIXME: Maybe we can come up with more graceful way of intercepting SDL events
-    Application::Get()->GetWindow().OnSDLEvent.BindRaw([](SDL_Event event){ImGui_ImplSDL3_ProcessEvent(&event);});
+    Application::Get()->GetWindow().OnSDLEvent.BindRaw([](const SDL_Event& event){ImGui_ImplSDL3_ProcessEvent(&event);});
 
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
