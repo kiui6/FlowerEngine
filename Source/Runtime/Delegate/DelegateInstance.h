@@ -46,9 +46,6 @@ template <bool Const, typename UserClass, typename RetType,
   typename... ArgTypes>
 class MemDelegateInstance : public DelegateInstance<RetType(ArgTypes...)>
 {
-    //MemFuncPtr<UserClass, RetType, ArgTypes...> ptr;
-
-    // FIXME: Make auto-deduction work
     typename MemFuncPtr<Const, UserClass, RetType(ArgTypes...)>::Type function;
     UserClass* user;
 public:
