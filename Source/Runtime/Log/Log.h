@@ -22,8 +22,8 @@ public:
 	static void Error(const char* Namespace, const char* message);
 	static void ErrorFormat(const char* Namespace, const char* message, ...);
 
-	static void Fatal(const char* Namespace, const char* message);
-	static void FatalFormat(const char* Namespace, const char* message, ...);
+	[[noreturn]] static void Fatal(const char* Namespace, const char* message);
+	[[noreturn]] static void FatalFormat(const char* Namespace, const char* message, ...);
 
 	static void Assert(const char* Namespace, const char* message);
 	static void AssertFormat(const char* Namespace, const char* message, ...);
