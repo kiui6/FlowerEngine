@@ -14,6 +14,8 @@
 #include <set>
 #include <mutex>
 
+#include <Utility/Meta/AlwaysFalse.h>
+
 #include <SDL3/SDL_gpu.h>
 
 #include "GPUContext.h"
@@ -57,19 +59,11 @@ protected:
 template<typename T>
 inline std::unique_ptr<T> RenderEngine::MakeRenderModule()
 {
-    if constexpr (std::is_constructible_v<T, const GPUContext&, const RenderStateStore&>) {
+    if constexpr (std::is_constructible_v<T, GPUContext&, RenderStateStore&>) {
         return std::make_unique<T>(m_ctx, m_stateStore);
-    } else if constexpr (std::is_constructible_v<T, GPUContext&, const RenderStateStore&>) {
-        return std::make_unique<T>(m_ctx, m_stateStore);
-    } else if constexpr (std::is_constructible_v<T, const GPUContext&, RenderStateStore&>) {
-        return std::make_unique<T>(m_ctx, m_stateStore);
-    } else if constexpr (std::is_constructible_v<T, GPUContext&, RenderStateStore&>) {
-        return std::make_unique<T>(m_ctx, m_stateStore);
-    } else if constexpr (std::is_constructible_v<T, const GPUContext&>) {
-        return std::make_unique<T>(m_ctx);
     } else if constexpr (std::is_constructible_v<T, GPUContext&>) {
         return std::make_unique<T>(m_ctx);
     } else {
-        static_assert(false, "T has no suitable constructor");
+        static_assert(AlwaysFalse<T>::value, "T has no suitable constructor");
     }
 }
