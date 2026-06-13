@@ -123,12 +123,12 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
 
     SDL_GPUTexture *swapchainTexture = NULL;
     uint32_t swapchainTextureW, swapchainTextureH;
-    SDL_AcquireGPUSwapchainTexture(cmd, m_ctx.window, &swapchainTexture, &swapchainTextureW, &swapchainTextureH);
+    SDL_WaitAndAcquireGPUSwapchainTexture(cmd, m_ctx.window, &swapchainTexture, &swapchainTextureW, &swapchainTextureH);
     // Don't attempt any rendering if swapchain texture is invalid, it will crash
-    if(!swapchainTexture) {
+    if(!swapchainTexture) [[unlikely]] {
         SDL_SubmitGPUCommandBuffer(cmd);
-        SDL_WaitForGPUSwapchain(m_ctx.device, m_ctx.window);
         renderView.Reset();
+        POP_TRACE_SCOPE();
         return;
     }
 
