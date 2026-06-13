@@ -46,8 +46,6 @@ RenderObject& RenderView::AddStaticRenderObject(uint64_t id)
 void RenderView::Reset()
 {
     PUSH_TRACE_SCOPE("RenderView::Reset()");
-
-    m_staticRenderObjectsDirty = false;
     
     size_t staticRObjectsCountBeforeReset = m_staticRenderObjects.size();
 

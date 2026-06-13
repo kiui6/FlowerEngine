@@ -31,15 +31,15 @@ class RenderView
         bool isReferenced = false;
     };
 protected:
-    Float4x4 m_projMatrix;
-    Float3 m_cameraPosition;
+    Float4x4 m_projMatrix{};
+    Float3 m_cameraPosition{};
 
-    std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects;
+    std::unordered_map<uint64_t, RenderObjectHandle> m_staticRenderObjects{};
     bool m_staticRenderObjectsDirty = false;
-    std::vector<RenderObject> m_dynamicRenderObjects;
+    std::vector<RenderObject> m_dynamicRenderObjects{};
 
-    std::unordered_map<uint64_t, RenderStateUpdateHandle> m_stateUpdates;
-    std::set<std::unique_ptr<RenderJob>> m_renderJobs;
+    std::unordered_map<uint64_t, RenderStateUpdateHandle> m_stateUpdates{};
+    std::set<std::unique_ptr<RenderJob>> m_renderJobs{};
 public:
     void SetCameraPosition(Float3 position) {m_cameraPosition = position;}
     Float3 GetCameraPosition() const {return m_cameraPosition;}
