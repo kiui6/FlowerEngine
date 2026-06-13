@@ -32,14 +32,13 @@ class TaskQueue
     std::deque<TaskDescriptor> m_queue;
     std::mutex m_queueLock;
     std::mutex m_taskAvailableLock;
-    std::condition_variable m_cvTaskAvailable;
+    std::condition_variable_any m_cvTaskAvailable;
 public:
     void Push(std::unique_ptr<IAsyncTask>& task, uint8_t priority = 0);
     std::unique_ptr<IAsyncTask> Pop();
+    std::unique_ptr<IAsyncTask> Pop(std::stop_token stopToken);
 
     size_t Size() const {return m_queue.size();}
-
-    std::condition_variable& TaskAvailableCV() {return m_cvTaskAvailable;}
 };
 
 class TaskPool
@@ -49,12 +48,18 @@ class TaskPool
         std::atomic_bool bInUse = false;
 
         ThreadDescriptor(std::function<void(std::stop_token, ThreadDescriptor*, TaskQueue*)> threadCallback, TaskQueue* queue) : thread(threadCallback, this, queue) {}
+        ThreadDescriptor(ThreadDescriptor&& other) noexcept
+            : thread(std::move(other.thread)),
+            bInUse(other.bInUse.load())
+        {
+            other.bInUse.store(false);
+        }
     };
 
     std::mutex m_poolLock;
 
-    std::vector<std::unique_ptr<ThreadDescriptor>> m_threads;
     TaskQueue m_tasks;
+    std::vector<ThreadDescriptor> m_threads;
 public:
     TaskPool(size_t initialSize);
 
