@@ -3,6 +3,7 @@
 #include "../Platform.h"
 
 #include <cstdint>
+#include <cstdio>
 
 void Platform::DebugPrint(const char *string)
 {

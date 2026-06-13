@@ -2,6 +2,8 @@
 
 #include <cstdint>
 #include <memory>
+#include <vector>
+
 #include "RenderResourceType.h"
 
 #include "CompiledRenderResource.h"

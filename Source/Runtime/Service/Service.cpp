@@ -24,7 +24,7 @@ void ServiceProvider::Initialize()
 
             // Find unsorted dependencies
             for(std::string_view& dependency : archetypeBeingSolved.dependencyNames) {
-                if(std::find_if(m_serviceArchetypes.begin(), 
+                if(std::ranges::find_if(m_serviceArchetypes.begin(), 
                                 m_serviceArchetypes.end(), 
                                 [dependency](const ServiceArchetype& element){return dependency == element.serviceName;}) 
                     != m_serviceArchetypes.end())

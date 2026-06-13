@@ -2,7 +2,7 @@
 
 int Blackboard::AddValue(std::string key, BlackboardValueType type, BlackboardValue value)
 {
-    if(std::find_if(blackboardPairs.begin(), blackboardPairs.end(), [key](BlackboardPair& pair){return pair.key == key;}) == blackboardPairs.end())
+    if(std::ranges::find_if(blackboardPairs.begin(), blackboardPairs.end(), [key](BlackboardPair& pair){return pair.key == key;}) == blackboardPairs.end())
     {
         return -1;
     }

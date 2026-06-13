@@ -4,6 +4,7 @@
 
 #include <optional>
 #include <type_traits>
+#include <cstring>
 
 class DataReader {
     DataView& m_view;
