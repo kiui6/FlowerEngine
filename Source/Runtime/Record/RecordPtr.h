@@ -83,6 +83,12 @@ public:
         return m_record;
     }
 
+    const RecordT* operator ->() const { 
+        return m_record;
+    }
+
+    operator bool() const {return IsBound();}
+
     ~RecordPtr() {
         if(m_record) {
             ReferenceCounterPtr::ReleaseRef(m_record);
@@ -114,3 +120,12 @@ public:
     // Checks if this record's instance is bound to the RecordPtr
     bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
 };
+
+template <RecordClass CastTo, RecordClass CastFrom>
+[[nodiscard]] inline RecordPtr<CastTo> CastRecord(const RecordPtr<CastFrom>& ptr) {
+    if(!ptr.IsBound() || ptr->GetType() != CastTo::StaticType()) {
+        return RecordPtr<CastTo>();
+    }
+
+    return RecordPtr<CastTo>(ptr.GetID(), static_cast<CastTo*>(ptr.Get()));
+}

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <World/Actor/Actor.h>
+#include <World/Actor/ActorFactory.h>
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 #include <GameFramework/Records/TextureRecord/TextureRecord.h>
 #include <Assets/AssetPtr.h>
@@ -24,7 +25,15 @@ class SpriteActor : public Actor
 
     uint16_t m_atlasIndex;
 public:
-    virtual void Initialize() override;
+    SpriteActor(const RecordPtr<ReferenceRecord>& reference);
 
     virtual void RecordRenderView(RenderView& renderView) override;
+};
+
+struct SpriteActorFactory : public ActorFactory
+{
+    static bool s_Initialized; 
+    virtual constexpr ID32 GetRecordType() override {return AtlasRecord::StaticType();}
+protected:
+    virtual std::unique_ptr<Actor> CreateActorImpl(const RecordPtr<ReferenceRecord> & reference) override {return std::make_unique<SpriteActor>(reference);}
 };

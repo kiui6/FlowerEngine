@@ -167,7 +167,7 @@ public:
     RecordID ReserveLocalRecordID() {return GenerateRecordID(); }
 protected:
     RecordID GenerateRecordID();
-    inline Record* CreateEmptyRecordFromType(ID32 type);
+    inline std::unique_ptr<Record> CreateEmptyRecordFromType(ID32 type);
 };
 
 template <RecordClass T>

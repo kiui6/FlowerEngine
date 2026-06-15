@@ -48,7 +48,7 @@ class Record : public ReferenceCounter, public Typed, public HasFlags<RecordFlag
 protected:
     RecordID m_id = INVALID_RECORD;
 public:
-    Field<StringField> EditorID = {FIELDID(EDID), "Untitled"};
+    Field<FString> EditorID = {FIELDID(EDID), "Untitled"};
 
     Record() : Typed(StaticType()) {}
     Record(RecordID id) : Typed(StaticType()) {m_id = id;}

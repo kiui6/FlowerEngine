@@ -2,9 +2,12 @@
 
 #include "../FieldBase.h"
 
-struct BoolField
+#include <vector>
+
+template <FieldValueClass KeyT, FieldValueClass ValueT>
+struct FPair
 {
-    using DecayType = bool;
+    using DecayType = std::pair<typename KeyT::DecayType, typename ValueT::DecayType>;
 
     static void Serialize(const DecayType& data, RecordFieldMemory& out) {}
     static void Deserialize(RecordFieldMemory* data, DecayType& out) {}

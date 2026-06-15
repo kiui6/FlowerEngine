@@ -9,6 +9,8 @@
 
 #include <Graphics/RenderStateUpdates/GlobalStateUpdate.h>
 
+#include "Actor/ActorFactoryLibrary.h"
+
 void World::SpawnDefaultActors()
 {
 }
@@ -26,7 +28,7 @@ Actor *World::SpawnActor(ActorCreateInfo &createInfo)
         return nullptr;
     }
 
-    ReferenceRecord* refptr = static_cast<ReferenceRecord*>(ref.Get());
+    RecordPtr<ReferenceRecord> refptr = CastRecord<ReferenceRecord>(ref);
 
     refptr->IsDynamic = createInfo.isDynamic;
     refptr->BaseTypename = createInfo.base->GetType();
@@ -36,36 +38,35 @@ Actor *World::SpawnActor(ActorCreateInfo &createInfo)
     return InstantiateActor(refptr, createInfo);
 }
 
-Actor *World::InstantiateActor(ReferenceRecord *ref, ActorInstantiateInfo &createInfo)
+Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const ActorInstantiateInfo &createInfo)
 {
     if(!ref || ref->BaseTypename == 0 || ref->Base == 0) {
         LOG(Error, LogWorld, "Failed to instantiate actor from a ReferenceRecord, insufficient data.");
         return nullptr;
     }
 
-    RecordFactory* factory = RecordFactoryLibrary::Get().GetFactory(ref->BaseTypename);
+    ActorFactory* factory = ActorFactoryLibrary::Get().GetFactory(ref->BaseTypename);
     if(!factory) {
         LOG(Error, LogWorld, "Failed to instantiate actor from a ReferenceRecord, REFR::NAME is specified, but no associated factory is registered.");
         return nullptr;
     }
 
-    Actor* actor = factory->CreateActor(ref);
+    std::unique_ptr<Actor> actor = factory->CreateActor(ref);
+    Actor* actorPtr = actor.get();
     if(!actor) {
         LOG(Error, LogWorld, "Failed to instantiate actor from a ReferenceRecord, factory is present, but returned nullptr.");
         return nullptr;
     }
-
-    actor->SetReference(ref);
-
-    actor->Initialize();
+    
+    actor->PostInit();
 
     if(ref->IsDynamic) {
-        m_dynamicActors.emplace(ref->GetID(), std::unique_ptr<Actor>(actor));
+        m_dynamicActors.emplace(ref->GetID(), std::move(actor));
     } else {
-        m_staticActors.emplace(ref->GetID(), std::unique_ptr<Actor>(actor));
+        m_staticActors.emplace(ref->GetID(), std::move(actor));
     }
 
-    return actor;
+    return actorPtr;
 }
 
 std::vector<Actor *> World::GetDynamicActors()
@@ -93,6 +94,10 @@ for(auto& [record, actor] : m_dynamicActors) {
 
 void World::ProcessInput(const InputView& input)
 {
+    // TODO: Store actors memory in contigious storage like set or vector
+    for(auto& [id, actor] : m_dynamicActors) {
+        actor->OnInput(input);
+    }
 }
 
 void World::BeginDestroy()

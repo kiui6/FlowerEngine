@@ -48,7 +48,7 @@ public:
     /*
      * Constructs actor from ReferenceRecord 
      */
-    Actor* InstantiateActor(ReferenceRecord* ref, ActorInstantiateInfo& createInfo);
+    Actor* InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const ActorInstantiateInfo& createInfo);
 
     std::vector<Actor*> GetDynamicActors();
 

@@ -5,7 +5,7 @@
 #include <string_view>
 #include <Localization/Text.h>
 
-struct TextField
+struct FText
 {
     using DecayType = Text;
 

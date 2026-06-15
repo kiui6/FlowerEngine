@@ -8,6 +8,4 @@
 class AtlasRecordFactory : public TemplatedRecordFactory<AtlasRecord>
 {
     static bool sIsInitialized;
-public:
-    virtual Actor* CreateActor(Record* reference) override {return new SpriteActor;}
 };

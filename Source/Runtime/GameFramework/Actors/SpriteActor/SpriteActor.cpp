@@ -7,27 +7,29 @@
 #include <Record/RecordLibrary.h>
 #include <Assets/AssetLibrary.h>
 
-void SpriteActor::Initialize()
+#include <World/Actor/ActorFactoryLibrary.h>
+
+bool SpriteActorFactory::s_Initialized = RegisterActorFactory<SpriteActorFactory>();
+
+SpriteActor::SpriteActor(const RecordPtr<ReferenceRecord> &reference) : Actor(reference)
 {
-    if(GetReference()) {
-        RecordLibrary* reclib = GetService<RecordLibrary>();
-        AssetLibrary* assetlib = GetService<AssetLibrary>();
+    RecordLibrary* reclib = GetService<RecordLibrary>();
+    AssetLibrary* assetlib = GetService<AssetLibrary>();
 
-        m_atlas = reclib->LoadRecord<AtlasRecord>(GetReference()->Base);
+    m_atlas = reclib->LoadRecord<AtlasRecord>(GetReference()->Base);
 
-        m_albedo = reclib->LoadRecord<TextureRecord>(m_atlas->AlbedoTexture);
-        m_autogenRelief = m_atlas->AutoReliefGeneration;
-        m_relief = reclib->LoadRecord<TextureRecord>(m_atlas->ReliefTexture);
+    m_albedo = reclib->LoadRecord<TextureRecord>(m_atlas->AlbedoTexture);
+    m_autogenRelief = m_atlas->AutoReliefGeneration;
+    m_relief = reclib->LoadRecord<TextureRecord>(m_atlas->ReliefTexture);
 
-        if(m_albedo.IsBound()) {
-            std::string path = m_albedo->TexturePath;
-            m_albedoData = assetlib->LoadAsset<Texture2DAsset>(path);
-        }
+    if(m_albedo.IsBound()) {
+        std::string path = m_albedo->TexturePath;
+        m_albedoData = assetlib->LoadAsset<Texture2DAsset>(path);
+    }
 
-        if(m_relief.IsBound()) {
-            std::string path = m_relief->TexturePath;
-            m_reliefData = assetlib->LoadAsset<Texture2DAsset>(path);
-        }
+    if(m_relief.IsBound()) {
+        std::string path = m_relief->TexturePath;
+        m_reliefData = assetlib->LoadAsset<Texture2DAsset>(path);
     }
 }
 

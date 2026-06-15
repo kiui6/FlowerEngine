@@ -4,24 +4,57 @@
 #include <vector>
 #include <cassert>
 
-constexpr size_t MAX_ARENA_BLOCKS = 256;
+
+// TODO Arena Implementation
+template <size_t BlockSize>
+class Arena
+{
+    std::unique_ptr<std::byte[]> m_memory;
+    size_t m_lastBlock = 0;
+    size_t m_currentOffset = 0;
+
+public:
+    Arena() {
+        m_memory = std::make_unique<std::byte[]>(BlockSize);
+        m_lastBlock = 0;
+        m_currentOffset = 0;
+    }
+
+    Arena(const Arena&) = delete;
+    Arena(Arena&&) = delete;
+
+    void* Allocate(size_t size, size_t align = alignof(std::max_align_t)) {
+        return nullptr;
+    }
+
+    template<typename T>
+    T* AllocateObject() {
+        void* memPtr = Allocate(sizeof(T), alignof(T));
+        T* objectPtr = new (memPtr) T();
+        return objectPtr;
+    }
+
+    void Reset() {
+        m_currentOffset = 0;
+    }
+};
 
 template <size_t BlockSize>
-class ArenaAllocator
+class DynamicArena
 {
     std::vector<std::unique_ptr<std::byte[]>> m_memBlocks;
     size_t m_lastBlock = 0;
     size_t m_currentOffset = 0;
 
 public:
-    ArenaAllocator() {
+    DynamicArena() {
         CreateNewBlock();
         m_lastBlock = 0;
         m_currentOffset = 0;
     }
 
-    ArenaAllocator(const ArenaAllocator&) = delete;
-    ArenaAllocator(ArenaAllocator&&) = delete;
+    DynamicArena(const DynamicArena&) = delete;
+    DynamicArena(DynamicArena&&) = delete;
 
     void* Allocate(size_t size, size_t align = alignof(std::max_align_t)) {
         uintptr_t addr = reinterpret_cast<uintptr_t>(m_memBlocks[m_lastBlock].get()) + m_currentOffset;

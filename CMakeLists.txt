@@ -98,7 +98,7 @@ set(SrcPlatform "Source/Runtime/Platform/Platform.cpp"
 
 set(SrcLocale "Source/Runtime/Localization/LocaleManager.cpp" "Source/Runtime/Localization/Text.cpp")
 
-set(SrcUtility "Source/Runtime/Utility/Arena.cpp" "Source/Runtime/Utility/PathBuilder.cpp")
+set(SrcUtility "Source/Runtime/Utility/Memory/Arena.cpp" "Source/Runtime/Utility/PathBuilder.cpp")
 
 set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime/GarbageCollector/ReferenceCounter.cpp")
 

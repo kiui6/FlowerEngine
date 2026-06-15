@@ -46,23 +46,22 @@ protected:
 
     World* m_world;
 public:
-    Actor() = default;
+    Actor() = delete;
+    Actor(const RecordPtr<ReferenceRecord>& reference);
     virtual ~Actor() = default;
 
     static uint32_t RecordType() {return FIELDID("ACT_");}
 
-    void SetReference(ReferenceRecord* ref);
-    void SetReferenceByID(RecordID recId);
     inline ReferenceRecord* GetReference() const {return m_ref.Get();}
     inline RecordID GetReferenceID() const {return m_ref.GetID();}
 
     virtual World* GetWorld();
 
-    virtual void Initialize(){}
     virtual void PostInit(){}
     virtual void BeginPlay() {}
 
     virtual void OnInput(const InputView& input) {}
+    virtual void PhysicsUpdate(float deltaTime) {}
     virtual void Tick(float deltaTime);
 
     virtual Transform2D GetTransform();

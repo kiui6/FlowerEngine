@@ -72,6 +72,14 @@ void Engine::Initialize()
     }
 
     LOG(Log, LogEngine, "EntryRecord found");
+
+    // After entry record is found, we can retrieve input action record 
+    m_inputMgr.Initialize();
+}
+
+void Engine::InitializeInputSystem(RawInputDevice *inputDev)
+{
+    m_inputMgr.SetInputDevice(inputDev);
 }
 
 void Engine::TravelTo(std::unique_ptr<World> travelWorld)
@@ -99,6 +107,9 @@ void Engine::Tick(float DeltaTime)
     }
 
     if(m_world) {
+        const InputView& inputView = m_inputMgr.GetView();
+        m_world->ProcessInput(inputView);
+
         m_world->Tick(DeltaTime);
     }
 

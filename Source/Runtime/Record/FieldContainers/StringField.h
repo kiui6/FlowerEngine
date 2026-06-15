@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-struct StringField
+struct FString
 {
     using DecayType = std::string;
 

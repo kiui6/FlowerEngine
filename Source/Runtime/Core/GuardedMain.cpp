@@ -57,7 +57,7 @@ int GuardedMain(int argc, char* argv[])
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 
     ActorInstantiateInfo acinfo1{};
-    Actor* act1 = myWorld->InstantiateActor(refRec.Get(), acinfo1);
+    Actor* act1 = myWorld->InstantiateActor(refRec, acinfo1);
 
     ActorCreateInfo acinfo2{};
     acinfo2.transform.Location = {32, 0};

@@ -4,14 +4,14 @@
 
 #include <Record/Record.h>
 #include <Record/FieldContainers/StringField.h>
-#include <Record/FieldContainers/BoolField.h>
+#include <Record/FieldContainers/TrivialField.h>
 
 class EntryRecord : public Record
 {
 public:
     EntryRecord() {SetType(EntryRecord::StaticType());}
 
-    Field<StringField> StartupScriptPath {FIELDID(SCRI)};
+    Field<FString> StartupScriptPath {FIELDID(SCRI)};
 
     static ID32 StaticType() {return MakeID32("ENTR");}
 

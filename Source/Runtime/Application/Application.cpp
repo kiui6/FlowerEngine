@@ -55,6 +55,10 @@ void Application::Initialize()
     m_window.Initialize("Flower++", 1280, 720);
 
     m_inputDev = GetService<Platform>()->Input()->CreateRawInputDevice(m_window);
+    
+    // Initialize Engine's essentials and start game mode
+    m_engine.Initialize();
+    m_engine.InitializeInputSystem(m_inputDev.get());
 	
 	m_render.Initialize(m_window.GetSDLWindowHandle());
 
@@ -66,9 +70,6 @@ void Application::StartLifecycle()
     // Allow running
     m_bRunning.store(true);
 
-    // Initialize Engine's essentials and start game mode
-    m_engine.Initialize();
-    
     auto frame_lifetime_start = std::chrono::high_resolution_clock::now();
 	auto frame_lifetime_end = std::chrono::high_resolution_clock::now();
 

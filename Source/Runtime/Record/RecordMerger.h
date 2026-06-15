@@ -9,10 +9,12 @@
 #include "IRecordSource.h"
 
 #include <Utility/Defines.h>
+#include <Utility/Memory/Arena.h>
 
 struct RecordMerger
 {
     std::vector<RecordMemory> m_memories;
+    DynamicArena<16*1024> m_IRArena;
 public:
 
     void ResizeMemoryPool(size_t newPoolSize) {

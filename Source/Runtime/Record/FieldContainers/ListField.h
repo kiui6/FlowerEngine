@@ -5,7 +5,7 @@
 #include <vector>
 
 template <FieldValueClass T>
-struct ListField
+struct FList
 {
     using DecayType = std::vector<typename T::DecayType>;
 

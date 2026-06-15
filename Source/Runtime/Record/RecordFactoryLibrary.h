@@ -18,10 +18,11 @@ public:
     }
 
     RecordFactory* GetFactory(uint32_t type) {
-        if(m_factories.find(type) == m_factories.end()) {
+        auto pair = m_factories.find(type);
+        if(pair == m_factories.end()) {
             return nullptr;
         }
-        return m_factories.at(type).get();
+        return pair->second.get();
     }
 };
 

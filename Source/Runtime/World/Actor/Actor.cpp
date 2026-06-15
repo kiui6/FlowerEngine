@@ -4,16 +4,15 @@
 
 #include <Record/RecordLibrary.h>
 
-void Actor::SetReference(ReferenceRecord *ref)
+Actor::Actor(const RecordPtr<ReferenceRecord> &reference)
+    : m_ref(reference)
 {
-    m_ref = ref;
-
-    DisplayName = m_ref->DisplayName;
-}
-
-void Actor::SetReferenceByID(RecordID recId)
-{
-    m_ref = GetService<RecordLibrary>()->LoadRecord<ReferenceRecord>(recId);
+    m_transform.Location.x = m_ref->Transform.Get().LocationX();
+    m_transform.Location.y = m_ref->Transform.Get().LocationY();
+    m_transform.Pivot.x = m_ref->Transform.Get().PivotX();
+    m_transform.Pivot.y = m_ref->Transform.Get().PivotY();
+    m_transform.Rotation = m_ref->Transform.Get().Rotation();
+    m_transform.Depth = m_ref->Transform.Get().Depth();
 }
 
 World *Actor::GetWorld()

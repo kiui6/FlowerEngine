@@ -6,6 +6,8 @@
 #include <World/World.h>
 #include <UI/UINode.h>
 
+#include <Input/InputManager.h>
+
 class GarbageCollector;
 
 class Engine
@@ -22,8 +24,12 @@ protected:
 
     uint32_t m_gameCanvasWidth, m_gameCanvasHeight;
     bool m_gameCanvasDirty;
+
+    InputManager m_inputMgr;
 public:
     void Initialize();
+
+    void InitializeInputSystem(RawInputDevice* inputDev);
 
     // Starts a process of traveling to the new world
     void TravelTo(std::unique_ptr<World> travelWorld);

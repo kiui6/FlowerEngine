@@ -4,7 +4,7 @@
 #include "../RecordPtr.h"
 
 // TODO: Make templated type check
-struct RecordField
+struct FRecord
 {
     using DecayType = RecordID;
 

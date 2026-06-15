@@ -39,17 +39,16 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint1
         return nullptr;
     }
 
-    Record* record;
-    record = factory->NewRecord();
+    std::unique_ptr<Record> record = factory->NewRecord();
     record->SetID(id);
 
-    m_records.emplace(id, record);
+    const auto& emplacedPair = m_records.emplace(id, std::move(record));
 
     if constexpr(IS_VERBOSE) {
         LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, recordType, recordType >> 8, recordType >> 16, recordType >> 24);
     }
 
-    return RecordPtr<Record>(id, record);
+    return RecordPtr<Record>(id, emplacedPair.first->second.get());
 }
 
 RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
@@ -69,7 +68,7 @@ RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
 
 RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
 {
-    Record* record = CreateEmptyRecordFromType(type);
+    std::unique_ptr<Record> record = CreateEmptyRecordFromType(type);
 
 
 
@@ -104,7 +103,7 @@ RecordID RecordLibrary::GenerateRecordID()
     return (static_cast<RecordID>(s_runtimeModID) << 48) | (local & 0x0000FFFFFFFFFFFF);
 }
 
-Record *RecordLibrary::CreateEmptyRecordFromType(ID32 type)
+std::unique_ptr<Record> RecordLibrary::CreateEmptyRecordFromType(ID32 type)
 {
     RecordFactory* factory = RecordFactoryLibrary::Get().GetFactory(type);
     if(!factory) {

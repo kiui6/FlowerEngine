@@ -5,7 +5,7 @@
 #include <unordered_map>
 
 template <typename KeyT, FieldValueClass T>
-struct HashmapField
+struct FHashmap
 {
     using DecayType = std::unordered_map<KeyT, typename T::DecayType>;
 
