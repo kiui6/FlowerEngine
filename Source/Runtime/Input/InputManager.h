@@ -9,20 +9,19 @@
 class InputManager
 {
     RawInputDevice* m_dev{};
+    RecordPtr<InputActionRecord> m_actionRec;
 
     InputView m_view{};
-    const InputView m_emptyView{};  
 public:
 
     void Initialize() {}
 
-    void SetInputDevice(RawInputDevice *inputDev) {m_dev = inputDev;}
+    void SetInputDevice(RawInputDevice *inputDev) { m_dev = inputDev; m_view.m_dev = m_dev; }
+
+    void SetInputActionRecord(const RecordPtr<InputActionRecord>& record) { m_actionRec = record; m_view.m_actionRec = m_actionRec; }
+    void SetInputActionRecord(RecordPtr<InputActionRecord>&& record) { m_actionRec = record; m_view.m_actionRec = m_actionRec; }
 
     const InputView& GetView() {
-        if(!m_dev) return m_emptyView;
-
-        // Setup view
-
         return m_view;
     }
 

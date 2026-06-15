@@ -11,9 +11,9 @@
 class WorldRecord : public Record
 {
 public:
-    Field<FHashmap<uint64_t, FRecord>> Chunks = {FIELDID(CHNK)};
+    Field<FHashmap<FUInt64, FRecord>> Chunks = {FIELDID(CHNK)};
     Field<FString> DisplayName = {FIELDID(DISP)};
-    Field<FTrivial<uint16_t>> TimeSpeedMultiplier = {FIELDID(KTIM)};
+    Field<FUInt16> TimeSpeedMultiplier = {FIELDID(KTIM)};
 
     WorldRecord() {SetType(WorldRecord::StaticType());}
     static ID32 StaticType() {return MakeID32("WRLD");}

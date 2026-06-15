@@ -3,11 +3,21 @@
 #include "../FieldBase.h"
 
 #include <unordered_map>
+#include <Utility/Hash.h>
 
-template <typename KeyT, FieldValueClass T>
+template <FieldValueClass KeyT, FieldValueClass T>
 struct FHashmap
 {
-    using DecayType = std::unordered_map<KeyT, typename T::DecayType>;
+    using DecayType = std::unordered_map<typename KeyT::DecayType, typename T::DecayType>;
+
+    static void Serialize(const DecayType& data, RecordFieldMemory& out) {}
+    static void Deserialize(RecordFieldMemory* data, DecayType& out) {}
+};
+
+template <FieldValueClass T>
+struct FHashmap<FString, T>
+{
+    using DecayType = std::unordered_map<typename FString::DecayType, typename T::DecayType, StringHash, std::equal_to<>>;
 
     static void Serialize(const DecayType& data, RecordFieldMemory& out) {}
     static void Deserialize(RecordFieldMemory* data, DecayType& out) {}

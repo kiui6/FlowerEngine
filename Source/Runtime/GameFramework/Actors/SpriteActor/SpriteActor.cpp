@@ -23,13 +23,11 @@ SpriteActor::SpriteActor(const RecordPtr<ReferenceRecord> &reference) : Actor(re
     m_relief = reclib->LoadRecord<TextureRecord>(m_atlas->ReliefTexture);
 
     if(m_albedo.IsBound()) {
-        std::string path = m_albedo->TexturePath;
-        m_albedoData = assetlib->LoadAsset<Texture2DAsset>(path);
+        m_albedoData = assetlib->LoadAsset<Texture2DAsset>(m_albedo->TexturePath.Get());
     }
 
     if(m_relief.IsBound()) {
-        std::string path = m_relief->TexturePath;
-        m_reliefData = assetlib->LoadAsset<Texture2DAsset>(path);
+        m_reliefData = assetlib->LoadAsset<Texture2DAsset>(m_relief->TexturePath.Get());
     }
 }
 

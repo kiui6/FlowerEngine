@@ -24,7 +24,9 @@ public:
     operator const typename FieldValue::DecayType&() const {return m_value;}
 
     inline ID32 GetID() const override {return m_id;}
+    
     typename FieldValue::DecayType& Get() {return m_value;}
+    const typename FieldValue::DecayType& Get() const {return m_value;}
 
     inline bool IsDirty() const override {return m_isDirty;}
 

@@ -37,7 +37,7 @@ public:
     // Creates Player Controller and other default actors
     void SpawnDefaultActors();
 
-    WeakRecordPtr<WorldRecord> GetRecord() {return m_worldRef.GetWeak();}
+    WeakRecordPtr<WorldRecord> GetRecord() {return m_worldRef;}
 
     /*
      * Spawns new empty actor of specified type

@@ -5,26 +5,6 @@
 #include <GarbageCollector/ReferenceCounterPtr.h>
 
 template <RecordClass RecordT = Record>
-class WeakRecordPtr
-{
-    RecordID m_id = INVALID_RECORD;
-    RecordT* m_record = nullptr;
-public:
-    WeakRecordPtr() {}
-    WeakRecordPtr(RecordT* record) : m_record(record) {
-        if(m_record) { 
-            m_id = record->GetID();
-        }
-    }
-    WeakRecordPtr(RecordID recordID) : m_id(recordID) {}
-    WeakRecordPtr(RecordID recordID, RecordT* record) : m_id(recordID), m_record(record) { }
-
-    RecordT* Get() { return m_record; }
-
-    bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
-};
-
-template <RecordClass RecordT = Record>
 class RecordPtr : public ReferenceCounterPtr
 {
 protected:
@@ -113,11 +93,31 @@ public:
         m_id = 0;
     }
 
-    WeakRecordPtr<RecordT> GetWeak() {
-        return WeakRecordPtr<RecordT>(m_id, m_record);
+    // Checks if this record's instance is bound to the RecordPtr
+    bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
+};
+
+template <RecordClass RecordT = Record>
+class WeakRecordPtr
+{
+    RecordID m_id = INVALID_RECORD;
+    RecordT* m_record = nullptr;
+public:
+    WeakRecordPtr() {}
+    WeakRecordPtr(const RecordPtr<RecordT>& recordPtr) {m_id = recordPtr.GetID(); m_record = recordPtr.Get();}
+
+    RecordT* Get() { return m_record; }
+
+    RecordT* operator ->() { 
+        return m_record;
     }
 
-    // Checks if this record's instance is bound to the RecordPtr
+    const RecordT* operator ->() const { 
+        return m_record;
+    }
+
+    operator bool() const {return IsBound();}
+
     bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
 };
 

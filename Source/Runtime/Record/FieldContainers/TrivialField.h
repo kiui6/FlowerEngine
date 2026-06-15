@@ -24,3 +24,6 @@ using FUInt8 = FTrivial<uint8_t>;
 using FUInt16 = FTrivial<uint16_t>;
 using FUInt32 = FTrivial<uint32_t>;
 using FUInt64 = FTrivial<uint64_t>;
+
+using FFloat = FTrivial<float>;
+using FDouble = FTrivial<double>;

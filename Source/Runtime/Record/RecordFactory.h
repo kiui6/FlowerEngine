@@ -7,8 +7,6 @@
 #include <array>
 #include <concepts>
 
-#include <World/Actor/Actor.h>
-
 struct RecordFactory
 {
     virtual constexpr ID32 GetRecordType() {return MakeID32("UNKN");}
