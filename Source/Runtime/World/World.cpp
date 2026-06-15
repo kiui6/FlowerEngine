@@ -61,9 +61,11 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
     actor->PostInit();
 
     if(ref->IsDynamic) {
-        m_dynamicActors.emplace(ref->GetID(), std::move(actor));
+        const auto& dynamicActorPtr = m_dynamicActors.emplace_back(std::move(actor));
+        m_dynamicActorsMap.emplace(ref->GetID(), dynamicActorPtr.get());
     } else {
-        m_staticActors.emplace(ref->GetID(), std::move(actor));
+        const auto& staticActorPtr = m_staticActors.emplace_back(std::move(actor));
+        m_staticActorsMap.emplace(ref->GetID(), staticActorPtr.get());
     }
 
     return actorPtr;
@@ -71,9 +73,8 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
 
 std::vector<Actor *> World::GetDynamicActors()
 {
-    return m_dynamicActors 
-        | std::views::values
-        | std::views::transform([](auto& ptr) { return ptr.get(); }) 
+    return m_dynamicActors
+        | std::views::transform([](auto& ptr) { return ptr.get(); })
         | std::ranges::to<std::vector>();
 }
 
@@ -87,15 +88,14 @@ void World::BeginPlay()
 
 void World::Tick(float DeltaTime)
 {
-for(auto& [record, actor] : m_dynamicActors) {
+for(const auto& actor : m_dynamicActors) {
         actor->Tick(DeltaTime);
     }
 }
 
 void World::ProcessInput(const InputView& input)
 {
-    // TODO: Store actors memory in contigious storage like set or vector
-    for(auto& [id, actor] : m_dynamicActors) {
+    for(const auto& actor : m_dynamicActors) {
         actor->OnInput(input);
     }
 }
@@ -109,7 +109,7 @@ void World::RecordRenderView(RenderView &renderView)
 {
     renderView.SetCameraPosition({0, 0, 0});
 
-    for(auto& [key, value] : m_dynamicActors) {
-        value->RecordRenderView(renderView);
+    for(const auto& actor : m_dynamicActors) {
+        actor->RecordRenderView(renderView);
     }
 }

@@ -18,8 +18,11 @@
 
 class World
 {
-    std::unordered_map<RecordID, std::unique_ptr<Actor>> m_staticActors;
-    std::unordered_map<RecordID, std::unique_ptr<Actor>> m_dynamicActors;
+    std::vector<std::unique_ptr<Actor>> m_staticActors;
+    std::unordered_map<RecordID, Actor*> m_staticActorsMap;
+    std::vector<std::unique_ptr<Actor>> m_dynamicActors;
+    std::unordered_map<RecordID, Actor*> m_dynamicActorsMap;
+
     std::vector<WorldChunk> m_chunks;
     
     RecordPtr<WorldRecord> m_worldRef;
