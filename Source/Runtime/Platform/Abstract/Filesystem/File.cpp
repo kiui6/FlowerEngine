@@ -4,6 +4,7 @@
 
 File::~File()
 {
+    Close();
 }
 
 void File::Open(const std::string& path, FileAccess access)
