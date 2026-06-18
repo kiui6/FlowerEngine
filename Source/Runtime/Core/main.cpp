@@ -49,14 +49,6 @@ int WinMain(
 
   	argv[argc] = NULL;
 
-	// Get Executable Path
-	char execFolderBuf[1024];
-	size_t execFolderBufLen = sizeof(execFolderBuf); 
-
-    // TODO: Get executable local path
-	//int execFolderBytes = GetModuleFileName(NULL, execFolderBuf, execFolderBufLen);
-	//IPlatform::Get()->SetExecutableLocalPath(IPath(execFolderBuf).StepBack());
-
 	return GuardedMain(argc, argv);
 }
 #else
