@@ -10,6 +10,9 @@
 
 #include <Math/Quadtree.h> 
 
+#include <Utility/Containers/FlatHashMap.h>
+#include <Utility/Hash.h>
+
 #include <Graphics/RenderEngine/RenderView/RenderView.h>
 
 #include <vector>
@@ -18,10 +21,8 @@
 
 class World
 {
-    std::vector<std::unique_ptr<Actor>> m_staticActors;
-    std::unordered_map<RecordID, Actor*> m_staticActorsMap;
-    std::vector<std::unique_ptr<Actor>> m_dynamicActors;
-    std::unordered_map<RecordID, Actor*> m_dynamicActorsMap;
+    FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash> m_staticActors;
+    FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash> m_dynamicActors;
 
     std::vector<WorldChunk> m_chunks;
     
@@ -53,7 +54,10 @@ public:
      */
     Actor* InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const ActorInstantiateInfo& createInfo);
 
-    std::vector<Actor*> GetDynamicActors();
+    const FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash>& GetDynamicActors() const {return m_dynamicActors;}
+
+    // TODO: All per-tick functions shall be merged into one 
+    // (except RecordRenderView(), which is a special rendering function that must be called after the whole frame ticked)
 
     // Gets called right after SpawnDefaultActors()
     // Allows actors to initialize their data that should be ready on BeginPlay
@@ -64,6 +68,8 @@ public:
     void ProcessInput(const InputView& input);
 
     void Tick(float DeltaTime);
+
+    void Update(float DeltaTime, const InputView& input);
 
     void BeginDestroy();
 

@@ -12,6 +12,13 @@ constexpr uint64_t FNV1a64(std::string_view str, uint64_t hash = 146959810393466
     return hash;
 }
 
+struct GoldHash {
+    constexpr uint64_t operator()(uint64_t x) const {
+        x ^= x >> 33;
+        return x * 0x9e3779b97f4a7c15ULL;
+    }
+};
+
 // Used for std::unordered_map as a hash function to allow heterogeneous lookup with std::string_view
 // std::unordered_map<std::string, _KeyT, StringHash, std::equal_to<>>
 struct StringHash {
