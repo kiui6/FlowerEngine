@@ -15,5 +15,5 @@ public:
     virtual std::shared_ptr<MappedFile> MapFile(const std::string& path, FileAccess access) = 0;
 
     virtual std::string GetBaseDirectory();
-    virtual std::string GetPreferencesDirectory(const std::string& org, const std::string& app);
+    virtual std::string GetPreferencesDirectory(std::string_view org, std::string_view app);
 };

@@ -35,9 +35,11 @@ const std::filesystem::path& DataManager::GetBasePath()
 
 const std::filesystem::path &DataManager::GetPrefPath()
 {
-    // TODO: Set pref path namespaces
     if(m_prefPath.empty()) {
-        m_prefPath = std::filesystem::absolute(GetService<Platform>()->Filesystem()->GetPreferencesDirectory("TODO", "TODO")).lexically_normal();
+        Config* cfg = GetService<Config>();
+        std::string_view companyName = cfg->GetNamespace("Game").GetString("Information.CompanyName", "Flower");
+        std::string_view gameTitle = cfg->GetNamespace("Game").GetString("Information.GameTitle", "Flower");
+        m_prefPath = std::filesystem::absolute(GetService<Platform>()->Filesystem()->GetPreferencesDirectory(companyName, gameTitle)).lexically_normal();
     }
 
     return m_prefPath;

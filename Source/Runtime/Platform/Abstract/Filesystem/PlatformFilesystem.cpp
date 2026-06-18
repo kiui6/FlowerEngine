@@ -7,8 +7,7 @@ std::string PlatformFilesystem::GetBaseDirectory()
     return SDL_GetBasePath();
 }
 
-std::string PlatformFilesystem::GetPreferencesDirectory(const std::string& org, const std::string& app)
+std::string PlatformFilesystem::GetPreferencesDirectory(std::string_view org, std::string_view app)
 {
-    // TODO: Get pref path for the game
-    return SDL_GetPrefPath(org.c_str(), app.c_str());
+    return SDL_GetPrefPath(org.data(), app.data());
 }
