@@ -9,6 +9,7 @@ set(SDL_STATIC ON)
 
 #include("CMake/VulkanCompileShaders.cmake")
 include("CMake/EnableLTO.cmake")
+include("CMake/StripSymbols.cmake")
 include(FetchContent)
 
 FetchContent_Declare(
