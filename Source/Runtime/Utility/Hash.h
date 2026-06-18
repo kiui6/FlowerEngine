@@ -29,6 +29,6 @@ struct StringHash {
     }
 
     std::size_t operator()(const std::string& s) const noexcept {
-        return operator()(std::string_view(s));
+        return operator()(s);
     }
 };

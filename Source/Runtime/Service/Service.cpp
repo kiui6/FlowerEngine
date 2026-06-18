@@ -51,6 +51,8 @@ void ServiceProvider::Initialize()
         AddService(service);
         sortedArchetypes.pop_back();
     }
+
+    m_serviceArchetypes.clear();
 }
 
 void ServiceProvider::Deinitialize()

@@ -7,6 +7,10 @@
     static inline simd128i simdLoadu128i(simd128i const *ptr) {
         return _mm_loadu_si128(ptr);
     }
+    
+    static inline simd128i simdLoad128i(simd128i const *ptr) {
+        return _mm_load_si128(ptr);
+    }
 
     static inline simd128i simdSet128i(const char val) {
         return _mm_set1_epi8(val);
@@ -27,6 +31,10 @@
 
     static inline simd128i simdLoadu128i(simd128i const *ptr) {
         return vld1q_u8(reinterpret_cast<const uint8_t*>(ptr));
+    }
+
+        static inline simd128i simdLoad128i(simd128i const *ptr) {
+        return vld1q_s8(reinterpret_cast<const uint8_t*>(ptr));
     }
 
     static inline simd128i simdSet128i(const char val) {

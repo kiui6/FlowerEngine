@@ -7,7 +7,7 @@
 #include <Record/FieldContainers/StringField.h>
 #include <Record/FieldContainers/TrivialField.h>
 #include <Record/FieldContainers/ListField.h>
-#include <Record/FieldContainers/HashmapField.h>
+#include <Record/FieldContainers/MapField.h>
 #include <Record/FieldContainers/PairField.h>
 
 #include <Platform/Abstract/Input/InputAction.h>
@@ -21,8 +21,8 @@ public:
 
     static ID32 StaticType() {return MakeID32("INAC");}
 
-    Field<FHashmap<FString, FList<FInputAction>>> m_actions{FIELDID(ACTS)};
-    Field<FHashmap<FString, FList<FInputAxis>>> m_axis{FIELDID(AXIS)};
+    Field<FMap<FString, FList<FInputAction>>> m_actions{FIELDID(ACTS)};
+    Field<FMap<FString, FList<FInputAxis>>> m_axis{FIELDID(AXIS)};
 
     virtual std::vector<FieldBase*> GetFields() override {
         std::vector<FieldBase*> fields = Record::GetFields();

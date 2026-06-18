@@ -3,7 +3,6 @@
 #include "../FieldBase.h"
 #include "../RecordPtr.h"
 
-// TODO: Make templated type check
 struct FRecord
 {
     using DecayType = RecordID;

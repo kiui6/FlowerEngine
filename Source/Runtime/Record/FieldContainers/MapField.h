@@ -6,7 +6,7 @@
 #include <Utility/Hash.h>
 
 template <FieldValueClass KeyT, FieldValueClass T>
-struct FHashmap
+struct FMap
 {
     using DecayType = std::unordered_map<typename KeyT::DecayType, typename T::DecayType>;
 
@@ -15,7 +15,7 @@ struct FHashmap
 };
 
 template <FieldValueClass T>
-struct FHashmap<FString, T>
+struct FMap<FString, T>
 {
     using DecayType = std::unordered_map<typename FString::DecayType, typename T::DecayType, StringHash, std::equal_to<>>;
 

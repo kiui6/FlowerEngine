@@ -61,21 +61,12 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
     actor->PostInit();
 
     if(ref->IsDynamic) {
-        const auto& dynamicActorPtr = m_dynamicActors.emplace_back(std::move(actor));
-        m_dynamicActorsMap.emplace(ref->GetID(), dynamicActorPtr.get());
+        m_dynamicActors.emplace(ref->GetID(), std::move(actor));
     } else {
-        const auto& staticActorPtr = m_staticActors.emplace_back(std::move(actor));
-        m_staticActorsMap.emplace(ref->GetID(), staticActorPtr.get());
+        m_staticActors.emplace(ref->GetID(), std::move(actor));
     }
 
     return actorPtr;
-}
-
-std::vector<Actor *> World::GetDynamicActors()
-{
-    return m_dynamicActors
-        | std::views::transform([](auto& ptr) { return ptr.get(); })
-        | std::ranges::to<std::vector>();
 }
 
 void World::PostInit()
@@ -88,14 +79,26 @@ void World::BeginPlay()
 
 void World::Tick(float DeltaTime)
 {
-for(const auto& actor : m_dynamicActors) {
+    for(const auto& [key, actor] : m_dynamicActors) {
         actor->Tick(DeltaTime);
+    }
+}
+
+void World::Update(float DeltaTime, const InputView &input)
+{
+    for(const auto& [key, actor] : m_dynamicActors) {
+        // Update input and prepare movement & action information for this frame
+        actor->OnInput(input);
+        // Perform user defined logic
+        actor->Tick(DeltaTime);
+        // Finally perform simulation updates (movement)
+        actor->SimulationUpdate(DeltaTime);
     }
 }
 
 void World::ProcessInput(const InputView& input)
 {
-    for(const auto& actor : m_dynamicActors) {
+    for(const auto& [key, actor] : m_dynamicActors) {
         actor->OnInput(input);
     }
 }
@@ -109,7 +112,7 @@ void World::RecordRenderView(RenderView &renderView)
 {
     renderView.SetCameraPosition({0, 0, 0});
 
-    for(const auto& actor : m_dynamicActors) {
+    for(const auto& [key, actor] : m_dynamicActors) {
         actor->RecordRenderView(renderView);
     }
 }

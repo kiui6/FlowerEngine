@@ -23,7 +23,6 @@ class Texture2DAsset : public Asset
     uint8_t m_channels;
 public:
     Texture2DAsset(std::string_view path) : Asset(path), m_data(std::unique_ptr<unsigned char, decltype(&stbi_image_free)>(nullptr, &stbi_image_free)) {SetType(Texture2DAsset::StaticType());}
-    // TODO
     Texture2DAsset(std::string_view path, DataView view);
 
     static ID32 StaticType() {return MakeID32("TEX2");}

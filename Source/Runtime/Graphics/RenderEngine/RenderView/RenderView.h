@@ -5,6 +5,8 @@
 #include <set>
 
 #include <Utility/Memory.h>
+#include <Utility/Hash.h>
+#include <Utility/Containers/FlatHashMap.h>
 #include <Math/Vectors.h>
 #include <Math/Matrix.h>
 

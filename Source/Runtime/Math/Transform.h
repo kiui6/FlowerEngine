@@ -7,11 +7,11 @@
 
 struct Transform2D
 {
-    uint8_t Depth = 0;
     Int2 Location = {0, 0};
     Int2 Pivot = {0, 0};
     Float2 Scale = {1, 1};
     float Rotation;
+    uint8_t Depth = 0;
 
     Transform2D operator+(Transform2D const& other) {
         Transform2D ret;

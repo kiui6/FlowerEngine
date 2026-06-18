@@ -1,11 +1,11 @@
 #pragma once
 
-#include "FieldType.h"
+#include "FieldNodeType.h"
 #include <cstdint>
 #include <vector>
 
 struct FieldNode {
-    FieldType type;
+    FieldNodeType type;
 };
 
 struct FieldNodeTrivial : FieldNode 
@@ -17,7 +17,7 @@ struct FieldNodeTrivial : FieldNode
 struct FieldNodeList : FieldNode {
     FieldNode** elements;
     uint32_t count;
-    FieldType elementType;
+    FieldNodeType elementType;
 };
 
 struct FieldNodePair : FieldNode {

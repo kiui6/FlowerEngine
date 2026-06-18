@@ -21,8 +21,10 @@
 
 class World
 {
-    FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash> m_staticActors;
-    FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash> m_dynamicActors;
+    using ActorsMapType = FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash>;
+
+    ActorsMapType m_staticActors;
+    ActorsMapType m_dynamicActors;
 
     std::vector<WorldChunk> m_chunks;
     
@@ -54,7 +56,7 @@ public:
      */
     Actor* InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const ActorInstantiateInfo& createInfo);
 
-    const FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash>& GetDynamicActors() const {return m_dynamicActors;}
+    const ActorsMapType& GetDynamicActors() const {return m_dynamicActors;}
 
     // TODO: All per-tick functions shall be merged into one 
     // (except RecordRenderView(), which is a special rendering function that must be called after the whole frame ticked)

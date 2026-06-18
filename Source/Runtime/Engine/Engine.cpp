@@ -108,9 +108,7 @@ void Engine::Tick(float DeltaTime)
 
     if(m_world) {
         const InputView& inputView = m_inputMgr.GetView();
-        m_world->ProcessInput(inputView);
-
-        m_world->Tick(DeltaTime);
+        m_world->Update(DeltaTime, inputView);
     }
 
     EngineDelegates::OnEngineTick.Broadcast(DeltaTime);

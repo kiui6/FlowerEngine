@@ -26,17 +26,20 @@ public:
         }
 
         for(InputKey actionCode : it->second) {
-            if(m_dev->GetKeyState(actionCode) == true) return true;
+            if(m_dev->GetKeyState(actionCode)) return true;
         }
 
         return false;
     }
 
+    bool GetActionPressed(std::string_view actionName) {return false;}
+    bool GetActionReleased(std::string_view actionName) {return false;}
+
     float GetAxis(std::string_view axisName) const {
         if(!m_dev || !m_actionRec) {
             return 0.f;
         }
-        
+
         return 0.f;
     }
 };

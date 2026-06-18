@@ -59,8 +59,10 @@ enum class InputKey : uint16_t {
 };
 
 enum class InputKeyState : uint8_t {
-    Pressed,
-    Released
+    None = 0,
+    JustPressed = 1,
+    Held = 2,
+    JustReleased = 3
 };
 
 enum class InputModKey : uint8_t {

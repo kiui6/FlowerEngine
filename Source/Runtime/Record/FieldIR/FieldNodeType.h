@@ -2,15 +2,16 @@
 
 #include <cstdint>
 
-enum class FieldType : uint8_t
+enum class FieldNodeType : uint8_t
 {
     None,
     Bool,
-    Trivial,
     Record,
     List,
+    Map,
     Tuple,
     Pair,
     String,
     Text,
+    Trivial,
 };

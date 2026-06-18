@@ -13,12 +13,14 @@
 
 #include <Localization/Text.h>
 
+#include <Delegate/Delegate.h>
+
 #include <memory>
 
 struct ActorSpatialInstance {
-    RecordID refid;
-    Float2 location;
     AABB bounds;
+    Float2 location;
+    RecordID refid;
     bool isDynamic;
 };
 
@@ -61,7 +63,7 @@ public:
     virtual void BeginPlay() {}
 
     virtual void OnInput(const InputView& input) {}
-    virtual void PhysicsUpdate(float deltaTime) {}
+    virtual void SimulationUpdate(float deltaTime) {}
     virtual void Tick(float deltaTime);
 
     virtual Transform2D GetTransform();
@@ -83,6 +85,10 @@ public:
 
     // Used for testing of collisions and visibility
     virtual AABB GetBoundingBox() {return {};}
+protected:
+    MulticastDelegate<> m_onCollision{};
+    MulticastDelegate<> m_onEnterCollision{};
+    MulticastDelegate<> m_onLeaveCollision{};
 };
 
 struct ActorInstantiateInfo

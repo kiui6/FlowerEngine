@@ -27,7 +27,7 @@ void RenderEngine::Initialize(SDL_Window* window)
         return;
     }
 
-    // Create devoce
+    // Create device
     {
         SDL_PropertiesID props = SDL_CreateProperties();
         SDL_SetStringProperty(props, SDL_PROP_GPU_DEVICE_CREATE_NAME_STRING, NULL);

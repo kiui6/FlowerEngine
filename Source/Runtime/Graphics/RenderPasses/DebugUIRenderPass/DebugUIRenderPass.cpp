@@ -1,11 +1,13 @@
 #include "DebugUIRenderPass.h"
 
-#include <imgui/imgui.h>
-#include <imgui/backends/imgui_impl_sdl3.h>
-#include <imgui/backends/imgui_impl_sdlgpu3.h>
-
 #include <Application/Application.h>
 #include <Debug/Tracer/Tracer.h>
+
+#ifdef HAS_DEBUGUI
+#   include <imgui/imgui.h>
+#   include <imgui/backends/imgui_impl_sdl3.h>
+#   include <imgui/backends/imgui_impl_sdlgpu3.h>
+#endif
 
 DebugUIRenderPass::DebugUIRenderPass(GPUContext &context, RenderStateStore& stateStore)
     : m_gpu(context), m_state(stateStore.Get<DebugUIRenderState>())
