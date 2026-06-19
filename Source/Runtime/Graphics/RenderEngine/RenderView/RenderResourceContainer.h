@@ -10,7 +10,7 @@
 
 struct CompiledRenderResources {
     template <class ResT>
-    using ResourceMap = std::unordered_map<uint64_t, std::shared_ptr<ResT>, GoldHash>;
+    using ResourceMap = std::unordered_map<uint64_t, std::shared_ptr<ResT>>;
 
     ResourceMap<CompiledTexture2DResource> texture2D;
 };

@@ -42,6 +42,11 @@ class RenderEngine
     RenderStateStore m_stateStore;
 
     CompiledRenderResources m_compiledRes;
+
+    // Per frame objects
+    RenderResourceCompiler m_resourceCompiler;
+    RenderStateUpdateContext m_renderStateUpdateContext;
+    SDL_GPUCopyPass* m_frameCopyPass;
 public:
     RenderEngine();
 

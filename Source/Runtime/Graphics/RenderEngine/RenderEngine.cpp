@@ -15,7 +15,9 @@
 #include <Debug/Tracer/Tracer.h>
 
 RenderEngine::RenderEngine()
-    : m_stateStore(m_ctx)
+    : m_stateStore(m_ctx), 
+    m_resourceCompiler(m_ctx, m_compiledRes),
+    m_renderStateUpdateContext(m_ctx, m_stateStore, nullptr)
 {
 }
 
@@ -83,20 +85,19 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
 
     // Compile elements
     PUSH_TRACE_SCOPE("Compile Elements");
-    RenderResourceCompiler resourceCompiler(m_ctx, m_compiledRes);
     if(renderView.m_staticRenderObjectsDirty) {
         for(const auto& [id, rendObject] : renderView.m_staticRenderObjects) {
             if(rendObject.lastReferencedFramesAgo != 0) continue;
 
             for(const auto& renderPass : m_renderPasses) {
-                renderPass->CompileStaticObject(resourceCompiler, rendObject.object);
+                renderPass->CompileStaticObject(m_resourceCompiler, rendObject.object);
             }
         }
     }
 
     for(const auto& rendObject : renderView.m_dynamicRenderObjects) {
         for(const auto& renderPass : m_renderPasses) {
-            renderPass->CompileDynamicObject(resourceCompiler, rendObject);
+            renderPass->CompileDynamicObject(m_resourceCompiler, rendObject);
         }
     }
     POP_TRACE_SCOPE();
@@ -107,14 +108,10 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // Perform State Updates
     PUSH_TRACE_SCOPE("State Update");
     BeginGPULabel(cmd, "State Update");
-    RenderStateUpdateContext renderStateUpdateContext {
-        .gpu = m_ctx,
-        .store = m_stateStore,
-        .cmd = cmd
-    };
+    m_renderStateUpdateContext.cmd = cmd;
     for(auto& [id, updateObj] : renderView.m_stateUpdates) {
         if(updateObj.isReferenced) {
-            updateObj.object->Apply(renderStateUpdateContext);
+            updateObj.object->Apply(m_renderStateUpdateContext);
             updateObj.isReferenced = false;
         }
     }
@@ -145,17 +142,17 @@ void RenderEngine::Render(float deltaTime, RenderView &renderView)
     // After all data is assembled into batches, it can be compiled into GPU resources
     PUSH_TRACE_SCOPE("Prepare Frame");
     BeginGPULabel(cmd, "Prepare Frame");
-    SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd);
+    m_frameCopyPass = SDL_BeginGPUCopyPass(cmd);
 
     for(const auto& pass : m_renderPasses) {
-        pass->PrepareFrame(cmd, copyPass);
+        pass->PrepareFrame(cmd, m_frameCopyPass);
     }
 
     for(std::unique_ptr<IBufferAttachmentUpdateHandler>& bufferAttachmentUpdateHandler : m_frameBufferAttachmentUpdateHandlers) {
-        bufferAttachmentUpdateHandler->Update(frameCtx, renderView, copyPass);
+        bufferAttachmentUpdateHandler->Update(frameCtx, renderView, m_frameCopyPass);
     }
 
-    SDL_EndGPUCopyPass(copyPass);
+    SDL_EndGPUCopyPass(m_frameCopyPass);
     EndGPULabel(cmd);
     POP_TRACE_SCOPE();
 
