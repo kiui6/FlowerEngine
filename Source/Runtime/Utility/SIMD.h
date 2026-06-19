@@ -7,9 +7,13 @@
     static inline simd128i simdLoadu128i(simd128i const *ptr) {
         return _mm_loadu_si128(ptr);
     }
-    
+
     static inline simd128i simdLoad128i(simd128i const *ptr) {
         return _mm_load_si128(ptr);
+    }
+
+    static inline void simdStore128i(simd128i *ptr, simd128i val) {
+        _mm_store_si128(ptr, val);
     }
 
     static inline simd128i simdSet128i(const char val) {
@@ -33,12 +37,12 @@
         return vld1q_u8(reinterpret_cast<const uint8_t*>(ptr));
     }
 
-        static inline simd128i simdLoad128i(simd128i const *ptr) {
-        return vld1q_s8(reinterpret_cast<const uint8_t*>(ptr));
-    }
-
     static inline simd128i simdSet128i(const char val) {
         return vdupq_n_u8(ptr);
+    }
+
+    static inline void simdStore128i(simd128i *ptr, simd128i val) {
+        vst1q_u8((uint8_t)ptr, val);
     }
 
     static inline int simdMovemask8(simd128i val) {
@@ -89,6 +93,10 @@
         simd128i result;
         memcpy(result.data, ptr->data, 16);
         return result;
+    }
+
+    static inline void simdStore128i(simd128i *ptr, simd128i val) {
+        memcpy(ptr, &val, sizeof(simd128i));
     }
 
     static inline simd128i simdSet128i(const char val) {

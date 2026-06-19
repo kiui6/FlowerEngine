@@ -61,9 +61,9 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
     actor->PostInit();
 
     if(ref->IsDynamic) {
-        m_dynamicActors.emplace(ref->GetID(), std::move(actor));
+        m_dynamicActors.Emplace(ref->GetID(), std::move(actor));
     } else {
-        m_staticActors.emplace(ref->GetID(), std::move(actor));
+        m_staticActors.Emplace(ref->GetID(), std::move(actor));
     }
 
     return actorPtr;
@@ -111,6 +111,10 @@ void World::BeginDestroy()
 void World::RecordRenderView(RenderView &renderView)
 {
     renderView.SetCameraPosition({0, 0, 0});
+
+    for(const auto& [key, actor] : m_staticActors) {
+        actor->RecordRenderView(renderView);
+    }
 
     for(const auto& [key, actor] : m_dynamicActors) {
         actor->RecordRenderView(renderView);

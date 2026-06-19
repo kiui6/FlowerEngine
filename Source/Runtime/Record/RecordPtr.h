@@ -59,15 +59,15 @@ public:
         return *this;
     }
 
-    RecordT* operator ->() { 
+    inline RecordT* operator ->() { 
         return m_record;
     }
 
-    const RecordT* operator ->() const { 
+    inline const RecordT* operator ->() const { 
         return m_record;
     }
 
-    operator bool() const {return IsBound();}
+    inline operator bool() const {return IsBound();}
 
     ~RecordPtr() {
         if(m_record) {
@@ -75,26 +75,26 @@ public:
         }
     }
 
-    RecordID GetID() const { return m_id; }
+    inline RecordID GetID() const { return m_id; }
 
-    RecordT* Get() const {
+    inline RecordT* Get() const {
         return m_record;
     }
 
-    void Release() {
+    inline void Release() {
         if(m_record) {
             ReferenceCounterPtr::ReleaseRef(m_record);
             m_record = nullptr;
         }
     }
 
-    void Reset() {
+    inline void Reset() {
         Release();
         m_id = 0;
     }
 
     // Checks if this record's instance is bound to the RecordPtr
-    bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
+    inline bool IsBound() const { return m_record != nullptr && !m_record->HasFlag(RecordFlags::Deleted); }
 };
 
 template <RecordClass RecordT = Record>

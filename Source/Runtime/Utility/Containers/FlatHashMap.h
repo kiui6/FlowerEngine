@@ -1,64 +1,76 @@
 #pragma once
 
 #include "../SIMD.h"
+#include "../Hash.h"
 
 #include <cassert>
 #include <bit>
 
-template <class K, class V, class HashFunction = std::hash<K>, class _KeyEq = std::equal_to<K>, class _Allocator = std::allocator<std::pair<const K, V>>>
-class FlatHashMap {
-    using Slot = std::pair<const K, V>;
+template <typename KeyType, typename = void>
+struct FlatHashMapDefaultHash {
+    using type = std::hash<KeyType>;
+};
 
-    struct Group {
-        uint8_t bytes[16];
-    };
+template <typename T>
+struct FlatHashMapDefaultHash<T, std::enable_if_t<std::is_integral_v<T>>> {
+    using type = GoldHash<T>;
+};
+
+template <class _Func, class _TArg>
+struct _FlatHashMapHash : _Func {
+    uint64_t operator()(const _TArg& key) {return _Func::operator()(key);}
+};
+
+template <class K, class V, class HashFunction = std::hash<K>, class _KeyEq = FlatHashMapDefaultHash<K>, class _Allocator = std::allocator<std::pair<const K, V>>>
+class FlatHashMap : _Allocator, _FlatHashMapHash<HashFunction, K> {
+    using Slot = std::pair<const K, V>;
+    using ContainerType = FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator>;
 
     struct Iterator {
     private:
-        uint8_t* m_metadata;
-        Slot* m_slots;
-        size_t m_capacity;
+        ContainerType* m_map;
         size_t m_index;
 
-        void SeekValidSlot() {
-            while (m_metadata[m_index] > 0x7F && m_index < m_capacity) {
+        void _SeekNextValidSlot() {
+            while (m_map->m_metadata[m_index] > 0x7F && m_index < m_map->m_capacity) {
                 ++m_index;
             }
         }
 
     public:
-        Iterator(uint8_t* metadata, Slot* slots, size_t capacity, size_t index)
-            : m_metadata(metadata), m_slots(slots), m_capacity(capacity), m_index(index) {
-            SeekValidSlot();
+        Iterator(ContainerType* map, size_t index)
+            : m_map(map), m_index(index)
+        {
+            _SeekNextValidSlot();
         }
 
-        Iterator& operator++() {
+        inline Iterator& operator++() {
             ++m_index;
-            SeekValidSlot();
+            _SeekNextValidSlot();
             return *this;
         }
 
-        Slot& operator*() {
-            return m_slots[m_index];
+        inline Slot& operator*() {
+            return m_map->m_slots[m_index];
         }
         
-        const Slot& operator*() const {
-            return m_slots[m_index];
+        inline const Slot& operator*() const {
+            return m_map->m_slots[m_index];
         }
 
-        Slot* operator->() {
-            return &m_slots[m_index];
+        inline Slot* operator->() {
+            return &m_map->m_slots[m_index];
         }
 
-        const Slot* operator->() const {
-            return &m_slots[m_index];
+        inline const Slot* operator->() const {
+            return &m_map->m_slots[m_index];
         }
 
-        bool operator==(const Iterator& other) const {
-            return m_index == other.m_index && m_slots == other.m_slots;
+        inline bool operator==(const Iterator& other) const {
+            return m_index == other.m_index && m_map == other.m_map;
         }
 
-        bool operator!=(const Iterator& other) const {
+        inline bool operator!=(const Iterator& other) const {
             return !(*this == other);
         }
     };
@@ -66,7 +78,6 @@ class FlatHashMap {
     using MetaAllocator = std::allocator_traits<_Allocator>
     :: template rebind_alloc<uint8_t>;
     
-    _Allocator m_alloc{};
     size_t m_occupied, m_capacity;
     Slot* m_slots;
     uint8_t* m_metadata;
@@ -74,19 +85,13 @@ public:
     FlatHashMap()
     : m_occupied(0), m_capacity(16)
     {
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
-        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-        memset(m_metadata, 0x80, m_capacity + 16);
+        _Resize(m_capacity);
     }
 
     FlatHashMap(const _Allocator & alloc)
-    : m_occupied(0), m_capacity(16), m_alloc(alloc)
+    : m_occupied(0), m_capacity(16), _Allocator(alloc)
     {
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
-        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-        memset(m_metadata, 0x80, m_capacity + 16);
+        _Resize(m_capacity);
     }
 
     FlatHashMap(size_t initCapacity)
@@ -94,78 +99,102 @@ public:
     {
         assert(initCapacity % 16 == 0 && "Initial capacity must be divisible by 16");
 
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
-        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-        memset(m_metadata, 0x80, m_capacity + 16);
+        _Resize(m_capacity);
     }
 
     FlatHashMap(size_t initCapacity, const _Allocator & alloc)
-    : m_occupied(0), m_capacity(initCapacity), m_alloc(alloc)
+    : m_occupied(0), m_capacity(initCapacity), _Allocator(alloc)
     {
         assert(initCapacity % 16 == 0 && "Initial capacity must be divisible by 16");
 
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
-        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-        memset(m_metadata, 0x80, m_capacity + 16);
+        _Resize(m_capacity);
     }
 
     FlatHashMap(_Allocator && alloc)
-    : m_occupied(0), m_capacity(16), m_alloc(alloc)
+    : m_occupied(0), m_capacity(16), _Allocator(alloc)
     {
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
-        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-        memset(m_metadata, 0x80, m_capacity + 16);
+        _Resize(m_capacity);
+    }
+
+    FlatHashMap(ContainerType && right) noexcept(std::is_nothrow_move_constructible<_Allocator>::value)
+    :   _Allocator(std::move(right.m_alloc)), 
+        m_occupied(std::move(right.m_occupied)), 
+        m_capacity(std::move(right.m_capacity)), 
+        m_slots(std::move(right.m_slots)),
+        m_metadata(std::move(right.m_metadata))
+    {
+        right.m_occupied = 0;
+        right.m_capacity = 0;
+        right.m_slots = nullptr;
+        right.m_metadata = nullptr;
     }
 
     ~FlatHashMap() {
-        if(m_metadata && m_slots ) {
-            for(int i = 0; i < m_occupied; --i) {
-                if (m_metadata[i] != 0x80 && m_metadata[i] != 0xFE) {
-                    m_slots[i].~Slot();
+        _DestroyAll();
+        _Deallocate();
+    }
+
+    ContainerType& operator=(const ContainerType& right) noexcept {
+        
+        return *this;
+    }
+
+    ContainerType& operator=(ContainerType && right) noexcept {
+        if (this == std::addressof(right)) return *this;
+
+        _Allocator& _Al                 = *this;
+        _Allocator& _Right_al           = right;
+        constexpr bool _Propagate = std::allocator_traits<_Allocator>::propagate_on_container_move_assignment::value;
+
+        if constexpr (_Propagate) {
+            if (_Al != _Right_al) {
+                auto&& _Alproxy       = static_cast<std::allocator_traits<_Allocator>::template rebind_alloc<std::pair<const K, V>>>(_Al);
+                auto&& _Right_alproxy = static_cast<std::allocator_traits<_Allocator>::template rebind_alloc<std::pair<const K, V>>>(_Right_al);
+
+                _Alproxy.operator=(std::move(_Right_alproxy));
+
+                m_slots     = std::exchange(right.m_slots, nullptr);
+                m_metadata  = std::exchange(right.m_metadata, nullptr);
+                m_occupied  = std::exchange(right.m_occupied, 0);
+                m_capacity  = std::exchange(right.m_capacity, 0);
+
+                return *this;
+            }
+        } else {
+            if (_Al != _Right_al) {
+                auto&& _Alproxy       = static_cast<std::allocator_traits<_Allocator>::template rebind_alloc<std::pair<const K, V>>>(_Al);
+                auto&& _Right_alproxy = static_cast<std::allocator_traits<_Allocator>::template rebind_alloc<std::pair<const K, V>>>(_Right_al);
+
+                _DestroyAll();
+                _Deallocate();
+
+                m_capacity  = std::exchange(right.m_capacity, 0);
+                
+                _Allocate();
+
+                for (auto it = right.begin(); it != right.end(); ++it) {
+                    emplace(std::move(it->first), std::move(it->second));
                 }
+
             }
         }
 
-        if(m_slots) {
-            std::allocator_traits<_Allocator>::deallocate(m_alloc, m_slots, m_capacity);
-        }
-
-        if(m_metadata) {
-            MetaAllocator metaAlloc(m_alloc);
-            std::allocator_traits<MetaAllocator>::deallocate(metaAlloc, m_metadata, m_capacity + 16);
-        }
-    }
-
-    FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator>& operator=(const FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator>& other) {
-        // TODO: Copy
-        assert(!"Unimplemented");
+        m_slots     = std::exchange(right.m_slots, nullptr);
+        m_metadata  = std::exchange(right.m_metadata, nullptr);
+        m_occupied  = std::exchange(right.m_occupied, 0);
+        m_capacity  = std::exchange(right.m_capacity, 0);
+         
+        _Allocator::operator=(right);
+        
         return *this;
     }
 
-    FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator>& operator=(FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator> && other) {
-        m_alloc = other.m_alloc;
-        m_capacity = other.m_capacity;
-        m_metadata = other.m_metadata;
-        m_occupied = other.m_occupied;
-        m_slots = other.m_slots;
-
-        other.m_capacity = 0;
-        other.m_metadata = nullptr;
-        other.m_occupied = 0;
-        other.m_slots = nullptr;
-
-        return *this;
-    }
-
-    inline Slot* insert(const K&  key, const V& value) {
-        return emplace(key, value);
+    inline Slot* Insert(const K&  key, const V& value) {
+        return Emplace(key, value);
     }
 
     template <class _VTy>
-    inline Slot* emplace(const K&  key, _VTy && value) {
+    inline Slot* Emplace(const K&  key, _VTy && value) {
         if(m_occupied >= (m_capacity * 7) * 0.125f) {
             _Rehash(m_capacity * 2);
         }
@@ -173,8 +202,8 @@ public:
         return _Emplace(key, std::forward<_VTy>(value));
     }
 
-    inline Slot* find(const K& key) {
-        const uint64_t hash = HashFunction{}(key);
+    inline Slot* Find(const K& key) {
+        const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
         const uint8_t h2 = hash & 0x7F;
         size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
 
@@ -210,7 +239,7 @@ public:
         return nullptr;
     }
 
-    void erase(const K& key) {
+    void Erase(const K& key) {
         Slot* slot = find(key);
         if (!slot) return;
 
@@ -220,21 +249,30 @@ public:
         m_occupied--;
     }
 
+    void Clear() {
+        _DestroyAll();
+
+        simd128i empty = simdSet128i(0x80);
+        for (size_t i = 0; i < m_capacity; i += 16) {
+            _mm_store_si128((simd128i*)&m_metadata[i], empty);
+        }
+    }
+
     V* operator[](const K& key) { return find(key); }
     const V* operator[](const K& key) const { return find(key); }
 
-    inline Iterator begin() {return Iterator(m_metadata, m_slots, m_capacity, 0);}
-    inline Iterator end() {return Iterator(m_metadata, m_slots, m_capacity, m_capacity);}
+    inline Iterator begin() {return Iterator(this, 0);}
+    inline Iterator end() {return Iterator(this, m_capacity);}
+    
+    inline const Iterator begin() const {return Iterator(this, 0);}
+    inline const Iterator end() const {return Iterator(this, m_capacity);}
 
-    inline const Iterator begin() const {return Iterator(m_metadata, m_slots, m_capacity, 0);}
-    inline const Iterator end() const {return Iterator(m_metadata, m_slots, m_capacity, m_capacity);}
-
-    inline bool empty() {return m_occupied;}
+    inline bool Empty() {return m_occupied;}
 
 protected:
     template <class _VTy>
     inline Slot* _Emplace(const K& key, _VTy && value) {
-        const uint64_t hash = HashFunction{}(key);
+        const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
         const uint8_t h2 = hash & 0x7F;
         size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
 
@@ -286,6 +324,23 @@ protected:
         return nullptr;
     }
 
+    void _DestroyAll() {
+        for(int i = 0; i < m_occupied; --i) {
+            if (m_metadata[i] != 0x80 && m_metadata[i] != 0xFE) {
+                m_slots[i].~Slot();
+            }
+        }
+
+        m_occupied = 0;
+    }
+
+    void _Allocate() {
+        MetaAllocator metaAlloc(*this);
+        m_slots = std::allocator_traits<_Allocator>::allocate(*this, m_capacity);
+        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
+        memset(m_metadata, 0x80, m_capacity + 16);
+    }
+
     void _Rehash(size_t newCapacity) {
         Slot* oldSlots = m_slots;
         uint8_t* oldMetadata = m_metadata;
@@ -294,20 +349,56 @@ protected:
         m_occupied = 0;
         m_capacity = newCapacity;
         
-        MetaAllocator metaAlloc(m_alloc);
-        m_slots = std::allocator_traits<_Allocator>::allocate(m_alloc, m_capacity);
+        MetaAllocator metaAlloc(*this);
+        m_slots = std::allocator_traits<_Allocator>::allocate(*this, m_capacity);
         m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
-
         memset(m_metadata, 0x80, m_capacity + 16);
 
         for (size_t i = 0; i < oldCapacity; ++i) {
             if (oldMetadata[i] != 0x80 && oldMetadata[i] != 0xFE) {
-                _Emplace(oldSlots[i].first, std::move(oldSlots[i].second));
+                _Emplace(std::move(oldSlots[i].first), std::move(oldSlots[i].second));
                 oldSlots[i].~Slot();
             }
         }
 
-        std::allocator_traits<_Allocator>::deallocate(m_alloc, oldSlots, oldCapacity);
+        std::allocator_traits<_Allocator>::deallocate(*this, oldSlots, oldCapacity);
         std::allocator_traits<MetaAllocator>::deallocate(metaAlloc, oldMetadata, oldCapacity + 16);
+    }
+
+    void _Resize(size_t newCapacity) {
+        assert(newCapacity % 16 == 0 && "Initial capacity must be divisible by 16");
+
+        if(m_metadata && m_slots ) {
+            for(int i = 0; i < m_occupied; --i) {
+                if (m_metadata[i] != 0x80 && m_metadata[i] != 0xFE) {
+                    m_slots[i].~Slot();
+                }
+            }
+        } else {
+            if(m_slots) {
+                std::allocator_traits<_Allocator>::deallocate(*this, m_slots, m_capacity);
+            }
+
+            if(m_metadata) {
+                MetaAllocator metaAlloc(*this);
+                std::allocator_traits<MetaAllocator>::deallocate(metaAlloc, m_metadata, m_capacity + 16);
+            }
+        }
+
+        MetaAllocator metaAlloc(*this);
+        m_slots = std::allocator_traits<_Allocator>::allocate(*this, m_capacity);
+        m_metadata = std::allocator_traits<MetaAllocator>::allocate(metaAlloc, m_capacity + 16);
+        memset(m_metadata, 0x80, m_capacity + 16);
+    }
+
+    void _Deallocate() {
+        if(m_slots) {
+            std::allocator_traits<_Allocator>::deallocate(*this, m_slots, m_capacity);
+        }
+
+        if(m_metadata) {
+            MetaAllocator metaAlloc(*this);
+            std::allocator_traits<MetaAllocator>::deallocate(metaAlloc, m_metadata, m_capacity + 16);
+        }
     }
 };

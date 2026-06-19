@@ -5,6 +5,7 @@
 #include <Data/DataManager.h>
 #include <Mixin/ThreadAware.h>
 #include <Log/Log.h>
+#include <Utility/Containers/FlatHashMap.h>
 
 #include "Record.h"
 #include "RecordPtr.h"
@@ -128,7 +129,7 @@ public:
      * @returns
      * RecordPtr of polymorphic record. returns unbound(RecordPtr::IsBound() == false) RecordPtr if couldn't fetch or load record. 
      */
-    [[nodiscard]] RecordPtr<Record> LoadRecordRaw(RecordID recordID);
+    [[nodiscard]] RecordPtr<Record> LoadRecordAnyType(RecordID recordID);
 
     /*
      * Fetches already loaded or synchronously loads the record from data files using its ID
@@ -151,7 +152,7 @@ public:
 
     template <RecordClass T>
     [[nodiscard]] RecordPtr<T> GetRecord(RecordID recordID);
-    [[nodiscard]] RecordPtr<Record> GetRecordRaw(RecordID recordID);
+    [[nodiscard]] RecordPtr<Record> GetRecordAnyType(RecordID recordID);
     [[nodiscard]] RecordPtr<Record> GetRecordOfType(RecordID recordID, ID32 type);
     
     void UnloadRecord(RecordID recordID);

@@ -51,21 +51,6 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint1
     return RecordPtr<Record>(id, emplacedPair.first->second.get());
 }
 
-RecordPtr<Record> RecordLibrary::LoadRecordRaw(RecordID recordID)
-{
-    std::unique_lock lock(m_mtx);
-
-    RecordMemory memory;
-    if(!m_merger.Merge(m_sources, recordID, memory)) {
-        // TODO: Log error;
-        return {};
-    }
-
-    // TODO
-
-    return RecordPtr<Record>();
-}
-
 RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
 {
     std::unique_ptr<Record> record = CreateEmptyRecordFromType(type);
@@ -75,7 +60,7 @@ RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
     return RecordPtr<Record>();
 }
 
-RecordPtr<Record> RecordLibrary::GetRecordRaw(RecordID recordID)
+RecordPtr<Record> RecordLibrary::GetRecordAnyType(RecordID recordID)
 {
     return RecordPtr<Record>();
 }

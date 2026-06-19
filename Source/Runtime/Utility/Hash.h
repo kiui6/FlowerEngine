@@ -12,10 +12,27 @@ constexpr uint64_t FNV1a64(std::string_view str, uint64_t hash = 146959810393466
     return hash;
 }
 
+template <typename T, std::enable_if_t<std::is_integral_v<T>, int> = 0>
 struct GoldHash {
-    constexpr uint64_t operator()(uint64_t x) const {
-        x ^= x >> 33;
-        return x * 0x9e3779b97f4a7c15ULL;
+    constexpr uint64_t operator()(T x) const {
+        using U = std::make_unsigned_t<T>;
+        U val = static_cast<U>(x);
+        if constexpr (sizeof(T) == 8) {
+            val ^= val >> 33;
+            return static_cast<uint64_t>(val * 0x9e3779b97f4a7c15ULL);
+        } else if constexpr (sizeof(T) == 4) {
+            val ^= val >> 16;
+            return static_cast<uint64_t>(val * 0x9e3779b1U);
+        } else if constexpr (sizeof(T) == 2) {
+            val ^= val >> 8;
+            return static_cast<uint64_t>(val * 0x9e37U);
+        } else if constexpr (sizeof(T) == 1) {
+            val ^= val >> 4;
+            return static_cast<uint64_t>(val * 0x9eU);
+        } else {
+            static_assert(sizeof(T) <= 8, "Unsupported GoldHash integer type");
+            return 0;
+        }
     }
 };
 
@@ -29,6 +46,7 @@ struct StringHash {
     }
 
     std::size_t operator()(const std::string& s) const noexcept {
-        return operator()(s);
+        // explicitly convert std::string_view or else this function calls itself
+        return operator()(std::string_view(s));
     }
 };

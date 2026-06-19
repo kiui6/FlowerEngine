@@ -21,7 +21,7 @@
 
 class World
 {
-    using ActorsMapType = FlatHashMap<RecordID, std::unique_ptr<Actor>, GoldHash>;
+    using ActorsMapType = FlatHashMap<RecordID, std::unique_ptr<Actor>>;
 
     ActorsMapType m_staticActors;
     ActorsMapType m_dynamicActors;
