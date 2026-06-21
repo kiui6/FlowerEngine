@@ -15,22 +15,22 @@ static constexpr is_master_plugin_t is_master_plugin{};
 class PluginReader : public IRecordSource {
     std::string m_name;
 
-    std::optional<DataView> m_fileView;
+    DataView m_fileView{};
     bool m_isMaster;
 
     uint16_t m_dependenciesCount = 0;
     std::unordered_map<uint16_t, uint64_t> m_dependencies;
 
-    std::optional<DataView> m_recordsView;
+    DataView m_recordsView{};
 
     size_t m_recordsLUTCount = 0;
-    std::optional<DataView> m_LUTView;
+    DataView m_LUTView{};
 public:
     PluginReader(std::string_view name) : m_name(name) {}
     PluginReader(is_master_plugin_t, std::string_view name) : m_name(name), m_isMaster(true) {}
 
     bool IsMaster() const {return m_isMaster;}
-    bool IsValid() const {return m_fileView.has_value() && m_fileView.value();}
+    bool IsValid() const {return m_fileView;}
     std::string_view GetName() const {return m_name;}
 
     void InitializeFileView(DataView&& view);

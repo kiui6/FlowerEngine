@@ -14,7 +14,7 @@ void PluginReader::InitializeFileView(DataView &&view)
         return;
     }
 
-    DataReader fileReader(*m_fileView);
+    DataReader fileReader(m_fileView);
 
     SerialHeader header;
     if(!fileReader.Read<SerialHeader>(header)) {
@@ -24,7 +24,7 @@ void PluginReader::InitializeFileView(DataView &&view)
 
     m_dependenciesCount = header.dependencyCount; 
     if(m_dependenciesCount) {
-        DataView dependenciesView = m_fileView->MakeSubView(header.dependenciesOffset, m_dependenciesCount * sizeof(SerialDependency));
+        DataView dependenciesView = m_fileView.MakeSubView(header.dependenciesOffset, m_dependenciesCount * sizeof(SerialDependency));
         DataReader dependenciesReader(dependenciesView);
 
         SerialDependency dependency;
@@ -33,10 +33,10 @@ void PluginReader::InitializeFileView(DataView &&view)
         }
     }
 
-    m_recordsView = m_fileView->MakeSubView(header.recordsBlobOffset, header.recordsBlobSize);
+    m_recordsView = m_fileView.MakeSubView(header.recordsBlobOffset, header.recordsBlobSize);
     
     m_recordsLUTCount = header.recordsLutCount;
-    m_LUTView = m_fileView->MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
+    m_LUTView = m_fileView.MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
 bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
@@ -95,7 +95,7 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
 bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
 {
     size_t entryOffset = 0;
-    DataReader reader(*m_LUTView);
+    DataReader reader(m_LUTView);
 
     int64_t left = 0, right = m_recordsLUTCount - 1;
     RecordID entryID;
@@ -121,7 +121,7 @@ bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
 
 DataView PluginReader::FindRecordFromOffset(size_t offset)
 {
-    return m_recordsView->MakeSubView(offset, m_recordsView->size() - offset);
+    return m_recordsView.MakeSubView(offset, m_recordsView.size() - offset);
 }
 
 uint8_t PluginReader::GetFixedFieldSizeFromType(FieldType type)
