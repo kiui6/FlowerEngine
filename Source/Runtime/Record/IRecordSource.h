@@ -6,6 +6,7 @@
 
 #include "RecordMemory.h"
 #include "RecordID.h"
+#include "RecordIR/RecordObject.h"
 
 class IRecordSource {
 public:

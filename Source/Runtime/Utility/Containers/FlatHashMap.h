@@ -16,12 +16,17 @@ struct FlatHashMapDefaultHash<T, std::enable_if_t<std::is_integral_v<T>>> {
     using type = GoldHash<T>;
 };
 
+template <typename T>
+struct FlatHashMapDefaultHash<T, std::enable_if_t<std::is_base_of_v<std::string, T>>> {
+    using type = StringHash;
+};
+
 template <class _Func, class _TArg>
 struct _FlatHashMapHash : _Func {
     uint64_t operator()(const _TArg& key) {return _Func::operator()(key);}
 };
 
-template <class K, class V, class HashFunction = std::hash<K>, class _KeyEq = FlatHashMapDefaultHash<K>, class _Allocator = std::allocator<std::pair<const K, V>>>
+template <class K, class V, class HashFunction = FlatHashMapDefaultHash<K>::type, class _KeyEq = std::equal_to<>, class _Allocator = std::allocator<std::pair<const K, V>>>
 class FlatHashMap : _Allocator, _FlatHashMapHash<HashFunction, K> {
     using Slot = std::pair<const K, V>;
     using ContainerType = FlatHashMap<K, V, HashFunction, _KeyEq, _Allocator>;
@@ -202,7 +207,7 @@ public:
         return _Emplace(key, std::forward<_VTy>(value));
     }
 
-    inline Slot* Find(const K& key) {
+    inline V* Find(const K& key) {
         const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
         const uint8_t h2 = hash & 0x7F;
         size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
@@ -220,7 +225,7 @@ public:
                 size_t slot_idx = (idx + bit) & (m_capacity - 1);
 
                 if (m_slots[slot_idx].first == key) {
-                    return &m_slots[slot_idx];
+                    return &m_slots[slot_idx].second;
                 }
 
                 mask &= mask - 1;
@@ -240,7 +245,7 @@ public:
     }
 
     void Erase(const K& key) {
-        Slot* slot = find(key);
+        Slot* slot = _FindSlot(key);
         if (!slot) return;
 
         size_t idx = slot - m_slots;
@@ -319,6 +324,43 @@ protected:
             }
 
             idx = (idx + 16) & (m_capacity - 1);
+        }
+
+        return nullptr;
+    }
+
+    inline Slot* _FindSlot(const K& key) {
+        const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
+        const uint8_t h2 = hash & 0x7F;
+        size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
+
+        const simd128i vecH2 = simdSet128i((char)h2);
+        const simd128i vecEmpty = simdSet128i((char)0x80);
+
+        while(true) {
+            simd128i metadata = simdLoad128i((const simd128i*)&m_metadata[idx]);
+            simd128i cmp = simdCmpEq8(metadata, vecH2);
+            uint16_t mask = simdMovemask8(cmp);
+
+            while(mask) {
+                uint16_t bit = std::countr_zero(mask);
+                size_t slot_idx = (idx + bit) & (m_capacity - 1);
+
+                if (m_slots[slot_idx].first == key) {
+                    return &m_slots[slot_idx];
+                }
+
+                mask &= mask - 1;
+            }
+
+            simd128i cmpEmpty = simdCmpEq8(metadata, vecEmpty);
+            int emptyMask = simdMovemask8(cmpEmpty);
+            
+            if (!emptyMask) {
+                idx = (idx + 16) & (m_capacity - 1);
+            } else {
+                return nullptr;
+            }
         }
 
         return nullptr;

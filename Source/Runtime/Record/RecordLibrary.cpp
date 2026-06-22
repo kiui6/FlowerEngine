@@ -42,13 +42,13 @@ RecordPtr<Record> RecordLibrary::CreateRecordFromType(uint32_t recordType, uint1
     std::unique_ptr<Record> record = factory->NewRecord();
     record->SetID(id);
 
-    const auto& emplacedPair = m_records.emplace(id, std::move(record));
+    auto* emplacedPair = m_records.Emplace(id, std::move(record));
 
     if constexpr(IS_VERBOSE) {
         LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, recordType, recordType >> 8, recordType >> 16, recordType >> 24);
     }
 
-    return RecordPtr<Record>(id, emplacedPair.first->second.get());
+    return RecordPtr<Record>(id, emplacedPair->second.get());
 }
 
 RecordPtr<Record> RecordLibrary::LoadRecordOfType(RecordID recordID, ID32 type)
@@ -73,7 +73,7 @@ RecordPtr<Record> RecordLibrary::GetRecordOfType(RecordID recordID, ID32 type)
 void RecordLibrary::UnloadRecord(RecordID recordID)
 {
     std::unique_lock lock(m_mtx);
-    m_records.erase(m_records.find(recordID));
+    m_records.Erase(recordID);
 }
 
 bool RecordLibrary::IsValidRecord(RecordID recordID) const

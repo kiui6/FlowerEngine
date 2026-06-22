@@ -45,6 +45,14 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
         return nullptr;
     }
 
+    if(auto existingActor = m_dynamicActors.Find(ref.GetID())) [[unlikely]] {
+        return existingActor->get();
+    }
+
+    if(auto existingActor = m_staticActors.Find(ref.GetID())) [[unlikely]] {
+        return existingActor->get();
+    }
+
     ActorFactory* factory = ActorFactoryLibrary::Get().GetFactory(ref->BaseTypename);
     if(!factory) {
         LOG(Error, LogWorld, "Failed to instantiate actor from a ReferenceRecord, REFR::NAME is specified, but no associated factory is registered.");

@@ -11,6 +11,8 @@
 #include <Utility/Defines.h>
 #include <Utility/Memory/Arena.h>
 
+#include "RecordIR/RecordObject.h"
+
 struct RecordMerger
 {
     std::vector<RecordMemory> m_memories;

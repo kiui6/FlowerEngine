@@ -9,6 +9,7 @@
 #include <GameFramework/Records/AtlasRecord/AtlasRecord.h>
 #include <Entry/EntryRecord.h>
 #include <Config/Config.h>
+#include <Debug/Tracer/Tracer.h>
 
 #ifdef HAS_DEBUGUI
 #   ifdef EDITOR
@@ -57,6 +58,7 @@ int GuardedMain(int argc, char* argv[])
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 
     ActorInstantiateInfo acinfo1{};
+    for(int i = 0; i < 2048; i++)
     Actor* act1 = myWorld->InstantiateActor(refRec, acinfo1);
 
     ActorCreateInfo acinfo2{};

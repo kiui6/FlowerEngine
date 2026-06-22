@@ -31,7 +31,7 @@ class RecordLibrary : public IService
 
     DataManager* m_datamgr = nullptr;
 
-    std::unordered_map<RecordID, std::unique_ptr<Record>> m_records;
+    FlatHashMap<RecordID, std::unique_ptr<Record>> m_records;
 
     // If editing Master File, should be set outside of bounds of reserved IDs
     std::atomic<RecordID> m_nextLocalID{1};
@@ -180,7 +180,7 @@ inline RecordPtr<T> RecordLibrary::CreateRecord(uint16_t pluginID)
     T* record = new T();
     record->SetID(id);
 
-    m_records.emplace(id, std::unique_ptr<Record>(record));
+    m_records.Emplace(id, std::unique_ptr<Record>(record));
 
     if constexpr(IS_VERBOSE) {
         LOGF(Log, LogRecord, "Created Record[0x%016llX] of Type[%c%c%c%c]", id, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
@@ -200,10 +200,10 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
     }
 
     // Try find record by ID
-    auto it = m_records.find(recordID);
-    if(it != m_records.end()) {
-        if(it->second->GetType() == T::StaticType()) {
-            return {recordID, static_cast<T*>(it->second.get())};
+    auto existingRecord = m_records.Find(recordID);
+    if(existingRecord != nullptr) {
+        if(existingRecord->get()->GetType() == T::StaticType()) {
+            return {recordID, static_cast<T*>(existingRecord->get())};
         }
     }
 
@@ -243,7 +243,7 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
         field->Deserialize(fieldMem);
     }
 
-    m_records.emplace(recordID, std::unique_ptr<Record>(record));
+    m_records.Emplace(recordID, std::unique_ptr<Record>(record));
 
     if constexpr(IS_VERBOSE) {
         LOGF(Log, LogRecord, "Loaded Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
@@ -257,10 +257,10 @@ inline RecordPtr<T> RecordLibrary::GetRecord(RecordID recordID)
 {
     std::shared_lock lock(m_mtx);
     
-    auto it = m_records.find(recordID);
-    if(it != m_records.end()) {
-        if(it->second->GetType() == T::StaticType()) {
-            return {recordID, static_cast<T*>(it->second.get())};
+    auto existingRecord = m_records.Find(recordID);
+    if(existingRecord != nullptr) {
+        if(existingRecord->get()->GetType() == T::StaticType()) {
+            return {recordID, static_cast<T*>(existingRecord->get())};
         }
     }
     
