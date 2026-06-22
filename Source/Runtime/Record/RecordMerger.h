@@ -16,7 +16,7 @@
 struct RecordMerger
 {
     std::vector<RecordMemory> m_memories;
-    DynamicArena<16*1024> m_IRArena;
+    GrowingArena<16*1024> m_NodeArena;
 public:
 
     void ResizeMemoryPool(size_t newPoolSize) {

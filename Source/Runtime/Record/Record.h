@@ -64,8 +64,9 @@ public:
 
     inline RecordID GetID() const {return m_id;}
 
-    virtual std::vector<FieldBase*> GetFields() {
+    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 1) {
         std::vector<FieldBase*> fields;
+        fields.reserve(reserveSize);
         fields.push_back(&EditorID);
         return fields;
     }

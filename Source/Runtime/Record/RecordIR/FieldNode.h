@@ -5,6 +5,10 @@
 #include <vector>
 
 struct FieldNode {
+    FieldNodeType type;
+    uint8_t flags;
+    uint8_t pad[2];
+    uint32_t size;
     union {
         bool     boolValue;
         int32_t  integerValue;
@@ -13,9 +17,6 @@ struct FieldNode {
         char*    stringValue;
         FieldNode* children;
     } data;
-    uint32_t size;
-    FieldNodeType type;
-    uint8_t flags;
 };
 
 static_assert(sizeof(FieldNode) == 16, "FieldNode size must be 16 bytes");

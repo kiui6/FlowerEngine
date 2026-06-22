@@ -5,5 +5,5 @@
 
 class ScriptVMAllocator
 {
-    DynamicArena<Kilobytes(512)> m_arena;
+    GrowingArena<Kilobytes(512)> m_arena;
 };

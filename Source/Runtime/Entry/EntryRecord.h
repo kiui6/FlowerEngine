@@ -15,8 +15,8 @@ public:
 
     static ID32 StaticType() {return MakeID32("ENTR");}
 
-    virtual std::vector<FieldBase*> GetFields() override {
-        std::vector<FieldBase*> fields = Record::GetFields();
+    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 2) override {
+        std::vector<FieldBase*> fields = Record::GetFields(reserveSize);
         fields.push_back(&StartupScriptPath);
         return fields;
     }
