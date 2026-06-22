@@ -20,8 +20,8 @@ void WorldBufferAttachmentUpdateHandler::Update(FrameContext &ctx, const RenderV
     SDL_GPUBuffer*& buffer = ctx.bufferAttachments[BufferRenderAttachment::WorldData];
 
     GPUWorldBufferData gpuData;
-    gpuData.projectionView = glm::ortho(  0.0f, static_cast<float>(globalState.canvasWidth),
-                                                static_cast<float>(globalState.canvasHeight), 0.0f,
+    gpuData.projectionView = glm::ortho(  -static_cast<float>(globalState.canvasWidth) / 2, static_cast<float>(globalState.canvasWidth) / 2,
+                                                static_cast<float>(globalState.canvasHeight) / 2, -static_cast<float>(globalState.canvasHeight) / 2,
                                                 -65536.0f, 65536.0f);
     gpuData.position = view.GetCameraPosition();
 
