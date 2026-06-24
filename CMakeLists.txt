@@ -47,14 +47,16 @@ target_compile_options(disable_cxx_features INTERFACE
 ) 
 
 # Third Party Sources
-set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
-
-set(SrcLZ4 "Source/ThirdParty/lz4/lz4.c" "Source/ThirdParty/lz4/lz4file.c" "Source/ThirdParty/lz4/lz4frame.c" "Source/ThirdParty/lz4/lz4hc.c" "Source/ThirdParty/lz4/xxhash.c")
-
-set(SrcImgui "Source/ThirdParty/imgui/imgui_demo.cpp" "Source/ThirdParty/imgui/imgui_tables.cpp" 
+add_library(Imgui INTERFACE)
+target_sources(Imgui INTERFACE "Source/ThirdParty/imgui/imgui_demo.cpp" "Source/ThirdParty/imgui/imgui_tables.cpp" 
              "Source/ThirdParty/imgui/imgui_draw.cpp" "Source/ThirdParty/imgui/imgui_widgets.cpp" 
              "Source/ThirdParty/imgui/imgui.cpp" "Source/ThirdParty/imgui/backends/imgui_impl_sdl3.cpp"
              "Source/ThirdParty/imgui/backends/imgui_impl_sdlgpu3.cpp")
+target_include_directories(Imgui INTERFACE "Source/ThirdParty/imgui/")
+
+set(SrcStbImage "Source/ThirdParty/stb/stb_image.cpp")
+
+set(SrcLZ4 "Source/ThirdParty/lz4/lz4.c" "Source/ThirdParty/lz4/lz4file.c" "Source/ThirdParty/lz4/lz4frame.c" "Source/ThirdParty/lz4/lz4hc.c" "Source/ThirdParty/lz4/xxhash.c")
 
 # Modules Sources
 set(SrcApplication "Source/Runtime/Application/Application.cpp")
@@ -164,7 +166,7 @@ if(WIN32)
       "Source/Runtime/Platform/Windows/System/WindowsPlatformSystem.cpp"
     )
     
-    set(Sources WIN32 ${Sources} ${WindowsPlatform} "Editor/Platforms/Windows/resources.rc" )
+    set(Sources ${Sources} ${WindowsPlatform} "Resources/Platforms/Windows/resources.rc")
 elseif(UNIX)
     set(LinuxPlatform "Source/Runtime/Platform/Linux/LinuxPlatform.cpp" 
 
@@ -178,42 +180,18 @@ elseif(UNIX)
     set(Sources ${Sources} ${LinuxPlatform})
 endif()
 
-# Only include imgui in debug build
+add_library(Shared INTERFACE)
+target_sources(Shared INTERFACE ${Sources})
+target_link_libraries(Shared INTERFACE disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
+target_include_directories(Shared INTERFACE "Source/Runtime" "Source/ThirdParty")
+target_compile_features(Shared INTERFACE cxx_std_23)
+
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  set(Sources ${Sources} ${SrcImgui}) 
-endif()
-# Game
-
-add_executable(Game ${Sources})
-
-target_link_libraries(Game disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
-
-target_include_directories(Game PRIVATE "Source/Runtime")
-target_include_directories(Game PRIVATE "Source/ThirdParty")
-
-set_property(TARGET Game PROPERTY CXX_STANDARD 23)
-
-# Include HAS_DEBUGUI define to the game in Debug build
-if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-  target_compile_definitions(Game PUBLIC HAS_DEBUGUI)
+  target_link_libraries(Shared INTERFACE Imgui) 
+  target_compile_definitions(Shared INTERFACE HAS_DEBUGUI)
 endif()
 
-# Editor
-
-set(EditorSources ${SrcImgui}) 
-
-add_executable(Editor ${Sources} ${EditorSources})
-
-target_link_libraries(Editor disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
-
-target_include_directories(Editor PRIVATE "Source/Runtime" "Source/Editor")
-
-target_include_directories(Editor PRIVATE "Source/ThirdParty")
-
-target_compile_definitions(Editor PUBLIC EDITOR)
-target_compile_definitions(Editor PUBLIC HAS_DEBUGUI)
-
-set_property(TARGET Editor PROPERTY CXX_STANDARD 23)
+add_subdirectory("CMake/Targets")
 
 # Shaders
 # add_shaders(Shaders "Shaders/FullscreenTriangle/FullscreenTriangle.vert" "Shaders/FullscreenTriangle/FullscreenTriangle.frag")
