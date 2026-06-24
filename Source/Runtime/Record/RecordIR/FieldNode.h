@@ -1,20 +1,22 @@
 #pragma once
 
 #include "FieldNodeType.h"
+#include "FieldNodeOp.h"
 #include <cstdint>
 #include <vector>
 
 struct FieldNode {
     FieldNodeType type;
-    uint8_t flags;
-    uint8_t pad[2];
-    uint32_t size;
+    FieldNodeOp op;
+    uint16_t size;
+    uint16_t elementNumber;
+    uint16_t pad;
     union {
         bool     boolValue;
-        int32_t  integerValue;
+        uint32_t  integerValue;
         float    floatValue;
-        double   doubleVaue;
-        char*    stringValue;
+        double   doubleValue;
+        const char*    stringValue;
         FieldNode* children;
     } data;
 };

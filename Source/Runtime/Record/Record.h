@@ -13,6 +13,7 @@
 
 #include "Field.h"
 #include "RecordID.h"
+#include "RecordIR/RecordIRBuilder.h"
 
 #include "FieldContainers/StringField.h"
 
@@ -75,6 +76,9 @@ public:
     void MarkDirty() {SetFlag(RecordFlags::Dirty);}
 
     bool IsDirty() override;
+
+    virtual bool Serialize(RecordIRBuilder& builder) {return false;}
+    virtual bool Deserialize(const RecordObject& object) {return false;}
 
 protected: 
     void SetID(RecordID newID) {m_id = newID;}

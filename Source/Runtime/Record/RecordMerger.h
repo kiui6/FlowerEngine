@@ -9,14 +9,13 @@
 #include "IRecordSource.h"
 
 #include <Utility/Defines.h>
-#include <Utility/Memory/Arena.h>
 
-#include "RecordIR/RecordObject.h"
+#include "RecordIR/RecordIRBuilder.h"
 
 struct RecordMerger
 {
     std::vector<RecordMemory> m_memories;
-    GrowingArena<16*1024> m_NodeArena;
+    RecordIRBuilder m_builder;
 public:
 
     void ResizeMemoryPool(size_t newPoolSize) {
