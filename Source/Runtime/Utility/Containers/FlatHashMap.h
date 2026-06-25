@@ -83,9 +83,9 @@ class FlatHashMap : _Allocator, _FlatHashMapHash<HashFunction, K> {
     using MetaAllocator = std::allocator_traits<_Allocator>
     :: template rebind_alloc<uint8_t>;
     
-    size_t m_occupied, m_capacity;
-    Slot* m_slots;
-    uint8_t* m_metadata;
+    size_t m_occupied{}, m_capacity{};
+    Slot* m_slots{};
+    uint8_t* m_metadata{};
 public:
     FlatHashMap()
     : m_occupied(0), m_capacity(16)
