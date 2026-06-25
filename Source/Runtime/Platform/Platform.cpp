@@ -20,7 +20,9 @@ bool Platform::bIsInitialized = RegisterService<Platform>();
 #elifdef PLATFORM_UNIX
 
 #elifdef PLATFORM_MAC
-
+#   include "Mac/Input/MacPlatformInput.h"
+#   include "Mac/Filesystem/MacPlatformFilesystem.h"
+#   include "Mac/System/MacPlatformSystem.h"
 #endif
 
 void Platform::Initialize()
@@ -41,6 +43,10 @@ void Platform::Initialize()
     m_input = std::make_unique<LinuxPlatformInput>();
     m_fs = std::make_unique<LinuxPlatformFilesystem>();
     m_sys = std::make_unique<LinuxPlatformSystem>();
+#elifdef PLATFORM_MAC
+    m_input = std::make_unique<MacPlatformInput>();
+    m_fs = std::make_unique<MacPlatformFilesystem>();
+    m_sys = std::make_unique<MacPlatformSystem>();
 #else
     static_assert(!"No platform implementation available!");
 #endif

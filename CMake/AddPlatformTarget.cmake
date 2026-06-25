@@ -27,18 +27,21 @@ function(add_platform_target TARGET_NAME)
             COMMENT "Copying MoltenVK dylib to app bundle"
         )
 
-        target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_MACOS)
+        target_compile_definitions(${TARGET_NAME} PRIVATE PLATFORM_MAC)
+
+        set(MAC_FLOWER_WRAPPER_PATH "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper.sh")
+        configure_file(
+            ${PROJECT_SOURCE_DIR}/Resources/Platforms/Mac/FlowerWrapper.sh.in
+            ${CMAKE_CURRENT_BINARY_DIR}/FlowerWrapper.sh
+            @ONLY
+        )
 
         add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E echo "#!/bin/bash" > "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper"
-            # Disable Metal Heap to extend support for older hardware
-            COMMAND ${CMAKE_COMMAND} -E echo "export MVK_CONFIG_USE_MTLHEAP=0" >> "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper"
-            # Specify icd file for loader
-            COMMAND ${CMAKE_COMMAND} -E echo "export VK_ICD_FILENAMES=\"$(dirname \"\$0\")/../Resources/vulkan/icd.d/MoltenVK_icd.json\"" >> "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper"
-            # Launch real executable
-            COMMAND ${CMAKE_COMMAND} -E echo "exec \"$(dirname \"$0\")/${TARGET_NAME}\" \"\$@\"" >> "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper"
-            COMMAND chmod +x "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/MacOS/FlowerWrapper"
-            COMMENT "Creating launch wrapper for macOS bundle"
+            COMMAND ${CMAKE_COMMAND} -E copy
+                ${CMAKE_CURRENT_BINARY_DIR}/FlowerWrapper.sh
+                ${MAC_FLOWER_WRAPPER_PATH}
+            COMMAND chmod +x ${MAC_FLOWER_WRAPPER_PATH}
+            COMMENT "Installing launch wrapper for macOS bundle"
         )
     endif()
 

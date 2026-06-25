@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.29)
 
 project ("Flower")
 
+set(ORGANIZATION_ID com.flower)
+
 add_subdirectory("Tools")
 
 set(BUILD_CONFIG "$<$<CONFIG:Debug>:Debug>$<$<CONFIG:Release>:Release>")
@@ -13,19 +15,27 @@ include("CMake/StripSymbols.cmake")
 include("CMake/MoltenVK.cmake")
 include(FetchContent)
 
-message(STATUS "Fetching dependencies...")
+message(STATUS "Fetching GLM 1.0.1")
 
 FetchContent_Declare(
   glm
   GIT_REPOSITORY https://github.com/g-truc/glm.git
   GIT_TAG        1.0.1
-)
+  )
+  
+FetchContent_MakeAvailable(glm)
+  
+message(STATUS "Fetching JSON 3.12.0")
 
 FetchContent_Declare(
   json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
   GIT_TAG        v3.12.0
-)
+  )
+  
+FetchContent_MakeAvailable(json)
+  
+message(STATUS "Fetching SDL 3.4.4")
 
 FetchContent_Declare(
   sdl
@@ -33,7 +43,7 @@ FetchContent_Declare(
   GIT_TAG        release-3.4.4
 )
 
-FetchContent_MakeAvailable(sdl glm json)
+FetchContent_MakeAvailable(sdl)
 
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
@@ -170,7 +180,7 @@ if(WIN32)
     )
     
     set(Sources ${Sources} ${WindowsPlatform} "Resources/Platforms/Windows/resources.rc")
-elseif(UNIX)
+elseif(NOT APPLE AND UNIX)
     set(LinuxPlatform "Source/Runtime/Platform/Linux/LinuxPlatform.cpp" 
 
       # Filesystem
@@ -181,11 +191,22 @@ elseif(UNIX)
     )
 
     set(Sources ${Sources} ${LinuxPlatform})
+elseif(APPLE)
+    set(MacPlatform "Source/Runtime/Platform/Mac/MacPlatform.cpp" 
+
+      # Filesystem
+      "Source/Runtime/Platform/Mac/Filesystem/MacMappedFile.cpp"
+
+      # System
+      "Source/Runtime/Platform/Mac/System/MacPlatformSystem.cpp"
+    )
+
+    set(Sources ${Sources} ${MacPlatform})
 endif()
 
 add_library(Shared INTERFACE)
 target_sources(Shared INTERFACE ${Sources})
-target_link_libraries(Shared INTERFACE disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Shared INTERFACE c++ disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
 target_include_directories(Shared INTERFACE "Source/Runtime" "Source/ThirdParty")
 target_compile_features(Shared INTERFACE cxx_std_23)
 

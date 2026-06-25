@@ -6,3 +6,5 @@ CMakeFiles/
 CMakeCache.txt
 
 *.spv
+
+.DS_Store

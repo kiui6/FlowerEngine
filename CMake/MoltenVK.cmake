@@ -1,13 +1,15 @@
 add_library(MoltenVK INTERFACE)
 
+# TODO: Temporal measure, move to metal with shadercross later.
+
 if(APPLE)
-message(STATUS "Fetching MoltenVK 1.2.6")
+message(STATUS "Fetching MoltenVK 1.4.1")
 
 include(FetchContent)
 
 FetchContent_Declare(
     MoltenVKTar
-    URL https://github.com/KhronosGroup/MoltenVK/releases/download/v1.2.6-rc2/MoltenVK-macos.tar
+    URL https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar
 )
 
 FetchContent_MakeAvailable(MoltenVKTar)

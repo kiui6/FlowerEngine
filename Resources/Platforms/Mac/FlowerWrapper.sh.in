@@ -1,0 +1,4 @@
+#!/bin/bash
+export MVK_CONFIG_USE_MTLHEAP=0
+export VK_ICD_FILENAMES="$(dirname "$0")/../Resources/vulkan/icd.d/MoltenVK_icd.json"
+exec "$(dirname "$0")/@TARGET_NAME@" "$@"
