@@ -207,7 +207,7 @@ endif()
 
 add_library(Shared INTERFACE)
 target_sources(Shared INTERFACE ${Sources})
-target_link_libraries(Shared INTERFACE c++ disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
+target_link_libraries(Shared INTERFACE disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
 target_include_directories(Shared INTERFACE "Source/Runtime" "Source/ThirdParty")
 target_include_directories(Shared INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_compile_features(Shared INTERFACE cxx_std_23)

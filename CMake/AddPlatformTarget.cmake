@@ -1,6 +1,8 @@
 function(add_platform_target TARGET_NAME)
     add_executable(${TARGET_NAME} ${ARGN})
 
+    set_target_properties(${TARGET_NAME} PROPERTIES LINKER_LANGUAGE CXX)
+
     target_link_libraries(${TARGET_NAME} PRIVATE Shared)
 
     if(WIN32)
