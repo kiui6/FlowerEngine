@@ -171,8 +171,13 @@ SDL_GPUShader *RenderUtils::CreateShader(SDL_GPUDevice *device, SDL_GPUShaderSta
     SDL_GPUShaderCreateInfo createInfo{
         .code_size              = size,
         .code                   = reinterpret_cast<const Uint8*>(data),
+#ifdef RENDER_USE_METAL
+        .entrypoint             = "main0",
+        .format                 = SDL_GPU_SHADERFORMAT_MSL,
+#else
         .entrypoint             = "main",
         .format                 = SDL_GPU_SHADERFORMAT_SPIRV,
+#endif
         .stage                  = stage,
         .num_samplers           = numSamplers,
         .num_storage_textures   = numStorageTextures,

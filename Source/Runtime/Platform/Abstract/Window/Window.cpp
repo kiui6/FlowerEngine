@@ -10,7 +10,15 @@ void Window::Initialize(std::string_view title, uint32_t width, uint32_t height)
     m_width = width;
     m_height = height;
 
-    m_window = SDL_CreateWindow(m_title.c_str(), width, height, SDL_WINDOW_VULKAN | SDL_WINDOW_RESIZABLE);
+	SDL_WindowFlags flags = SDL_WINDOW_RESIZABLE;
+
+	#ifdef RENDER_USE_METAL
+		flags |= SDL_WINDOW_METAL;
+	#else
+		flags |= SDL_WINDOW_VULKAN;
+	#endif
+
+    m_window = SDL_CreateWindow(m_title.c_str(), width, height, flags);
 
 	m_surface = SDL_GetWindowSurface(m_window);
 

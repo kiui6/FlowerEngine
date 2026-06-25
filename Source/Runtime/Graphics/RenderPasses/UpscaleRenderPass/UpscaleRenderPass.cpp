@@ -5,8 +5,8 @@
 #include <Graphics/RenderEngine/RenderUtils.h>
 
 // Shaders
-#include "Shaders/FullscreenTriangle.vert.h"
-#include "Shaders/FullscreenTriangle.frag.h"
+#include <Shaders/FullscreenTriangle.vert.h>
+#include <Shaders/FullscreenTriangle.frag.h>
 
 UpscaleRenderPass::UpscaleRenderPass(GPUContext &context, RenderStateStore& stateStore)
     : m_gpu(context), m_state(stateStore.Get<UpscaleRenderState>())
@@ -21,7 +21,7 @@ UpscaleRenderPass::UpscaleRenderPass(GPUContext &context, RenderStateStore& stat
         m_gpu.device, 
         SDL_GPU_SHADERSTAGE_VERTEX, 
         FullscreenTriangle_vert_h,
-        sizeof(FullscreenTriangle_vert_h),
+        FullscreenTriangle_vert_h_size,
         0, 0, 1, 0);
 
     m_fragmentShader = RenderUtils::CreateShader(

@@ -33,6 +33,7 @@ FetchContent_MakeAvailable(glslang)
 message(STATUS "Searching for DXC")
 
 find_package(dxc)
+find_library(METAL_LIB Metal)
 
 set(ShaderCompilerSources "Source/main.cpp" "Source/SPIRVCompiler.cpp" "Source/WriteOut.cpp" "Source/Cross/Metal/SPIRVToMSL.cpp" "Source/Cross/DX/SPIRVToHLSL.cpp")
 
@@ -51,16 +52,21 @@ target_link_libraries(ShaderCompiler PRIVATE
 target_include_directories(ShaderCompiler PRIVATE ${glslang_SOURCE_DIR})
 
 target_compile_features(ShaderCompiler PRIVATE cxx_std_23)
-
 set_target_properties(ShaderCompiler PROPERTIES LINKER_LANGUAGE CXX)
 
-if(APPLE)
-    target_sources(ShaderCompiler "Source/Cross/Metal/MSLCompiler.mm")
-    target_compile_definitions(ShaderCompiler PLATFORM_MAC)
+if(METAL_LIB)
+    find_library(FOUNDATION_LIB Foundation REQUIRED)
+
+    target_sources(ShaderCompiler PRIVATE "Source/Cross/Metal/MSLCompiler.mm")
+    target_link_libraries(ShaderCompiler PRIVATE ${METAL_LIB} ${FOUNDATION_LIB})
+    target_compile_definitions(ShaderCompiler PRIVATE HAS_METAL)
+    set_target_properties(ShaderCompiler PROPERTIES 
+        OSX_DEPLOYMENT_TARGET "10.15"
+    )
 endif()
     
 if(dxc_FOUND)
-    target_sources(ShaderCompiler "Source/Cross/DX/HLSLCompiler.cpp")
-    target_link_libraries(ShaderCompiler dxc::dxcompiler)
-    target_compile_definitions(ShaderCompiler HAS_DXC)
+    target_sources(ShaderCompiler PRIVATE "Source/Cross/DX/HLSLCompiler.cpp")
+    target_link_libraries(ShaderCompiler PRIVATE dxc::dxcompiler)
+    target_compile_definitions(ShaderCompiler PRIVATE HAS_DXC)
 endif()

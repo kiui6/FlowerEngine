@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
             if(context.inputPath.ends_with("vert")) {
                 shaderStage = EShLanguage::EShLangVertex;
             }
-            else if(context.inputPath.ends_with("vert")) {
+            else if(context.inputPath.ends_with("frag")) {
                 shaderStage = EShLanguage::EShLangFragment;
             } else {
                 std::cerr << "Failed to deduce stage. Specify stage using --stage <vert/frag/comp/geom>\n";
@@ -66,15 +66,15 @@ int main(int argc, char* argv[]) {
 
         finalBinary = std::vector<uint8_t>(bytePtr, bytePtr + byteSize);
     } else if(context.target == CompilationTarget::MSL){
-        std::string mslSource = CrossCompileToMSL(spirv);
+        std::string mslSource = CrossCompileToMSL(spirv, context.stage);
 
         const uint8_t* bytePtr = reinterpret_cast<const uint8_t*>(mslSource.data());
         size_t byteSize = mslSource.size();
 
         finalBinary = std::vector<uint8_t>(bytePtr, bytePtr + byteSize);
     } else if(context.target == CompilationTarget::Metallib){
-        #ifdef PLATFORM_MAC
-            std::string mslSource = CrossCompileToMSL(spirv);
+        #ifdef HAS_METAL
+            std::string mslSource = CrossCompileToMSL(spirv, context.stage);
             finalBinary = CompileMSLToMetallib(mslSource);
         #else
             std::cerr << "Metallib cross compilation is only available on MacOS";
@@ -110,7 +110,7 @@ int main(int argc, char* argv[]) {
         if(context.format == OutputFormat::Binary) {
             WriteBinaryFile(context.outputPath, finalBinary);
         } else if (context.format == OutputFormat::CArray) {
-
+            WriteCArrayFile(context.outputPath, finalBinary);
         }
     } catch(const std::runtime_error& exc) {
         std::cerr << exc.what();
@@ -164,7 +164,7 @@ CompilationContext CreateContextFromArguments(const ArgParser& args)
                 ctx.outputPath += ".spv";
                 break;
             case CompilationTarget::MSL:
-                ctx.outputPath += ".msl";
+                ctx.outputPath += ".metal";
                 break;
             case CompilationTarget::Metallib:
                 ctx.outputPath += ".metallib";

@@ -9,7 +9,12 @@
 std::vector<uint8_t> CompileMSLToMetallib(const std::string& mslSource) {
     id<MTLDevice> device = MTLCreateSystemDefaultDevice();
     if (!device) {
-        throw std::runtime_error("Metal is not supported on this Mac");
+        NSArray<id<MTLDevice>> *devices = MTLCopyAllDevices();
+        if (devices.count == 0) {
+            throw std::runtime_error("Metal is not supported on this Mac");
+        }
+
+        device = devices[0];
     }
 
     NSError* error = nil;
@@ -27,7 +32,7 @@ std::vector<uint8_t> CompileMSLToMetallib(const std::string& mslSource) {
         throw std::runtime_error("Metal compilation failed: " + std::string([errDesc UTF8String]));
     }
 
-    NSData* metallibData = library.binaryData;
+    NSData* metallibData = [library binaryData];
     if (!metallibData) {
         throw std::runtime_error("Failed to extract metallib data");
     }

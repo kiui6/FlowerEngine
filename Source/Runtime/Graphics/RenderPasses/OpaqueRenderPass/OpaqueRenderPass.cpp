@@ -10,8 +10,8 @@
 #include <Debug/Tracer/Tracer.h>
 #include <Math/Mesh.h>
 
-#include "Shaders/OpaqueSpriteQuad.frag.h"
-#include "Shaders/OpaqueSpriteQuad.vert.h"
+#include <Shaders/OpaqueSpriteQuad.vert.h>
+#include <Shaders/OpaqueSpriteQuad.frag.h>
 
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
     : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>()), globalState(stateStore.Get<GlobalRenderState>())
@@ -40,14 +40,14 @@ OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateS
         m_gpu.device, 
         SDL_GPU_SHADERSTAGE_VERTEX, 
         OpaqueSpriteQuad_vert_h,
-        sizeof(OpaqueSpriteQuad_vert_h),
+        OpaqueSpriteQuad_vert_h_size,
         0, 0, 2, 0);
 
     m_opaqueSpritePipelineFragmentShader = RenderUtils::CreateShader(
         m_gpu.device, 
         SDL_GPU_SHADERSTAGE_FRAGMENT, 
         OpaqueSpriteQuad_frag_h,
-        sizeof(OpaqueSpriteQuad_frag_h),
+        OpaqueSpriteQuad_frag_h_size,
         1, 0, 0, 0);
 
     // Create Graphics Pipeline

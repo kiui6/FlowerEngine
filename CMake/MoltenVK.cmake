@@ -1,6 +1,6 @@
 add_library(MoltenVK INTERFACE)
 
-# TODO: Temporal measure, move to metal with shadercross later.
+# TODO: Temporal measure, move to MoltenVK 1.2.6-rc2 & vulkan loader
 
 if(APPLE)
 message(STATUS "Fetching MoltenVK 1.4.1")
