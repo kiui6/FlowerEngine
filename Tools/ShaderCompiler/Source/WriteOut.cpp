@@ -6,6 +6,7 @@
 #include <string>
 #include <string_view>
 #include <algorithm>
+#include <iomanip>
 
 void WriteBinaryFile(const std::string &path, const std::vector<uint8_t> &data)
 {

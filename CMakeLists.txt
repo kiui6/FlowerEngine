@@ -211,6 +211,7 @@ target_link_libraries(Shared INTERFACE disable_cxx_features SDL3::SDL3-static gl
 target_include_directories(Shared INTERFACE "Source/Runtime" "Source/ThirdParty")
 target_include_directories(Shared INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated)
 target_compile_features(Shared INTERFACE cxx_std_23)
+add_dependencies(Shared FundamentalShaders)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   target_link_libraries(Shared INTERFACE Imgui) 
