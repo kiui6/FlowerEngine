@@ -7,4 +7,5 @@ enum class CompilationTarget {
     HLSL,
     DXBC,
     DXIL,
+    SN,
 };

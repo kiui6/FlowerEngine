@@ -47,6 +47,9 @@ target_link_libraries(ShaderCompiler PRIVATE
     spirv-cross-glsl
     spirv-cross-msl
     spirv-cross-hlsl
+
+    # Used for ShaderNode
+    nlohmann_json
 )
 
 target_include_directories(ShaderCompiler PRIVATE ${glslang_SOURCE_DIR})
@@ -61,7 +64,7 @@ if(METAL_LIB)
     target_link_libraries(ShaderCompiler PRIVATE ${METAL_LIB} ${FOUNDATION_LIB})
     target_compile_definitions(ShaderCompiler PRIVATE HAS_METAL)
     set_target_properties(ShaderCompiler PROPERTIES 
-        OSX_DEPLOYMENT_TARGET "10.15"
+        OSX_DEPLOYMENT_TARGET "11"
     )
 endif()
     

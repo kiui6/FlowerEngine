@@ -63,8 +63,9 @@ public:
     virtual void BeginPlay() {}
 
     virtual void OnInput(const InputView& input) {}
-    virtual void SimulationUpdate(float deltaTime) {}
     virtual void Tick(float deltaTime);
+    // Performs final simulation update after input & tick for current frame
+    virtual void SimulationUpdate(float deltaTime) {}
 
     virtual Transform2D GetTransform();
     virtual const Transform2D& GetRelativeTransform() const {return m_transform;}
