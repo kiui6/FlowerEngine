@@ -3,24 +3,36 @@ add_library(MoltenVK INTERFACE)
 # TODO: Temporal measure, move to MoltenVK 1.2.6-rc2 & vulkan loader
 
 if(APPLE)
-message(STATUS "Fetching MoltenVK 1.4.1")
+    message(STATUS "Searching for MoltenVK")
 
-include(FetchContent)
+    find_library(MOLTENVK_LIBRARY
+        NAMES MoltenVK
+        HINTS /opt/local/lib /usr/local/lib /usr/lib
+        REQUIRED
+    )
 
-FetchContent_Declare(
-    MoltenVKTar
-    URL https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar
-)
+    if(NOT MOLTENVK_LIBRARY)
+        message(STATUS "MoltenVK not found")
+        message(STATUS "Fetching MoltenVK 1.4.1")
 
-FetchContent_MakeAvailable(MoltenVKTar)
+        include(FetchContent)
+        FetchContent_Declare(
+            MoltenVKTar
+            URL https://github.com/KhronosGroup/MoltenVK/releases/download/v1.4.1/MoltenVK-macos.tar
+        )
 
-set(MOLTENVK_DYLIB "${moltenvktar_SOURCE_DIR}/MoltenVK/dylib/macOS/libMoltenVK.dylib")
+        FetchContent_MakeAvailable(MoltenVKTar)
 
-target_sources(MoltenVK INTERFACE
-    "${MOLTENVK_DYLIB}"
-)
-set_source_files_properties("${MOLTENVK_DYLIB}" PROPERTIES
-    MACOSX_PACKAGE_LOCATION "Frameworks"
-)
+        set(MOLTENVK_LIBRARY "${moltenvktar_SOURCE_DIR}/MoltenVK/dylib/macOS/libMoltenVK.dylib")
+    else()
+        message(STATUS "Found MoltenVK: ${MOLTENVK_LIBRARY}")
+    endif()
+
+    target_sources(MoltenVK INTERFACE
+        "${MOLTENVK_LIBRARY}"
+    )
+    set_source_files_properties("${MOLTENVK_LIBRARY}" PROPERTIES
+        MACOSX_PACKAGE_LOCATION "Frameworks"
+    )
 
 endif()

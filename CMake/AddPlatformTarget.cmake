@@ -24,7 +24,7 @@ function(add_platform_target TARGET_NAME)
 
         add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
             COMMAND ${CMAKE_COMMAND} -E copy
-                "${MOLTENVK_DYLIB}"
+                "${MOLTENVK_LIBRARY}"
                 "$<TARGET_BUNDLE_DIR:${TARGET_NAME}>/Contents/Frameworks/libMoltenVK.dylib"
             COMMENT "Copying MoltenVK dylib to app bundle"
         )
