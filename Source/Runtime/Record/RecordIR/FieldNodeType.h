@@ -5,6 +5,8 @@
 enum class FieldNodeType : uint8_t
 {
     None,
+    Integer,
+    Unsigned,
     Bool,
     Record,
     List,

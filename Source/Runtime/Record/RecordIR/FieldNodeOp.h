@@ -4,7 +4,8 @@
 
 enum class FieldNodeOp : uint8_t
 {
-    Emplace,
-    Insert,
-    Remove,
+    Insert = 0,
+    Remove = 1,
+    Move = 2,
+    Modify = 3,
 };

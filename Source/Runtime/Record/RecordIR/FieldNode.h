@@ -6,14 +6,15 @@
 #include <vector>
 
 struct FieldNode {
-    FieldNodeType type;
-    FieldNodeOp op;
-    uint16_t size;
-    uint16_t elementNumber;
-    uint16_t pad;
+    FieldNodeType type = FieldNodeType::None;
+    FieldNodeOp op = FieldNodeOp::Insert;
+    uint16_t size = 0;
+    uint16_t elementNumber = 0;
+    uint16_t flags = 0;
     union {
         bool     boolValue;
-        uint32_t  integerValue;
+        uint64_t  unsignedValue;
+        int64_t  integerValue;
         float    floatValue;
         double   doubleValue;
         const char*    stringValue;
