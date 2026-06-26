@@ -23,7 +23,7 @@ struct FlatHashMapDefaultHash<T, std::enable_if_t<std::is_base_of_v<std::string,
 
 template <class _Func, class _TArg>
 struct _FlatHashMapHash : _Func {
-    uint64_t operator()(const _TArg& key) {return _Func::operator()(key);}
+    uint64_t operator()(const _TArg& key) const {return _Func::operator()(key);}
 };
 
 template <class K, class V, class HashFunction = FlatHashMapDefaultHash<K>::type, class _KeyEq = std::equal_to<>, class _Allocator = std::allocator<std::pair<const K, V>>>
@@ -122,7 +122,7 @@ public:
     }
 
     FlatHashMap(ContainerType && right) noexcept(std::is_nothrow_move_constructible<_Allocator>::value)
-    :   _Allocator(std::move(right.m_alloc)), 
+    :   _Allocator(std::move(right)), 
         m_occupied(std::move(right.m_occupied)), 
         m_capacity(std::move(right.m_capacity)), 
         m_slots(std::move(right.m_slots)),
@@ -200,14 +200,14 @@ public:
 
     template <class _VTy>
     inline Slot* Emplace(const K&  key, _VTy && value) {
-        if(m_occupied >= (m_capacity * 7) * 0.125f) {
+        if(m_occupied >= m_capacity * 0.75) {
             _Rehash(m_capacity * 2);
         }
 
         return _Emplace(key, std::forward<_VTy>(value));
     }
 
-    inline V* Find(const K& key) {
+    inline V* Find(const K& key) const {
         const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
         const uint8_t h2 = hash & 0x7F;
         size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
@@ -272,8 +272,8 @@ public:
     inline const Iterator begin() const {return Iterator(this, 0);}
     inline const Iterator end() const {return Iterator(this, m_capacity);}
 
-    inline bool Empty() {return m_occupied;}
-
+    inline bool Empty() const {return m_occupied;}
+    inline size_t Size() const {return m_occupied;}
 protected:
     template <class _VTy>
     inline Slot* _Emplace(const K& key, _VTy && value) {
@@ -329,7 +329,7 @@ protected:
         return nullptr;
     }
 
-    inline Slot* _FindSlot(const K& key) {
+    inline Slot* _FindSlot(const K& key) const {
         const uint64_t hash = _FlatHashMapHash<HashFunction, K>::operator()(key);
         const uint8_t h2 = hash & 0x7F;
         size_t idx = ((hash >> 7) & (m_capacity - 1)) & ~15;
