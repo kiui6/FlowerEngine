@@ -70,13 +70,8 @@ public:
 
     bool IsDirty() override;
 
-    virtual bool Serialize(RecordObject& object) {
-        object
-        .CreateField(EditorID.GetID(), FieldNodeType::String)
-        .SetString(EditorID.Get());
-        return false;
-    }
-    virtual bool Deserialize(const RecordObject& object) {return false;}
+    virtual bool Serialize(RecordObject& object);
+    virtual bool Deserialize(const RecordObject& object);
 
 protected: 
     void SetID(RecordID newID) {m_id = newID;}

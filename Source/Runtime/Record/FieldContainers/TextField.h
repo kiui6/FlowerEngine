@@ -9,6 +9,6 @@ struct FText
 {
     using DecayType = Text;
 
-    static void Serialize(const DecayType& data, RecordObject::NodeWrapper& out) {}
+    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
     static void Deserialize(FieldNode* node, DecayType& out) {}
 };

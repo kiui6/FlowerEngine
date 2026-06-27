@@ -6,7 +6,7 @@
 #include <vector>
 
 struct FieldNode {
-    FieldNodeType type = FieldNodeType::None;
+    FieldNodeType type = FieldNodeType::MAX;
     FieldNodeOp op = FieldNodeOp::Insert;
     uint16_t size = 0;
     uint16_t targetPosition = 0;

@@ -9,6 +9,6 @@ struct FPair
 {
     using DecayType = std::pair<typename KeyT::DecayType, typename ValueT::DecayType>;
 
-    static void Serialize(const DecayType& data, RecordObject::NodeWrapper& out) {}
+    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
     static void Deserialize(FieldNode* node, DecayType& out) {}
 };

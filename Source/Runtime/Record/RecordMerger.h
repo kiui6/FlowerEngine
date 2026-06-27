@@ -24,11 +24,11 @@ struct RecordMerger
 public:
     static constexpr const uint8_t NULL_OBJECT = 0xff;
 private:
-    std::shared_mutex m_objectsMutex;
+    std::shared_mutex m_objectsMutex{};
 
-    std::vector<RecordObject> m_objects;
+    std::vector<RecordObject> m_objects{};
 
-    std::atomic_uint16_t m_poolUsedBits = 0;
+    std::atomic_uint16_t m_poolUsedBits{0};
 
     inline uint8_t AcquireObject() {
         uint16_t mask = m_poolUsedBits.load(std::memory_order_acquire);

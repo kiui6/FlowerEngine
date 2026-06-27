@@ -30,3 +30,16 @@ bool Record::IsDirty()
 
     return false;
 }
+
+bool Record::Serialize(RecordObject &object)
+{
+    object
+    .CreateField(EditorID.GetID(), FieldNodeType::String)
+    .SetString(EditorID.Get());
+    return false;
+}
+
+bool Record::Deserialize(const RecordObject &object)
+{
+    return false;
+}

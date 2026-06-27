@@ -16,6 +16,7 @@ static constexpr is_master_plugin_t is_master_plugin{};
 
 class PluginReader : public IRecordSource {
     std::string m_name;
+    uint64_t m_uniqueID;
 
     DataView m_fileView{};
     bool m_isMaster;
@@ -37,11 +38,15 @@ public:
 
     void InitializeFileView(DataView&& view);
 
-    bool FetchRecordObject(RecordID id, RecordObject& result) override;
+    // IRecordSource Interface
+    virtual bool ResolveUniquePluginID(uint64_t uniqueID, uint16_t& relativeID) override {return false;}
+    virtual uint64_t GetUniquePluginID() override {return m_uniqueID;}
+    virtual bool FetchRecordInfo(RecordID id, RecordInformation& result) override {return false;}
+    bool PopulateRecordFieldObject(RecordID id, RecordObject& result) override;
     std::optional<ID32> FetchRecordType(RecordID id) override {return {};}
     bool HasRecord(RecordID id) override {return false;}
 protected:
-    bool FindRecordLUTEntry(RecordID id, SerialLUTEntry& result); 
+    bool FindRecordLUTEntry(RecordID id, SerialLUTEntry& result);
     DataView FindRecordFromOffset(size_t offset);
 
     uint8_t GetFixedFieldSizeFromType(FieldNodeType type);

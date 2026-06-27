@@ -30,7 +30,7 @@ public:
      * This function expects RecordObject& result to be empty before any operations to allow optimization.
      * If it's not cleared before execution, behavior is undefined. 
      */
-    virtual bool FetchRecordObject(RecordID id, RecordObject& result) = 0;
+    virtual bool PopulateRecordFieldObject(RecordID id, RecordObject& result) = 0;
     /*
      * Fetches Record's LUT entry from a file
      *

@@ -229,7 +229,7 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
     T* record = new T();
     record->SetID(recordID);
 
-    record->Deserialize(&recObject);
+    record->Deserialize(*recObject);
 
     m_merger.FreeObject(recObjectID);
 

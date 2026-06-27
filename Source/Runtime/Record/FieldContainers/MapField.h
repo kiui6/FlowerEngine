@@ -10,7 +10,7 @@ struct FMap
 {
     using DecayType = std::unordered_map<typename KeyT::DecayType, typename T::DecayType>;
 
-    static void Serialize(const DecayType& data, RecordObject::NodeWrapper& out) {}
+    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
     static void Deserialize(FieldNode* node, DecayType& out) {}
 };
 
@@ -19,6 +19,6 @@ struct FMap<FString, T>
 {
     using DecayType = std::unordered_map<typename FString::DecayType, typename T::DecayType, StringHash, std::equal_to<>>;
 
-    static void Serialize(const DecayType& data, RecordObject::NodeWrapper& out) {}
+    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
     static void Deserialize(FieldNode* node, DecayType& out) {}
 };

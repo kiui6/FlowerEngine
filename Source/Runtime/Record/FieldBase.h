@@ -35,6 +35,6 @@ concept FieldValueClass =
         typename T::DecayType;
         { T::Deserialize(std::declval<FieldNode*>(), std::declval<typename T::DecayType&>()) } 
             -> std::same_as<void>;
-        { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<RecordObject::NodeWrapper&>()) } 
+        { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<RecordFieldObject::NodeWrapper&>()) } 
             -> std::same_as<void>;
     };

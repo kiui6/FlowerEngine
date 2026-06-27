@@ -21,9 +21,9 @@ struct SerialHeader
     u64 dependenciesOffset = 0;
     u16 dependencyCount = 0;
 
-    u16 padding;
+    u16 infoSectionOffset = 0;
 
-    u32 checksum;
+    u32 checksum = 0;
 };
 
 static_assert(sizeof(SerialHeader) % alignof(SerialHeader) == 0);

@@ -16,6 +16,8 @@ RecordLibrary::RecordLibrary()
 void RecordLibrary::Initialize()
 {
     m_datamgr = GetService<DataManager>();
+
+    m_merger.ResizeMemoryPool(2);
 }
 
 void RecordLibrary::Deinitialize()

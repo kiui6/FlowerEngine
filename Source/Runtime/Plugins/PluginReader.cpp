@@ -22,6 +22,8 @@ void PluginReader::InitializeFileView(DataView &&view)
         return;
     }
 
+    m_uniqueID = header.pluginID;
+
     m_dependenciesCount = header.dependencyCount; 
     if(m_dependenciesCount) {
         DataView dependenciesView = m_fileView.MakeSubView(header.dependenciesOffset, m_dependenciesCount * sizeof(SerialDependency));
@@ -39,7 +41,7 @@ void PluginReader::InitializeFileView(DataView &&view)
     m_LUTView = m_fileView.MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
-bool PluginReader::FetchRecordObject(RecordID id, RecordObject& result)
+bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject& result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -65,7 +67,7 @@ bool PluginReader::FetchRecordObject(RecordID id, RecordObject& result)
             return false;
         }
 
-        RecordObject::NodeWrapper node = result.CreateField(fieldHeader.id, fieldHeader.type);
+        RecordFieldObject::NodeWrapper node = result.CreateField(fieldHeader.id, fieldHeader.type);
 
         if(fieldHeader.type == FieldNodeType::String) {
             uint32_t strSize;
