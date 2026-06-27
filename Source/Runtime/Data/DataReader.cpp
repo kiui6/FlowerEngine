@@ -5,14 +5,13 @@ std::optional<std::byte> DataReader::ReadByte(bool advance)
     return std::optional<std::byte>();
 }
 
-bool DataReader::ReadBytes(size_t length, std::unique_ptr<std::byte[]>& result, bool advance)
+bool DataReader::ReadBytes(size_t length, void* result, bool advance)
 {
     if((m_view.size() - m_cursor) < (length)) {
         return false;
     }
 
-    result = std::make_unique<std::byte[]>(length);
-    memcpy(result.get(), m_view.data() + m_cursor, length);
+    memcpy(result, m_view.data() + m_cursor, length);
 
     if(advance) Advance(length);
 

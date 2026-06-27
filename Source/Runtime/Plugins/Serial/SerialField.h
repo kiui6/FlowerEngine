@@ -4,12 +4,12 @@
 
 #include <Utility/Types.h>
 
-#include <Record/RecordFieldMemory.h>
+#include <Record/RecordIR/FieldNodeType.h>
 
 struct SerialField
 {
     u32 id;
-    FieldType type;
+    FieldNodeType type;
 };
 
 static_assert(sizeof(SerialField) % alignof(SerialField) == 0);

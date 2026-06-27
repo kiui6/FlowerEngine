@@ -39,7 +39,7 @@ void PluginReader::InitializeFileView(DataView &&view)
     m_LUTView = m_fileView.MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
-bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
+bool PluginReader::FetchRecordObject(RecordID id, RecordObject& result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -49,8 +49,8 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
     DataView recordFieldsView = FindRecordFromOffset(lutEntry.offset);
     DataReader recordFieldsReader(recordFieldsView);
 
-    result.SetRecordID(id);
-    result.SetRecordType(lutEntry.type); 
+    result.SetID(id);
+    result.SetType(lutEntry.type); 
 
     // If record is marked as deleted in the Look-up Table, we can ignore reading any fields
     if(lutEntry.flags & SerialRecordFlags::Deleted) {
@@ -65,28 +65,23 @@ bool PluginReader::FetchRecordMemory(RecordID id, RecordMemory& result)
             return false;
         }
 
-        RecordFieldMemory& fieldMem = result.AddFieldAndRetrieveMemory(fieldHeader.id);
-        uint32_t dataSize;
+        RecordObject::NodeWrapper node = result.CreateField(fieldHeader.id, fieldHeader.type);
 
-        // TODO: Implement algorithms for all types
-        switch(fieldHeader.type) {
-            case FieldType::String:
-                if(!recordFieldsReader.Read<uint32_t>(dataSize)) {
+        if(fieldHeader.type == FieldNodeType::String) {
+            uint32_t strSize;
+            if(!recordFieldsReader.Read<uint32_t>(strSize)) {
                     LOG(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
                     return false;
-                }
-                break;
-            default:
-                dataSize = GetFixedFieldSizeFromType(fieldHeader.type);
-        };
-
-        if(!recordFieldsReader.ReadBytes(dataSize, fieldMem.data)) {
-            LOG(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
-            return false;
+            }
+            node.SetSize(strSize);
+            node.SetString(reinterpret_cast<const char*>(recordFieldsReader.GetData()));
+        } else {
+            uint32_t dataSize = GetFixedFieldSizeFromType(fieldHeader.type);
+            if(!recordFieldsReader.ReadBytes(dataSize, &node.GetNode()->data)) {
+                LOG(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
+                return false;
+            }
         }
-
-        fieldMem.type = fieldHeader.type;
-        fieldMem.size = dataSize;
     }
 
     return true;
@@ -124,16 +119,16 @@ DataView PluginReader::FindRecordFromOffset(size_t offset)
     return m_recordsView.MakeSubView(offset, m_recordsView.size() - offset);
 }
 
-uint8_t PluginReader::GetFixedFieldSizeFromType(FieldType type)
+uint8_t PluginReader::GetFixedFieldSizeFromType(FieldNodeType type)
 {
     switch(type) {
-        case FieldType::Integer:
+        case FieldNodeType::Integer:
             return 4;
-        case FieldType::Unsigned:
+        case FieldNodeType::Unsigned:
             return 4;
-        case FieldType::Float:
+        case FieldNodeType::Float:
             return 4;
-        case FieldType::Boolean:
+        case FieldNodeType::Bool:
             return 1;
         default:
             return 0;

@@ -207,41 +207,31 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
         }
     }
 
-    // TODO: Implement merging
-    RecordMemory memory;
-    if(!m_merger.Merge(m_sources, recordID, memory)) {
+    RecordObject* recObject;
+    uint8_t recObjectID = m_merger.LoadAndMerge(m_sources, recordID, recObject);
+    if(recObjectID == RecordMerger::NULL_OBJECT) {
         LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
         return {};
     }
 
-    if(memory.IsDeleted()) {
+    if(recObject->GetDeleted()) {
         LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]. Record is deleted", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
             return {};
     }
 
-    if(memory.GetType() != T::StaticType()) {
+    if(recObject->GetType() != T::StaticType()) {
         LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]. Record type mismatch, actual type is Type[%c%c%c%c]", recordID, 
             T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24,
-            memory.GetType(), memory.GetType() >> 8, memory.GetType() >> 16, memory.GetType() >> 24);
+            recObject->GetType(), recObject->GetType() >> 8, recObject->GetType() >> 16, recObject->GetType() >> 24);
             return {};
     }
 
     T* record = new T();
     record->SetID(recordID);
 
-    for(FieldBase* field : record->GetFields()) {
-        RecordFieldMemory* fieldMem = memory.GetField(field->GetID());
-        if(!fieldMem) {
-            /*
-            LOGF(Warning, LogRecord, "Found no Field[%c%c%c%c] data for Record[0x%016llX] of Type[%c%c%c%c].", 
-                field->GetID(), field->GetID() >> 8, field->GetID() >> 16, field->GetID() >> 24,
-                recordID, 
-                T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
-            */
-            continue;
-        }
-        field->Deserialize(fieldMem);
-    }
+    record->Deserialize(&recObject);
+
+    m_merger.FreeObject(recObjectID);
 
     m_records.Emplace(recordID, std::unique_ptr<Record>(record));
 

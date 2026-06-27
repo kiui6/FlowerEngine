@@ -126,6 +126,8 @@ public:
         m_currentOffset = 0;
     }
 
+    inline bool IsEmpty() const { return !(m_currentOffset || m_lastBlock);}
+
 private:
     void CreateNewBlock() {
         m_memBlocks.emplace_back(std::make_unique<std::byte[]>(BlockSize));

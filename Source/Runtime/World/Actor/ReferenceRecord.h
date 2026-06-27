@@ -31,14 +31,4 @@ public:
     Field<FText> DisplayName = {FIELDID(DISP)};
 
     static ID32 StaticType() {return MakeID32("REFR");}
-
-    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 6) override {
-        std::vector<FieldBase*> fields = Record::GetFields(reserveSize);
-        fields.push_back(&Transform);
-        fields.push_back(&BaseTypename);
-        fields.push_back(&Base);
-        fields.push_back(&IsDynamic);
-        fields.push_back(&ParentChunk);
-        return fields;
-    }
 };

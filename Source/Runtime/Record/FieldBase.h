@@ -6,7 +6,7 @@
 #include <span>
 
 #include <Utility/ID.h>
-#include "RecordFieldMemory.h"
+#include "RecordIR/RecordObject.h"
 
 #define FIELDID(id) MakeID32( #id )
 
@@ -17,8 +17,8 @@ class FieldBase
 public:
     virtual inline ID32 GetID() const = 0;
     virtual inline bool IsDirty() const = 0;
-    virtual void Serialize(RecordFieldMemory& memory) = 0;
-    virtual void Deserialize(RecordFieldMemory* memory) = 0;
+    virtual void Serialize(RecordObject& builder) = 0;
+    virtual void Deserialize(FieldNode* node) = 0;
 };
 
 template<typename T>
@@ -33,8 +33,8 @@ template<typename T>
 concept FieldValueClass = 
     requires {
         typename T::DecayType;
-        { T::Deserialize(std::declval<RecordFieldMemory*>(), std::declval<typename T::DecayType&>()) } 
+        { T::Deserialize(std::declval<FieldNode*>(), std::declval<typename T::DecayType&>()) } 
             -> std::same_as<void>;
-        { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<RecordFieldMemory&>()) } 
+        { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<RecordObject::NodeWrapper&>()) } 
             -> std::same_as<void>;
     };

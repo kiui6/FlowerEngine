@@ -2,13 +2,18 @@
 
 #include <Log/Log.h>
 
-bool RecordMerger::Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordMemory& result)
+uint8_t RecordMerger::LoadAndMerge(std::map<uint16_t, IRecordSource*>& sources, RecordID recordId, RecordObject*& resObject)
 {
+    std::shared_lock<std::shared_mutex> lock(m_objectsMutex);
+
+    uint8_t objectPos = AcquireObject();
+    RecordObject& object = m_objects[objectPos];
     for(const auto& [key, source] : sources) {
-        return source->FetchRecordMemory(recordId, result);
+        source->FetchRecordObject(recordId, object);
+        return objectPos;
     }
 
-    return false;
+    return objectPos;
 
     // TODO
     if(sources.size() == 0) {
@@ -20,12 +25,12 @@ bool RecordMerger::Merge(std::map<uint16_t, IRecordSource*>& sources, RecordID r
     for(size_t sourceIndex = 0; sourceIndex < sources.size(); ++sourceIndex) {
         IRecordSource* source = sources[sourceIndex];
         
-        RecordMemory& memoryForSource = m_memories[sourceIndex];
+        RecordObject& memoryForSource = m_objects[sourceIndex];
         memoryForSource.Reset();
-        if(!source->FetchRecordMemory(recordId, memoryForSource)) {
+        if(!source->FetchRecordObject(recordId, memoryForSource)) {
             continue;
         }
     }
 
-    return true;
+    return 0xFF;
 }

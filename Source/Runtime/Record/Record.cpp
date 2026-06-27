@@ -19,13 +19,14 @@ bool Record::IsDirty()
         return true;
     }
 
-    for(FieldBase* field : this->GetFields()) {
-        if(field->IsDirty()) {
-            // Set record dirty so that consequential calls are resolved faster
-            SetFlag(RecordFlags::Dirty);
-            return true;
-        }
-    }
+    // TODO: What whould we do about it?
+    //for(FieldBase* field : this->GetFields()) {
+    //    if(field->IsDirty()) {
+    //        // Set record dirty so that consequential calls are resolved faster
+    //        SetFlag(RecordFlags::Dirty);
+    //        return true;
+    //    }
+    //}
 
     return false;
 }

@@ -18,8 +18,10 @@ public:
     inline size_t GetSize() {return m_view.size();}
     inline size_t GetCursor() {return m_cursor;}
 
+    inline const std::byte* GetData() const  {return m_view.data() + m_cursor;}
+
     std::optional<std::byte> ReadByte(bool advance = true);
-    bool ReadBytes(size_t length, std::unique_ptr<std::byte[]>& result, bool advance = true);
+    bool ReadBytes(size_t length, void* result, bool advance = true);
 
     bool ReadString(size_t length, std::string& result, bool advance = true) {
         if((m_view.size() - m_cursor) < length) {

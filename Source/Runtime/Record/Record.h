@@ -13,7 +13,7 @@
 
 #include "Field.h"
 #include "RecordID.h"
-#include "RecordIR/RecordIRBuilder.h"
+#include "RecordIR/RecordObject.h"
 
 #include "FieldContainers/StringField.h"
 
@@ -65,19 +65,17 @@ public:
 
     inline RecordID GetID() const {return m_id;}
 
-    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 1) {
-        std::vector<FieldBase*> fields;
-        fields.reserve(reserveSize);
-        fields.push_back(&EditorID);
-        return fields;
-    }
-
     // Marks Record Dirty, meaning that the Record has changed and should be saved again
     void MarkDirty() {SetFlag(RecordFlags::Dirty);}
 
     bool IsDirty() override;
 
-    virtual bool Serialize(RecordIRBuilder& builder) {return false;}
+    virtual bool Serialize(RecordObject& object) {
+        object
+        .CreateField(EditorID.GetID(), FieldNodeType::String)
+        .SetString(EditorID.Get());
+        return false;
+    }
     virtual bool Deserialize(const RecordObject& object) {return false;}
 
 protected: 

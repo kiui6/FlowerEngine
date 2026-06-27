@@ -23,13 +23,6 @@ public:
 
     Field<FMap<FString, FList<FInputAction>>> m_actions{FIELDID(ACTS)};
     Field<FMap<FString, FList<FInputAxis>>> m_axis{FIELDID(AXIS)};
-
-    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 3) override {
-        std::vector<FieldBase*> fields = Record::GetFields(reserveSize);
-        fields.push_back(&m_actions);
-        fields.push_back(&m_axis);
-        return fields;
-    }
 };
 
 class InputActionRecordFactory : public TemplatedRecordFactory<InputActionRecord>

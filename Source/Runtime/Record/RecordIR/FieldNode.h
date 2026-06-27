@@ -9,8 +9,8 @@ struct FieldNode {
     FieldNodeType type = FieldNodeType::None;
     FieldNodeOp op = FieldNodeOp::Insert;
     uint16_t size = 0;
-    uint16_t elementNumber = 0;
-    uint16_t flags = 0;
+    uint16_t targetPosition = 0;
+    uint16_t sourcePosition = 0;
     union {
         bool     boolValue;
         uint64_t  unsignedValue;

@@ -6,6 +6,7 @@
 
 enum class SerialRecordFlags : u16 {
     Deleted = 1 << 0,
+    Delta = 1 << 1,
 };
 
 inline bool operator&(SerialRecordFlags a, SerialRecordFlags b) {

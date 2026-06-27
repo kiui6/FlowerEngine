@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include <Record/IRecordSource.h>
 #include <Data/DataView.h>
 #include <Data/DataReader.h>
@@ -35,12 +37,12 @@ public:
 
     void InitializeFileView(DataView&& view);
 
-    bool FetchRecordMemory(RecordID id, RecordMemory& result) override;
+    bool FetchRecordObject(RecordID id, RecordObject& result) override;
     std::optional<ID32> FetchRecordType(RecordID id) override {return {};}
     bool HasRecord(RecordID id) override {return false;}
 protected:
     bool FindRecordLUTEntry(RecordID id, SerialLUTEntry& result); 
     DataView FindRecordFromOffset(size_t offset);
 
-    uint8_t GetFixedFieldSizeFromType(FieldType type);
+    uint8_t GetFixedFieldSizeFromType(FieldNodeType type);
 };
