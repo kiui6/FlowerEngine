@@ -73,6 +73,9 @@ int GuardedMain(int argc, char* argv[])
     RecordPtr<TextureRecord> gcRec = GetService<RecordLibrary>()->CreateRecord<TextureRecord>();
     }
 
+    // Expected: Reported as a warning "Record was deleted!" in game
+    // And assert "RecordMerger: No sources provides" is thrown in the editor 
+    // We can't load record in the editor, until we establish load order
     RecordPtr<EntryRecord> loadedRec = GetService<RecordLibrary>()->LoadRecord<EntryRecord>(3);
 
     // This should trigger GC

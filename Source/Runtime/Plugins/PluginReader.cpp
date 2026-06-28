@@ -41,7 +41,21 @@ void PluginReader::InitializeFileView(DataView &&view)
     m_LUTView = m_fileView.MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
-bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject& result)
+bool PluginReader::FetchRecordInfo(RecordID id, RecordInformation &result)
+{
+    SerialLUTEntry lutEntry;
+    if(!FindRecordLUTEntry(id, lutEntry)) {
+        return false;
+    }
+
+    result.fieldsCount = lutEntry.fieldsCount;
+    result.isDeleted = lutEntry.flags & SerialRecordFlags::Deleted;
+    result.type = lutEntry.type;
+
+    return true;
+}
+
+bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject &result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -58,7 +72,9 @@ bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject& result)
     if(lutEntry.flags & SerialRecordFlags::Deleted) {
         result.SetDeleted(true);
         return true;
-    }    
+    }
+
+    RecordFieldObject& fieldObject = result.CreateFieldObject();
 
     for(uint16_t i = 0; i < lutEntry.fieldsCount; i++) {
         SerialField fieldHeader;
@@ -67,7 +83,7 @@ bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject& result)
             return false;
         }
 
-        RecordFieldObject::NodeWrapper node = result.CreateField(fieldHeader.id, fieldHeader.type);
+        RecordFieldObject::NodeWrapper node = fieldObject.CreateField(fieldHeader.id, fieldHeader.type);
 
         if(fieldHeader.type == FieldNodeType::String) {
             uint32_t strSize;

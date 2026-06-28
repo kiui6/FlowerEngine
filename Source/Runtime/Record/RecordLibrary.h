@@ -229,7 +229,11 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
     T* record = new T();
     record->SetID(recordID);
 
-    record->Deserialize(*recObject);
+    if(!record->Deserialize(*recObject)) {
+        LOGF(Error, LogRecord, "Failed to load Record[0x%016llX] of Type[%c%c%c%c]. Deserialization failed", recordID, T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);
+        m_merger.FreeObject(recObjectID);
+        return {};
+    }
 
     m_merger.FreeObject(recObjectID);
 

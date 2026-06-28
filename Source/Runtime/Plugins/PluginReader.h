@@ -41,7 +41,7 @@ public:
     // IRecordSource Interface
     virtual bool ResolveUniquePluginID(uint64_t uniqueID, uint16_t& relativeID) override {return false;}
     virtual uint64_t GetUniquePluginID() override {return m_uniqueID;}
-    virtual bool FetchRecordInfo(RecordID id, RecordInformation& result) override {return false;}
+    virtual bool FetchRecordInfo(RecordID id, RecordInformation& result) override;
     bool PopulateRecordFieldObject(RecordID id, RecordObject& result) override;
     std::optional<ID32> FetchRecordType(RecordID id) override {return {};}
     bool HasRecord(RecordID id) override {return false;}

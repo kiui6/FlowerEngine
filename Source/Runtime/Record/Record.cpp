@@ -34,6 +34,7 @@ bool Record::IsDirty()
 bool Record::Serialize(RecordObject &object)
 {
     object
+    .CreateFieldObject()
     .CreateField(EditorID.GetID(), FieldNodeType::String)
     .SetString(EditorID.Get());
     return false;

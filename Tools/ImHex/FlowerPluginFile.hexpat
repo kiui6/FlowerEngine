@@ -16,26 +16,32 @@ struct PluginHeader
     u64 dependenciesOffset;
     u16 dependencyCount;
 
-    u16 _padding;
+    u16 infoSectionOffset;
 
     u32 checksum;
 };
 
 enum FieldType : u32 {
-    Integer = 0,
-    Unsigned = 1,
-    Float = 2,
-    Boolean = 3,
-    String = 4,
-    List = 5,
-    Map = 6
+    Integer     = 0,
+    Unsigned    = 1,
+    Float       = 2,
+    Double      = 3,
+    Bool        = 4,
+    Record      = 5,
+    List        = 6,
+    Map         = 7,
+    Tuple       = 8,
+    Pair        = 9,
+    String      = 10,
+    Text        = 11,
+    Trivial     = 12
 };
 
 fn fieldDataSize(FieldType type) {
     if (type == FieldType::Integer) return 4;
     if (type == FieldType::Unsigned) return 4;
     if (type == FieldType::Float) return 8;
-    if (type == FieldType::Boolean) return 1;
+    if (type == FieldType::Bool) return 1;
     if (type == FieldType::String) {
         u32 stringSize @ $-4;
         return stringSize;
