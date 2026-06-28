@@ -120,7 +120,7 @@ std::vector<uint32_t> CompileGLSLToSPIRV(const std::string &source, EShLanguage 
 
     shader.setEnvInput(glslang::EShSourceGlsl, stage, glslang::EShClientVulkan, 100);
     shader.setEnvClient(glslang::EShClientVulkan, glslang::EShTargetVulkan_1_0);
-    shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_5);
+    shader.setEnvTarget(glslang::EShTargetSpv, glslang::EShTargetSpv_1_3);
 
     TBuiltInResource resources = InitResources();
     const int defaultVersion = 450;
