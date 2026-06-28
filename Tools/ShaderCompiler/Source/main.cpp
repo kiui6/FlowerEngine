@@ -127,6 +127,7 @@ void PrintUsage() {
     std::cerr << "\t--output <Path> - Path for output file\n\n";
     std::cerr << "\t--stage <vert/frag/comp/geom> - Specify shader stage\n\n";
     std::cerr << "\t--target <spirv/msl/metallib/dxil> - Specify target binary format for compilation\n\n";
+    std::cerr << "\t--spirv-version <Version> - Specify SPIRV version to compile GLSL into\n\n";
     std::cerr << "\t--format <default/h> - format for output file\n";
     std::cerr << "\t\tdefault - output binary without any transformations\n";
     std::cerr << "\t\tcarray - output binary as c-array in a header file\n";
