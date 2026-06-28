@@ -70,8 +70,15 @@ public:
 
     bool IsDirty() override;
 
-    virtual bool Serialize(RecordObject& object);
-    virtual bool Deserialize(const RecordObject& object);
+    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 1) {
+        std::vector<FieldBase*> fields;
+        fields.reserve(reserveSize);
+        fields.push_back(&EditorID);
+        return fields;
+    }
+
+    bool Serialize(RecordObject& object);
+    bool Deserialize(const RecordObject& object);
 
 protected: 
     void SetID(RecordID newID) {m_id = newID;}

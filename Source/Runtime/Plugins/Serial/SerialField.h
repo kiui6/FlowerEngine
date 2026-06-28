@@ -9,7 +9,7 @@
 struct SerialField
 {
     u32 id;
-FieldNodeType type; // Prioritize IR conventions and types if possible
+    FieldNodeType type; // Prioritize IR conventions and types if possible
 };
 
 static_assert(sizeof(SerialField) % alignof(SerialField) == 0);

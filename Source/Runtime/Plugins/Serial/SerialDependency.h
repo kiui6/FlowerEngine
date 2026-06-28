@@ -6,8 +6,8 @@
 
 struct SerialDependency
 {
-    u64 prefixIndex;
-    u64 dependencyID;
+    u64 pluginOrderID;
+    u64 sourceID;
 };
 
 static_assert(sizeof(SerialDependency) % alignof(SerialDependency) == 0);

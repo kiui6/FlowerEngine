@@ -5,6 +5,7 @@
 
 #include <cassert>
 #include <bit>
+#include <functional>
 
 template <typename KeyType, typename = void>
 struct FlatHashMapDefaultHash {
@@ -335,8 +336,7 @@ public:
         }
     }
 
-    V& operator[](const K& key) { return find(key)->second; }
-    const V& operator[](const K& key) const { return find(key)->second; }
+    inline V* operator[](const K& key) const { return Find(key); }
 
     inline Iterator begin() {return Iterator(this, 0);}
     inline Iterator end() {return Iterator(this, m_capacity);}

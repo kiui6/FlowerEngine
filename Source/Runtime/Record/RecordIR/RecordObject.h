@@ -65,6 +65,14 @@ public:
         m_fields.Emplace(id, node);
         return NodeWrapper(m_alloc, node);
     }
+
+    inline FieldNode* GetField(ID32 id) const {
+        if(FieldNode** node = m_fields[id]) {
+            return *node;
+        } else {
+            return nullptr;
+        }
+    }
 };
 
 class RecordObject
@@ -86,9 +94,10 @@ public:
     void SetDeleted(bool deleted) {m_deleted = deleted;}
     bool GetDeleted() const {return m_deleted;}
 
-    RecordFieldObject& CreateFieldObject() {return m_fieldObjects.emplace_back(RecordFieldObject(m_alloc));}
+    RecordFieldObject& CreateFieldObject() {return m_fieldObjects.emplace_back(m_alloc);}
+    size_t GetFieldObjectCount() const {return m_fieldObjects.size();}
 
-    void SetFinal(size_t finalID) const {}
+    void SetFinal(size_t finalID) {m_finalFO = &m_fieldObjects[finalID];}
     RecordFieldObject* GetFinal() const {return m_finalFO;}
 
     inline bool IsEmpty() const {return m_fieldObjects.empty() && m_alloc.Empty();}

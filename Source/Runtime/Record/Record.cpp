@@ -42,5 +42,16 @@ bool Record::Serialize(RecordObject &object)
 
 bool Record::Deserialize(const RecordObject &object)
 {
-    return false;
+    RecordFieldObject* fieldObject = object.GetFinal();
+    if(!fieldObject) {
+        return false;
+    }
+    
+    for(FieldBase* field : this->GetFields()) {
+        if(FieldNode* node = fieldObject->GetField(field->GetID())) {
+            field->Deserialize(node);
+        }
+    }
+
+    return true;
 }

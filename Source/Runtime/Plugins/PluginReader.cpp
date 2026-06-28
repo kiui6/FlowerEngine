@@ -31,7 +31,7 @@ void PluginReader::InitializeFileView(DataView &&view)
 
         SerialDependency dependency;
         while(dependenciesReader.Read<SerialDependency>(dependency)) {
-            m_dependencies.emplace(dependency.prefixIndex, dependency.dependencyID);
+            m_dependencies.emplace(dependency.pluginOrderID, dependency.sourceID);
         }
     }
 
@@ -76,8 +76,8 @@ bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject &result)
 
     RecordFieldObject& fieldObject = result.CreateFieldObject();
 
+    SerialField fieldHeader;
     for(uint16_t i = 0; i < lutEntry.fieldsCount; i++) {
-        SerialField fieldHeader;
         if(!recordFieldsReader.Read<SerialField>(fieldHeader)) {
             LOG(Assert, LogPluginReader, "Expected field header, but met unexpected EOF.");
             return false;
@@ -93,6 +93,7 @@ bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject &result)
             }
             node.SetSize(strSize);
             node.SetString(reinterpret_cast<const char*>(recordFieldsReader.GetData()));
+            recordFieldsReader.Advance(strSize);
         } else {
             uint32_t dataSize = GetFixedFieldSizeFromType(fieldHeader.type);
             if(!recordFieldsReader.ReadBytes(dataSize, &node.GetNode()->data)) {
