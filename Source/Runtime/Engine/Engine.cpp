@@ -17,7 +17,7 @@
 
 #include <Debug/Tracer/Tracer.h>
 
-void Engine::InternalTravel()
+void Engine::UnloadCurrentWorld()
 {
     if(m_world){
         EngineDelegates::OnWorldUnload.Broadcast(m_world.get());
@@ -25,14 +25,20 @@ void Engine::InternalTravel()
         m_world.reset();
         m_GC->RequestGCPass(true);
     }
+}
+
+void Engine::InternalTravel()
+{
+    UnloadCurrentWorld();
 
     m_world = std::move(m_travelWorld);
     m_world->SpawnDefaultActors();
     m_world->PostInit();
 
-#   ifndef EDITOR
-    m_world->BeginPlay();
-#   endif
+    if constexpr(!IS_EDITOR) {
+        m_world->BeginPlay();
+    }
+
     EngineDelegates::OnWorldLoad.Broadcast(m_world.get());
 
     LOGF(Log, LogEngine, "Traveled to world: \"%s\"", m_world->GetName().c_str());
@@ -82,12 +88,12 @@ void Engine::InitializeInputSystem(RawInputDevice *inputDev)
     m_inputMgr.SetInputDevice(inputDev);
 }
 
-void Engine::TravelTo(std::unique_ptr<World> travelWorld)
+void Engine::TravelToConstructedWorld(std::unique_ptr<World> travelWorld)
 {
     m_travelWorld = std::move(travelWorld);
 }
 
-void Engine::TravelTo(RecordID travelWorldId)
+void Engine::LoadAndTravel(RecordID travelWorldId)
 {
     RecordPtr<WorldRecord> worldRecord = GetService<RecordLibrary>()->LoadRecord<WorldRecord>(travelWorldId);
     if(!worldRecord.IsBound()) {

@@ -101,7 +101,9 @@ void Application::StartLifecycle()
 
         m_inputDev->Update();
 
-        m_engine.Tick(m_deltaTime);
+        if constexpr(!IS_EDITOR) {
+            m_engine.Tick(m_deltaTime);
+        }
         
         RenderView& renderView = m_render.GetFrameRenderView();
         // Record state changes
