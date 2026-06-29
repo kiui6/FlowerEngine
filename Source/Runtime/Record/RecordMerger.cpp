@@ -43,7 +43,7 @@ uint8_t RecordMerger::LoadAndMerge(std::map<uint16_t, IRecordSource*>& sources, 
         return NULL_OBJECT;
     }
 
-    sources[recordRelativePluginID]->PopulateRecordFieldObject(baseRecordID, *resObject);
+    sources[recordRelativePluginID]->PopulateRecordFieldObjectBase(baseRecordID, *resObject);
 
     uint64_t recordUniquePluginID = sources[recordRelativePluginID]->GetUniquePluginID();
     bool hasDeltas = false;

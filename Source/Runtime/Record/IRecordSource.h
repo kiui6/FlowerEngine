@@ -24,13 +24,23 @@ public:
     virtual uint64_t GetUniquePluginID() = 0;
 
     /*
-     * Fetches Record object from file and inserts it into the result
+     * Fetches Record object base from file and inserts it into the result
      *
      * @warning
      * This function expects RecordObject& result to be empty before any operations to allow optimization.
      * If it's not cleared before execution, behavior is undefined. 
      */
-    virtual bool PopulateRecordFieldObject(RecordID id, RecordObject& result) = 0;
+    virtual bool PopulateRecordFieldObjectBase(RecordID id, RecordObject& result) = 0;
+    
+    /*
+     * Fetches Record object delta from file and inserts it into the result
+     *
+     * @warning
+     * This function expects RecordObject& result to be empty before any operations to allow optimization.
+     * If it's not cleared before execution, behavior is undefined. 
+     */
+    virtual bool PopulateRecordFieldObjectDelta(RecordID id, RecordObject& result) = 0;
+
     /*
      * Fetches Record's LUT entry from a file
      *

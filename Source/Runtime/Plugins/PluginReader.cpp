@@ -55,7 +55,7 @@ bool PluginReader::FetchRecordInfo(RecordID id, RecordInformation &result)
     return true;
 }
 
-bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject &result)
+bool PluginReader::PopulateRecordFieldObjectBase(RecordID id, RecordObject &result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -104,6 +104,11 @@ bool PluginReader::PopulateRecordFieldObject(RecordID id, RecordObject &result)
     }
 
     return true;
+}
+
+bool PluginReader::PopulateRecordFieldObjectDelta(RecordID id, RecordObject &result)
+{
+    return false;
 }
 
 bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
