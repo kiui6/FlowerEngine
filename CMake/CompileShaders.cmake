@@ -19,21 +19,23 @@ function(compile_shader SHADER_SOURCE SHADER_OUTPUT TARGET_NAME)
     set(${OUTPUT_SHADER_FILE} ${SHADER_OUTPUT} PARENT_SCOPE)
 endfunction()
 
+set(SHADER_SOURCE_FOLDER "${PROJECT_SOURCE_DIR}/Shaders")
+
 file(GLOB_RECURSE SHADER_SOURCES 
-    "${PROJECT_SOURCE_DIR}/Shaders/*.vert"
-    "${PROJECT_SOURCE_DIR}/Shaders/*.frag"
+    "${SHADER_SOURCE_FOLDER}/*.vert"
+    "${SHADER_SOURCE_FOLDER}/*.frag"
 )
 
 set(GENERATED_SHADER_HEADERS "")
 
 foreach(SOURCE_FILE ${SHADER_SOURCES})
-    get_filename_component(FILE_NAME ${SOURCE_FILE} NAME)
+    file(RELATIVE_PATH FILE_NAME ${SHADER_SOURCE_FOLDER} ${SOURCE_FILE})
     
     if(NOT DEFINED CROSS_PLATFORM)
         set(API "spirv")
     endif()
 
-    set(OUTPUT_SHADER_FILE "${CMAKE_CURRENT_BINARY_DIR}/generated/Shaders/${FILE_NAME}.h")
+    set(OUTPUT_SHADER_FILE "${CMAKE_CURRENT_BINARY_DIR}/generated/generated/Shaders/${FILE_NAME}.h")
     
     compile_shader(${SOURCE_FILE} ${OUTPUT_SHADER_FILE} ${API})
     

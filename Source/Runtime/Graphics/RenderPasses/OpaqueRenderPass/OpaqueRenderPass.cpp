@@ -10,8 +10,8 @@
 #include <Debug/Tracer/Tracer.h>
 #include <Math/Mesh.h>
 
-#include <Shaders/OpaqueSpriteQuad.vert.h>
-#include <Shaders/OpaqueSpriteQuad.frag.h>
+#include <generated/Shaders/OpaqueRenderPass/OpaqueSpriteQuad.vert.h>
+#include <generated/Shaders/OpaqueRenderPass/OpaqueSpriteQuad.frag.h>
 
 OpaqueRenderPass::OpaqueRenderPass(GPUContext& context, RenderStateStore& stateStore)
     : m_gpu(context), tilemapState(stateStore.Get<TilemapRenderState>()), globalState(stateStore.Get<GlobalRenderState>())

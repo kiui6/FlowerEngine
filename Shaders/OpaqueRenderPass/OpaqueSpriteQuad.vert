@@ -35,6 +35,7 @@ void main() {
     
     gl_Position = worldData.projectionView * vertexPosition;
 
-    fragUV = sprite.uv.xy + inUV * (sprite.uv.zw - sprite.uv.xy);
+    vec2 fixedUV = vec2(inUV.x, 1.0 - inUV.y);
+    fragUV = sprite.uv.xy + fixedUV * (sprite.uv.zw - sprite.uv.xy);
     fragTint = vec3(sprite.tint.x, sprite.tint.y, sprite.tint.z);
 }

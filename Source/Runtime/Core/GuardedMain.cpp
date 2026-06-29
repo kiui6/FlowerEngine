@@ -57,7 +57,10 @@ int GuardedMain(int argc, char* argv[])
 
     RecordPtr<InputActionRecord> inputRec = GetService<RecordLibrary>()->CreateRecord<InputActionRecord>();
     inputRec->EditorID = "TestActions";
+    inputRec->actions.Get().emplace("moveU", std::vector{InputKey::Key_W});
     inputRec->actions.Get().emplace("moveL", std::vector{InputKey::Key_A});
+    inputRec->actions.Get().emplace("moveD", std::vector{InputKey::Key_S});
+    inputRec->actions.Get().emplace("moveR", std::vector{InputKey::Key_D});
     application.GetEngine().GetInputManager().SetInputActionRecord(inputRec);
 
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
