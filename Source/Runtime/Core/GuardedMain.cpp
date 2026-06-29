@@ -55,6 +55,11 @@ int GuardedMain(int argc, char* argv[])
     worldRec->EditorID = "TestWorld";
     worldRec->DisplayName = "Test World";
 
+    RecordPtr<InputActionRecord> inputRec = GetService<RecordLibrary>()->CreateRecord<InputActionRecord>();
+    inputRec->EditorID = "TestActions";
+    inputRec->actions.Get().emplace("moveL", std::vector{InputKey::Key_A});
+    application.GetEngine().GetInputManager().SetInputActionRecord(inputRec);
+
     std::unique_ptr<World> myWorld = std::make_unique<World>(worldRec);
 
     ActorInstantiateInfo acinfo1{};

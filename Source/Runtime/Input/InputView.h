@@ -19,7 +19,7 @@ public:
             return false;
         }
         
-        const auto& actionHashmap = m_actionRec->m_actions.Get();
+        const auto& actionHashmap = m_actionRec->actions.Get();
         auto it = actionHashmap.find(actionName);
         if(it == actionHashmap.end()) {
             return false;
@@ -38,6 +38,20 @@ public:
     float GetAxis(std::string_view axisName) const {
         if(!m_dev || !m_actionRec) {
             return 0.f;
+        }
+
+        const auto& axisHashmap = m_actionRec->axis.Get();
+        auto it = axisHashmap.find(axisName);
+        if(it == axisHashmap.end()) {
+            return false;
+        }
+
+        for(const std::pair<InputAxis, float>& pair : it->second) {
+            float value = m_dev->GetAxisValue(pair.first);
+            float multiplier = pair.second;
+            if(value > 0.05f || value < 0.05f) {
+                return value * multiplier;
+            }
         }
 
         return 0.f;

@@ -27,6 +27,14 @@ class SpriteActor : public Actor
 public:
     SpriteActor(const RecordPtr<ReferenceRecord>& reference);
 
+    virtual void OnInput(const InputView& input) override {
+        if(input.GetAction("moveL")) {
+            auto loc = GetLocation();
+            loc.x -= 1;
+            SetLocation(loc);
+        }
+    }
+
     virtual void RecordRenderView(RenderView& renderView) override;
 };
 

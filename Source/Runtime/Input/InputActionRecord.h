@@ -21,8 +21,8 @@ public:
 
     static ID32 StaticType() {return MakeID32("INAC");}
 
-    Field<FMap<FString, FList<FInputAction>>> m_actions{FIELDID(ACTS)};
-    Field<FMap<FString, FList<FInputAxis>>> m_axis{FIELDID(AXIS)};
+    Field<FMap<FString, FList<FInputAction>>> actions{FIELDID(ACTS)};
+    Field<FMap<FString, FList<FInputAxis>>> axis{FIELDID(AXIS)};
 };
 
 class InputActionRecordFactory : public TemplatedRecordFactory<InputActionRecord>

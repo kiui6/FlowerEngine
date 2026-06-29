@@ -29,7 +29,9 @@ protected:
 public:
     void Initialize();
 
+    // Input API
     void InitializeInputSystem(RawInputDevice* inputDev);
+    InputManager& GetInputManager() {return m_inputMgr;}
 
     // Starts a process of traveling to the new world
     void TravelTo(std::unique_ptr<World> travelWorld);

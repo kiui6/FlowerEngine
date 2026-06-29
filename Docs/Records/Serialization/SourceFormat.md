@@ -71,6 +71,18 @@ struct SerialLUTEntry
 <sub>*Diag 4. Structure of an RLUT entry*</sub>
 
 ### Record Field Blob (ReFB)
+Before parsing ReFB, reader needs to fetch RLUT entry for the corresponding record.
+Record Field Data is located at specified offset, and contains N amount of fields.
+
+Fields of records are located one after another in a contiguous region without spaces.
+
+For optimization, default-initialized fields may be ommited from the binary.
+
+### Record Field Base (Base)
+Base contains only initial state of the fields.
+
+### Record Field Delta (Delta)
+Delta is structured differently from the base.
 
 ## Parsing rules
 ### Base Detection Rules
