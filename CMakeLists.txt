@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.29)
 
-project ("Flower")
+set(ORGANIZATION_ID "com.flower" CACHE STRING "Organization ID")
+set(PROJECT_NAME "flower" CACHE STRING "Project Name")
 
-set(ORGANIZATION_ID com.flower)
+project ("Flower")
 
 add_subdirectory("Tools")
 
