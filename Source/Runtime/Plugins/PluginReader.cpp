@@ -85,21 +85,8 @@ bool PluginReader::PopulateRecordFieldObjectBase(RecordID id, RecordObject &resu
 
         RecordFieldObject::NodeWrapper node = fieldObject.CreateField(fieldHeader.id, fieldHeader.type);
 
-        if(fieldHeader.type == FieldNodeType::String) {
-            uint32_t strSize;
-            if(!recordFieldsReader.Read<uint32_t>(strSize)) {
-                    LOG(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
-                    return false;
-            }
-            node.SetSize(strSize);
-            node.SetString(reinterpret_cast<const char*>(recordFieldsReader.GetData()));
-            recordFieldsReader.Advance(strSize);
-        } else {
-            uint32_t dataSize = GetFixedFieldSizeFromType(fieldHeader.type);
-            if(!recordFieldsReader.ReadBytes(dataSize, &node.GetNode()->data)) {
-                LOG(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
-                return false;
-            }
+        if(!SerialFormatBaseReader::PopulateFieldFromSerial(recordFieldsReader, fieldHeader.type, node)) {
+            return false;
         }
     }
 
@@ -143,19 +130,17 @@ DataView PluginReader::FindRecordFromOffset(size_t offset)
     return m_recordsView.MakeSubView(offset, m_recordsView.size() - offset);
 }
 
-uint8_t PluginReader::GetFixedFieldSizeFromType(FieldNodeType type)
+bool SerialFormatBaseReader::ParseString(DataReader &reader, RecordFieldObject::NodeWrapper &result)
 {
-    switch(type) {
-        case FieldNodeType::Integer:
-            return 4;
-        case FieldNodeType::Unsigned:
-            return 4;
-        case FieldNodeType::Float:
-            return 4;
-        case FieldNodeType::Bool:
-            return 1;
-        default:
-            return 0;
+    uint32_t strSize;
+    if(!reader.Read<uint32_t>(strSize)) {
+            LOG(Assert, LogPluginReader, "Expected string size, but met unexpected EOF.");
+            return false;
     }
-    return 0;
+
+    result.SetSize(strSize);
+    result.SetString(reinterpret_cast<const char*>(reader.GetData()));
+    reader.Advance(strSize);
+
+    return true;
 }

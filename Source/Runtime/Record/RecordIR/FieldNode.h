@@ -8,9 +8,10 @@
 struct FieldNode {
     FieldNodeType type = FieldNodeType::MAX;
     FieldNodeOp op = FieldNodeOp::Insert;
-    uint16_t size = 0;
-    uint16_t targetPosition = 0;
-    uint16_t sourcePosition = 0;
+    uint16_t reserved = 0;
+    uint32_t size = 0;
+    uint32_t sourcePosition = 0;
+    uint32_t targetPosition = 0;
     union {
         bool     boolValue;
         uint64_t  unsignedValue;
@@ -22,4 +23,4 @@ struct FieldNode {
     } data;
 };
 
-static_assert(sizeof(FieldNode) == 16, "FieldNode size must be 16 bytes");
+static_assert(sizeof(FieldNode) == 24, "FieldNode size must be 24 bytes");

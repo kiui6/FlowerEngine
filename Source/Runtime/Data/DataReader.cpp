@@ -7,7 +7,7 @@ std::optional<std::byte> DataReader::ReadByte(bool advance)
 
 bool DataReader::ReadBytes(size_t length, void* result, bool advance)
 {
-    if((m_view.size() - m_cursor) < (length)) {
+    if(m_cursor > m_view.size() || (m_view.size() - m_cursor) < (length)) {
         return false;
     }
 

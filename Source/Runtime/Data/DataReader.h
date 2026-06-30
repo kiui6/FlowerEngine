@@ -5,6 +5,7 @@
 #include <optional>
 #include <type_traits>
 #include <cstring>
+#include <bit>
 
 class DataReader {
     DataView& m_view;
@@ -24,7 +25,7 @@ public:
     bool ReadBytes(size_t length, void* result, bool advance = true);
 
     bool ReadString(size_t length, std::string& result, bool advance = true) {
-        if((m_view.size() - m_cursor) < length) {
+        if(m_cursor > m_view.size() || (m_view.size() - m_cursor) < length) {
             return false;
         }
 
@@ -39,7 +40,7 @@ public:
     template <typename T>
     requires std::is_trivially_copyable_v<T>
     bool ReadArray(size_t length, std::vector<T>& result, bool advance = true) {
-        if((m_view.size() - m_cursor) < (sizeof(T) * length)) {
+        if(m_cursor > m_view.size() || (m_view.size() - m_cursor) < (sizeof(T) * length)) {
             return false;
         }
 
@@ -54,11 +55,18 @@ public:
     template <typename T>
     requires std::is_trivially_copyable_v<T>
     bool Read(T& result, bool advance = true) {
-        if((m_view.size() - m_cursor) < sizeof(T)) {
+        if(m_cursor > m_view.size() || (m_view.size() - m_cursor) < sizeof(T)) {
             return false;
         }
-
-        memcpy(&result, m_view.data() + m_cursor, sizeof(result));
+        
+        if constexpr (std::endian::native == std::endian::little) {
+            memcpy(&result, m_view.data() + m_cursor, sizeof(result));
+        } else {
+            static_assert(std::false_type::value, "Byteswap is not yet implemented for Big-Endian platforms");
+            T raw;
+            memcpy(&result, m_view.data() + m_cursor, sizeof(result));
+            result = raw;
+        }
 
         if(advance) Advance(sizeof(result));
 

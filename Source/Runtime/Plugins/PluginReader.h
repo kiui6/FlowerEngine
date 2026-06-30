@@ -6,10 +6,43 @@
 #include <Data/DataView.h>
 #include <Data/DataReader.h>
 
+#include <Log/Log.h>
+
 #include "Serial/SerialDependency.h"
 #include "Serial/SerialLUTEntry.h"
 #include "Serial/SerialHeader.h"
 #include "Serial/SerialField.h"
+
+class SerialFormatBaseReader {
+    using FieldParser = bool (*)(DataReader&, RecordFieldObject::NodeWrapper&);
+public:
+    static inline bool PopulateFieldFromSerial(DataReader& reader, FieldNodeType type, RecordFieldObject::NodeWrapper& result) {
+        switch(type) {
+            case FieldNodeType::Integer: return ParseTrivial<int32_t>(reader, result);
+            case FieldNodeType::Unsigned: return ParseTrivial<uint32_t>(reader, result);
+            case FieldNodeType::Float: return ParseTrivial<float>(reader, result);
+            case FieldNodeType::Double: return ParseTrivial<double>(reader, result);
+            case FieldNodeType::String: return ParseString(reader, result);
+            default: 
+                LOG(Assert, LogSerialFormatBaseReader, "Unsupported field element type!"); 
+                return false;
+        }
+    }
+private:
+    template <typename T>
+    static bool ParseTrivial(DataReader& reader, RecordFieldObject::NodeWrapper& result) {
+        uint32_t dataSize = sizeof(T);
+
+        if(!reader.ReadBytes(dataSize, &result.GetNode()->data)) {
+            LOG(Assert, LogPluginReader, "Expected field data, but met unexpected EOF.");
+            return false;
+        }
+
+        return true;
+    }
+
+    static bool ParseString(DataReader& reader, RecordFieldObject::NodeWrapper& result);
+};
 
 struct is_master_plugin_t {};
 static constexpr is_master_plugin_t is_master_plugin{};
@@ -49,6 +82,4 @@ public:
 protected:
     bool FindRecordLUTEntry(RecordID id, SerialLUTEntry& result);
     DataView FindRecordFromOffset(size_t offset);
-
-    uint8_t GetFixedFieldSizeFromType(FieldNodeType type);
 };

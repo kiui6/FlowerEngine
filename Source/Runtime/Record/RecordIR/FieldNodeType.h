@@ -17,6 +17,5 @@ enum class FieldNodeType : uint8_t
     String      = 10,
     Text        = 11,
     Trivial     = 12,
-
-    MAX         = 0xFF
+    MAX
 };

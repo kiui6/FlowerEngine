@@ -19,10 +19,17 @@ class InputActionRecord : public Record
 public:
     InputActionRecord() {SetType(InputActionRecord::StaticType());}
 
-    static ID32 StaticType() {return MakeID32("INAC");}
+    static ID32 StaticType() {return MakeID32("INPA");}
 
     Field<FMap<FString, FList<FInputAction>>> actions{FIELDID(ACTS)};
     Field<FMap<FString, FList<FInputAxis>>> axis{FIELDID(AXIS)};
+
+    virtual std::vector<FieldBase*> GetFields(size_t reserveSize = 3) {
+        std::vector<FieldBase*> fields = Record::GetFields(reserveSize);
+        fields.push_back(&actions);
+        fields.push_back(&axis);
+        return fields;
+    }
 };
 
 class InputActionRecordFactory : public TemplatedRecordFactory<InputActionRecord>
