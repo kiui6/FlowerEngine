@@ -23,5 +23,5 @@ struct FTuple
     using DecayType = TupleStruct;
 
     static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(FieldNode* node, DecayType& out) {}
+    static void Deserialize(const FieldNode& node, DecayType& out) {}
 };

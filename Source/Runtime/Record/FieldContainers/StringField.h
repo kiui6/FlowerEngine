@@ -9,8 +9,7 @@ struct FString
     using DecayType = std::string;
 
     static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(FieldNode* node, DecayType& out) {
-        //out.reserve(node->size);
-        out.assign(node->data.stringValue, node->size);
+    static void Deserialize(const FieldNode& node, DecayType& out) {
+        out.assign(node.data.stringValue, node.size);
     }
 };

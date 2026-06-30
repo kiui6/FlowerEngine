@@ -12,7 +12,7 @@ struct FTrivial
     using DecayType = T;
 
     static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(FieldNode* node, DecayType& out) {}
+    static void Deserialize(const FieldNode& node, DecayType& out) {}
 };
 
 using FInt8 = FTrivial<int8_t>;

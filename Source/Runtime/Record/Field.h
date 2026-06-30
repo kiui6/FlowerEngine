@@ -35,7 +35,7 @@ public:
         m_isDirty = false;
     }
 
-    void Deserialize(FieldNode* node) override {
+    void Deserialize(const FieldNode& node) override {
         FieldValue::Deserialize(node, m_value);
         m_isDirty = false;
     }

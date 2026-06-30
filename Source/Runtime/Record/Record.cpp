@@ -49,7 +49,7 @@ bool Record::Deserialize(const RecordObject &object)
     
     for(FieldBase* field : this->GetFields()) {
         if(FieldNode* node = fieldObject->GetField(field->GetID())) {
-            field->Deserialize(node);
+            field->Deserialize(*node);
         }
     }
 
