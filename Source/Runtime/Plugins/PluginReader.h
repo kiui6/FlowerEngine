@@ -23,6 +23,8 @@ public:
             case FieldNodeType::Float: return ParseTrivial<float>(reader, result);
             case FieldNodeType::Double: return ParseTrivial<double>(reader, result);
             case FieldNodeType::String: return ParseString(reader, result);
+            case FieldNodeType::Map: return ParseMap(reader, result);
+            case FieldNodeType::List: return ParseList(reader, result);
             default: 
                 LOG(Assert, LogSerialFormatBaseReader, "Unsupported field element type!"); 
                 return false;
@@ -42,6 +44,8 @@ private:
     }
 
     static bool ParseString(DataReader& reader, RecordFieldObject::NodeWrapper& result);
+    static bool ParseMap(DataReader& reader, RecordFieldObject::NodeWrapper& result);
+    static bool ParseList(DataReader& reader, RecordFieldObject::NodeWrapper& result);
 };
 
 struct is_master_plugin_t {};

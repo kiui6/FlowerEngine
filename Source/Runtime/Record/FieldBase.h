@@ -17,8 +17,8 @@ class FieldBase
 public:
     virtual inline ID32 GetID() const = 0;
     virtual inline bool IsDirty() const = 0;
-    virtual void Serialize(RecordObject& builder) = 0;
-    virtual void Deserialize(const FieldNode& node) = 0;
+    virtual bool Serialize(RecordObject& builder) = 0;
+    virtual bool Deserialize(const FieldNode& node) = 0;
 };
 
 template<typename T>
@@ -34,7 +34,7 @@ concept FieldValueClass =
     requires {
         typename T::DecayType;
         { T::Serialize(std::declval<const typename T::DecayType&>(), std::declval<RecordFieldObject::NodeWrapper&>()) } 
-            -> std::same_as<void>;
+            -> std::same_as<bool>;
         { T::Deserialize(std::declval<const FieldNode&>(), std::declval<typename T::DecayType&>()) } 
-            -> std::same_as<void>;
+            -> std::same_as<bool>;
     };

@@ -2,28 +2,36 @@
 
 #include "../FieldBase.h"
 
+#include <Log/Log.h>
+
 #include <Utility/Meta/IsTrivial.h>
 
 #include <cstdint>
 
-template <IsTrivial T>
+template <IsTrivial T, FieldNodeType NodeEnumT = FieldNodeType::Trivial>
 struct FTrivial
 {
     using DecayType = T;
 
-    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(const FieldNode& node, DecayType& out) {}
+    static bool Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
+    static bool Deserialize(const FieldNode& node, DecayType& out) {
+        if(node.type != NodeEnumT) {
+            LOG(Assert, LogFTrivialDeserialize, "Passed node type mismatch!");
+            return false;
+        }
+
+        memcpy(&out, &node.data, sizeof(T));
+
+        return true;
+    }
 };
 
-using FInt8 = FTrivial<int8_t>;
-using FInt16 = FTrivial<int16_t>;
-using FInt32 = FTrivial<int32_t>;
-using FInt64 = FTrivial<int64_t>;
+using FInteger = FTrivial<int32_t, FieldNodeType::Integer>;
+using FLong = FTrivial<int64_t, FieldNodeType::Long>;
 
-using FUInt8 = FTrivial<uint8_t>;
-using FUInt16 = FTrivial<uint16_t>;
-using FUInt32 = FTrivial<uint32_t>;
-using FUInt64 = FTrivial<uint64_t>;
+using FUnsigned = FTrivial<uint32_t, FieldNodeType::Unsigned>;
 
-using FFloat = FTrivial<float>;
-using FDouble = FTrivial<double>;
+using FFloat = FTrivial<float, FieldNodeType::Float>;
+using FDouble = FTrivial<double, FieldNodeType::Double>;
+
+using FBool = FTrivial<bool, FieldNodeType::Bool>;

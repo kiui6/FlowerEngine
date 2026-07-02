@@ -56,12 +56,12 @@ void UpscaleStateUpdate::Apply(RenderStateUpdateContext &ctx)
         state.compensationCalculation.x = 1;
     }
 
-    float widthScaleFactor = state.gameCanvasWidth / state.viewportWidth;
-    float heightScaleFactor = state.gameCanvasHeight / state.viewportHeight;
+    float widthScaleFactor = (float)state.gameCanvasWidth / (float)state.viewportWidth;
+    float heightScaleFactor = (float)state.gameCanvasHeight / (float)state.viewportHeight;
 
     if(std::min(widthScaleFactor, heightScaleFactor) > 1.f) {
-        state.compensationCalculation.y = std::max(widthScaleFactor, heightScaleFactor);
-        state.compensationCalculation.x = std::max(widthScaleFactor, heightScaleFactor);
+        state.compensationCalculation.y *= std::max(widthScaleFactor, heightScaleFactor);
+        state.compensationCalculation.x *= std::max(widthScaleFactor, heightScaleFactor);
     }
     
     state.NotifyChanged();

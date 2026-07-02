@@ -30,13 +30,15 @@ public:
 
     inline bool IsDirty() const override {return m_isDirty;}
 
-    void Serialize(RecordObject& builder) override {
+    bool Serialize(RecordObject& builder) override {
         //FieldValue::Serialize(m_value,);
         m_isDirty = false;
+
+        return false;
     }
 
-    void Deserialize(const FieldNode& node) override {
-        FieldValue::Deserialize(node, m_value);
+    bool Deserialize(const FieldNode& node) override {
         m_isDirty = false;
+        return FieldValue::Deserialize(node, m_value);
     }
 };

@@ -144,3 +144,13 @@ bool SerialFormatBaseReader::ParseString(DataReader &reader, RecordFieldObject::
 
     return true;
 }
+
+bool SerialFormatBaseReader::ParseMap(DataReader &reader, RecordFieldObject::NodeWrapper &result)
+{
+    return true;
+}
+
+bool SerialFormatBaseReader::ParseList(DataReader &reader, RecordFieldObject::NodeWrapper &result)
+{
+    return true;
+}

@@ -11,9 +11,10 @@
 class WorldRecord : public Record
 {
 public:
-    Field<FMap<FUInt64, FRecord>> Chunks = {FIELDID(CHNK)};
+    // Map of chunk records with packed coordinates [(u64)Key = ((u32)X << 32) | (u32)Y]
+    Field<FMap<FLong, FRecord>> Chunks = {FIELDID(CHNK)};
     Field<FString> DisplayName = {FIELDID(DISP)};
-    Field<FUInt16> TimeSpeedMultiplier = {FIELDID(KTIM)};
+    Field<FFloat> TimeSpeedMultiplier = {FIELDID(KTIM)};
 
     WorldRecord() {SetType(WorldRecord::StaticType());}
     static ID32 StaticType() {return MakeID32("WRLD");}

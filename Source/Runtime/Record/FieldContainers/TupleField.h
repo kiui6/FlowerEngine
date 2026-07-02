@@ -2,6 +2,8 @@
 
 #include "../FieldBase.h"
 
+#include <Log/Log.h>
+
 #include <tuple>
 #include <type_traits>
 #include <concepts>
@@ -22,6 +24,12 @@ struct FTuple
 {
     using DecayType = TupleStruct;
 
-    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(const FieldNode& node, DecayType& out) {}
+    static bool Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {return false;}
+    static bool Deserialize(const FieldNode& node, DecayType& out) {
+        assert(node.type == FieldNodeType::Tuple);
+        assert(node.data.children != nullptr);
+
+        // TODO
+        return false;
+    }
 };
