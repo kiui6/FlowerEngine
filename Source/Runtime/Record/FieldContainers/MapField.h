@@ -7,10 +7,23 @@
 #include <cassert>
 #include <Utility/Hash.h>
 
+template <class KeyT>
+struct FMapDefaultHash {
+    using type = std::hash<KeyT>;
+};
+
+template <>
+struct FMapDefaultHash<std::string> {
+    using type = StringHash;
+};
+
 template <FieldValueClass KeyT, FieldValueClass ValueT>
 struct FMap
 {
-    using DecayType = std::unordered_map<typename KeyT::DecayType, typename ValueT::DecayType>;
+    using DecayType = std::unordered_map<typename KeyT::DecayType, 
+                                typename ValueT::DecayType, 
+                                typename FMapDefaultHash<typename KeyT::DecayType>::type,
+                                std::equal_to<>>;
 
     static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
     static void Deserialize(const FieldNode& node, DecayType& out) {
@@ -30,13 +43,4 @@ struct FMap
             out.emplace(keyData, valueData);
         }
     }
-};
-
-template <FieldValueClass T>
-struct FMap<FString, T>
-{
-    using DecayType = std::unordered_map<typename FString::DecayType, typename T::DecayType, StringHash, std::equal_to<>>;
-
-    static void Serialize(const DecayType& data, RecordFieldObject::NodeWrapper& out) {}
-    static void Deserialize(const FieldNode& node, DecayType& out) {}
 };

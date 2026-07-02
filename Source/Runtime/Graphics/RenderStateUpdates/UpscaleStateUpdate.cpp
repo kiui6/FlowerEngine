@@ -38,24 +38,30 @@ void UpscaleStateUpdate::Apply(RenderStateUpdateContext &ctx)
         viewportDirty = false;
     }
 
-    float OriginalViewportAspect = ((float)state.gameCanvasWidth / (float)state.gameCanvasHeight);
-    float CurrentViewportAspect =  (float)state.viewportWidth / (float)state.viewportHeight;
+    float CanvasAspect = ((float)state.gameCanvasWidth / (float)state.gameCanvasHeight);
+    float ViewportAspect =  (float)state.viewportWidth / (float)state.viewportHeight;
     
-    // TODO: Add compensation for down-scaling(game canvas > viewport).
-    // In case of down-scaling, compensation should happen for both size, to preserve sprite sizes, and ratio.
-    if(CurrentViewportAspect > OriginalViewportAspect) {
+    if(ViewportAspect > CanvasAspect) {
         // Compensate for lack of Y
         state.compensationCalculation.x = 1;
         // kY = Xc / ((Xo/Yo) * Yc)
-        state.compensationCalculation.y = (float)state.viewportWidth / (OriginalViewportAspect * (float)state.viewportHeight);
-    } else if(CurrentViewportAspect < OriginalViewportAspect) {
+        state.compensationCalculation.y = (float)state.viewportWidth / (CanvasAspect * (float)state.viewportHeight);
+    } else if(ViewportAspect < CanvasAspect) {
         // Compensate for lack of X
         state.compensationCalculation.y = 1;
         // kX = ((Xo/Yo) * Yc) / Xc
-        state.compensationCalculation.x = (OriginalViewportAspect * (float)state.viewportHeight) / (float)state.viewportWidth;
+        state.compensationCalculation.x = (CanvasAspect * (float)state.viewportHeight) / (float)state.viewportWidth;
     } else {
         state.compensationCalculation.y = 1;
         state.compensationCalculation.x = 1;
+    }
+
+    float widthScaleFactor = state.gameCanvasWidth / state.viewportWidth;
+    float heightScaleFactor = state.gameCanvasHeight / state.viewportHeight;
+
+    if(std::min(widthScaleFactor, heightScaleFactor) > 1.f) {
+        state.compensationCalculation.y = std::max(widthScaleFactor, heightScaleFactor);
+        state.compensationCalculation.x = std::max(widthScaleFactor, heightScaleFactor);
     }
     
     state.NotifyChanged();
