@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 #include <Record/IRecordSource.h>
-#include <Data/DataView.h>
+#include <Data/FileView.h>
 #include <Data/DataReader.h>
 
 #include <Log/Log.h>
@@ -55,7 +55,7 @@ class PluginReader : public IRecordSource {
     std::string m_name;
     uint64_t m_uniqueID;
 
-    DataView m_fileView{};
+    FileView m_fileView{};
     bool m_isMaster;
 
     uint16_t m_dependenciesCount = 0;
@@ -73,7 +73,7 @@ public:
     bool IsValid() const {return m_fileView;}
     std::string_view GetName() const {return m_name;}
 
-    void InitializeFileView(DataView&& view);
+    void InitializeFileView(FileView&& view);
 
     // IRecordSource Interface
     virtual bool ResolveUniquePluginID(uint64_t uniqueID, uint16_t& relativeID) override {return false;}

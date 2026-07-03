@@ -10,6 +10,7 @@
 #include <filesystem>
 
 #include "DataView.h"
+#include "FileView.h"
 #include "DataWriter.h"
 #include "DirectoryView.h"
 
@@ -41,8 +42,8 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    DataView OpenDataView(std::string_view relativePath);
-    DataView MapDataView(std::string_view relativePath);
+    FileView OpenDataView(std::string_view relativePath);
+    FileView MapDataView(std::string_view relativePath);
 
     /*
      * Opens a file and provides a writer for it.

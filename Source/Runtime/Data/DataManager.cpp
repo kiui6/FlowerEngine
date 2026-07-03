@@ -45,20 +45,20 @@ const std::filesystem::path &DataManager::GetPrefPath()
     return m_prefPath;
 }
 
-DataView DataManager::OpenDataView(std::string_view relativePath)
+FileView DataManager::OpenDataView(std::string_view relativePath)
 {
     std::string path = CanonicalizePathSandboxed(relativePath);
 
     auto fileHandle = m_fileHandles.find(path);
     if(fileHandle != m_fileHandles.end()) {
-        return DataView(fileHandle->second.file.lock());
+        return FileView(fileHandle->second.file.lock());
     }
 
     std::shared_ptr<FileBase> file = GetService<Platform>()->Filesystem()->OpenFile(path, FileAccess::Read | FileAccess::Binary);
 
     if(!file->IsOpen()) {
         LOGF(Error, LogData, "Failed to open data view to file: \"%.*s\"", relativePath.length(), relativePath.data());
-        return DataView(nullptr);
+        return FileView(nullptr);
     }
 
     FileHandle handle;
@@ -67,10 +67,10 @@ DataView DataManager::OpenDataView(std::string_view relativePath)
 
     m_fileHandles.emplace(relativePath, std::move(handle));
 
-    return DataView(file);
+    return FileView(file);
 }
 
-DataView DataManager::MapDataView(std::string_view relativePath)
+FileView DataManager::MapDataView(std::string_view relativePath)
 {
     std::string path = CanonicalizePathSandboxed(relativePath);
 
@@ -78,7 +78,7 @@ DataView DataManager::MapDataView(std::string_view relativePath)
 
     if(!file->IsOpen()) {
         LOGF(Error, LogData, "Failed to map data view to file: \"%.*s\"", relativePath.length(), relativePath.data());
-        return DataView(nullptr);
+        return FileView(nullptr);
     }
 
     FileHandle handle;
@@ -87,7 +87,7 @@ DataView DataManager::MapDataView(std::string_view relativePath)
 
     m_fileHandles.emplace(relativePath, std::move(handle));
     
-    return DataView(file);
+    return FileView(file);
 }
 
 DataWriter DataManager::OpenDataWriter(std::string_view relativePath)

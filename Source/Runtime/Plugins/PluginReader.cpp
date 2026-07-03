@@ -5,7 +5,7 @@
 
 #include <vector>
 
-void PluginReader::InitializeFileView(DataView &&view)
+void PluginReader::InitializeFileView(FileView &&view)
 {
     m_fileView = std::move(view);
 

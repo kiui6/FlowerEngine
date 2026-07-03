@@ -58,7 +58,7 @@ bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
         
         // Initialize file with a data view
         std::string pluginFilePath = "Game:" + std::string(plugin->GetName());
-        DataView view = dataMgr->MapDataView(pluginFilePath);
+        FileView view = dataMgr->MapDataView(pluginFilePath);
         if(view) {
             plugin->InitializeFileView(std::move(view));
         } else {

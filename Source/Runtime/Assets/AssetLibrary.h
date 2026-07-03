@@ -54,7 +54,8 @@ inline AssetPtr<T> AssetLibrary::LoadAsset(std::string_view path)
         return AssetPtr<T>(path, static_cast<T*>(loadedAsset->second.get()));
     }
 
-    DataView view = GetService<DataManager>()->OpenDataView(path);
+    // TODO: Refactor this, too much ambiguity
+    FileView view = GetService<DataManager>()->OpenDataView(path);
     
     std::unique_ptr<T> asset = std::make_unique<T>(path, view);
 

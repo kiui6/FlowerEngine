@@ -4,7 +4,7 @@ set(EditorSources )
 
 add_platform_target(Editor ${EditorSources})
 
-target_link_libraries(Editor PRIVATE Shared Imgui)
+target_link_libraries(Editor PRIVATE Imgui)
 
 target_include_directories(Editor PRIVATE "${PROJECT_SOURCE_DIR}/Source/Editor")
 
