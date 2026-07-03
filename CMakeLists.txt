@@ -169,7 +169,7 @@ set(SrcGameFramework
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
     ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin}
-    "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
+    )
 
 if(WIN32)
     set(WindowsPlatform "Source/Runtime/Platform/Windows/WindowsPlatform.cpp" 
@@ -206,12 +206,16 @@ elseif(APPLE)
     set(Sources ${Sources} ${MacPlatform})
 endif()
 
+add_library(SharedModules INTERFACE)
+target_sources(SharedModules INTERFACE ${Sources})
+target_link_libraries(SharedModules INTERFACE disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
+target_include_directories(SharedModules INTERFACE "Source/Runtime" "Source/ThirdParty")
+target_include_directories(SharedModules INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated)
+target_compile_features(SharedModules INTERFACE cxx_std_23)
+
 add_library(SharedEngine INTERFACE)
-target_sources(SharedEngine INTERFACE ${Sources})
-target_link_libraries(SharedEngine INTERFACE disable_cxx_features SDL3::SDL3-static glm-header-only nlohmann_json)
-target_include_directories(SharedEngine INTERFACE "Source/Runtime" "Source/ThirdParty")
-target_include_directories(SharedEngine INTERFACE ${CMAKE_CURRENT_BINARY_DIR}/generated)
-target_compile_features(SharedEngine INTERFACE cxx_std_23)
+target_sources(SharedEngine INTERFACE "Source/Runtime/Core/main.cpp" "Source/Runtime/Core/GuardedMain.cpp")
+target_link_libraries(SharedEngine INTERFACE SharedModules)
 add_dependencies(SharedEngine FundamentalShaders)
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")

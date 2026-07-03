@@ -50,7 +50,7 @@ FileView DataManager::OpenDataView(std::string_view relativePath)
     std::string path = CanonicalizePathSandboxed(relativePath);
 
     auto fileHandle = m_fileHandles.find(path);
-    if(fileHandle != m_fileHandles.end()) {
+    if(fileHandle != m_fileHandles.end() && !fileHandle->second.file.expired()) {
         return FileView(fileHandle->second.file.lock());
     }
 
@@ -73,6 +73,11 @@ FileView DataManager::OpenDataView(std::string_view relativePath)
 FileView DataManager::MapDataView(std::string_view relativePath)
 {
     std::string path = CanonicalizePathSandboxed(relativePath);
+
+    auto fileHandle = m_fileHandles.find(path);
+    if(fileHandle != m_fileHandles.end() && !fileHandle->second.file.expired()) {
+        return FileView(fileHandle->second.file.lock());
+    }
 
     std::shared_ptr<FileBase> file = GetService<Platform>()->Filesystem()->MapFile(path, FileAccess::Read | FileAccess::Binary);
 
@@ -101,7 +106,14 @@ DataWriter DataManager::OpenDataWriter(std::string_view relativePath)
 
     std::string path = CanonicalizePathSandboxed(relativePath);
 
-    return DataWriter();
+    auto fileHandle = m_fileHandles.find(path);
+    if(fileHandle != m_fileHandles.end() && !fileHandle->second.file.expired()) {
+        return DataWriter(fileHandle->second.file.lock());
+    }
+
+    std::shared_ptr<FileBase> file = GetService<Platform>()->Filesystem()->OpenFile(path, FileAccess::Write | FileAccess::Binary);
+
+    return DataWriter(file);
 }
 
 DirectoryView DataManager::OpenDirectoryView(std::string_view relativePath)

@@ -14,12 +14,23 @@ if(ENABLE_ENGINE_TESTS)
     )
     FetchContent_MakeAvailable(doctest)
 
-    set(SrcRecords "Records/Test_OffsetsParsing.cpp" )
+    add_executable(EngineTests "main.cpp" "Records/Test_OffsetsParsing.cpp")
 
-    add_executable(EngineTests "main.cpp" ${SrcRecords})
-
-    target_link_libraries(EngineTests PRIVATE doctest)
+    target_link_libraries(EngineTests PRIVATE SharedModules doctest SDL3::SDL3-static)
     target_compile_definitions(EngineTests PRIVATE ENGINE_TESTS)
+
+    if(WIN32)
+        set_target_properties(EngineTests PROPERTIES WIN32_EXECUTABLE TRUE)
+        target_compile_definitions(EngineTests PRIVATE PLATFORM_WINDOWS)
+        endif()
+        
+    if(APPLE)
+        target_compile_definitions(EngineTests PRIVATE PLATFORM_MAC)
+    endif()
+
+    if(UNIX AND NOT APPLE) 
+        target_compile_definitions(EngineTests PRIVATE PLATFORM_LINUX)
+    endif()
 
     include(CTest)
     add_test(NAME EngineTests COMMAND EngineTests)

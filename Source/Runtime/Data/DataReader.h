@@ -13,7 +13,22 @@ class DataReader {
 public:
     DataReader(DataView& view) : m_view(view) {}
 
-    inline void Advance(ptrdiff_t diff) {m_cursor += diff;}
+    inline void Advance(ptrdiff_t diff) {
+        if (diff == 0) return;
+
+        if (diff < 0) {
+            size_t absDiff = static_cast<size_t>(-diff);
+            if (m_cursor <= absDiff) {
+                m_cursor = 0;
+            } else {
+                m_cursor -= absDiff;
+            }
+            return;
+        }
+
+        size_t newPos = m_cursor + static_cast<size_t>(diff);
+        m_cursor = newPos;
+    }
     inline void SetOffset(size_t offset) {m_cursor = offset;}
 
     inline size_t GetSize() {return m_view.size();}
@@ -59,14 +74,7 @@ public:
             return false;
         }
         
-        if constexpr (std::endian::native == std::endian::little) {
-            memcpy(&result, m_view.data() + m_cursor, sizeof(result));
-        } else {
-            static_assert(std::false_type::value, "Byteswap is not yet implemented for Big-Endian platforms");
-            T raw;
-            memcpy(&result, m_view.data() + m_cursor, sizeof(result));
-            result = raw;
-        }
+        memcpy(&result, m_view.data() + m_cursor, sizeof(result));
 
         if(advance) Advance(sizeof(result));
 
