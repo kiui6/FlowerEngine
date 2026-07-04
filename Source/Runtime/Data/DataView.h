@@ -6,10 +6,9 @@
 #include <Platform/Abstract/Filesystem/FileBase.h>
 
 class DataView {
-    
+protected:
     const std::byte* m_data = nullptr;
     size_t m_offset = 0, m_size = 0;
-
 public:
     DataView() = default;
     DataView(const std::byte* data, size_t size, size_t offset = 0) : m_data(data), m_size(size), m_offset(offset) {}

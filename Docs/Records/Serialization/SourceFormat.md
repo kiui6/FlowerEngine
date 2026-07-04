@@ -70,6 +70,9 @@ struct SerialLUTEntry
 ```
 <sub>*Diag 4. Structure of an RLUT entry*</sub>
 
+### Record String Blob (ReSB)
+ReSB contains pure string data without null terminator. Offsets to correct string are then resolved at read/write time.
+
 ### Record Field Blob (ReFB)
 Before parsing ReFB, reader needs to fetch RLUT entry for the corresponding record.
 Record Field Data is located at specified offset, and contains N amount of fields.

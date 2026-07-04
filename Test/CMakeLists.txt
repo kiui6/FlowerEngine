@@ -20,9 +20,8 @@ if(ENABLE_ENGINE_TESTS)
     target_compile_definitions(EngineTests PRIVATE ENGINE_TESTS)
 
     if(WIN32)
-        set_target_properties(EngineTests PROPERTIES WIN32_EXECUTABLE TRUE)
         target_compile_definitions(EngineTests PRIVATE PLATFORM_WINDOWS)
-        endif()
+    endif()
         
     if(APPLE)
         target_compile_definitions(EngineTests PRIVATE PLATFORM_MAC)

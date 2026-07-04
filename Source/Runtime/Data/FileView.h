@@ -16,4 +16,8 @@ class FileView : public DataView {
     FileView(std::shared_ptr<FileBase> file, size_t offset, size_t size) : m_file(file), DataView(file ? file->GetData() : nullptr, size, offset) {}
 public:
     FileView() = default;
+
+    FileView MakeSubFileView(size_t offset, size_t size) const noexcept {
+        return FileView(m_file, m_offset + offset, size);
+    } 
 };

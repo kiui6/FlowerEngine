@@ -7,17 +7,26 @@
 #include "Serial/SerialDependency.h"
 #include "Serial/SerialLUTEntry.h"
 
-#include "RecordInfo.h"
+#include <Record/RecordIR/RecordObject.h>
 
-class PluginReader;
+#include <Data/DataWriter.h>
 
 class PluginWriter {
-    PluginReader* m_reader = nullptr;
-public:
-    PluginWriter() = default;
-    PluginWriter(PluginReader* reader) : m_reader(reader) {}
+    DataWriter m_writer;
 
-    void AddRecord(const RecordInfo& info);
+    struct RecordData {
+        RecordID id;
+        uint32_t type;
+        uint16_t flags;
+        std::vector<uint8_t> nodeData;
+        std::vector<uint8_t> stringData;
+    };
+
+    std::vector<RecordData> m_recordBlobs;
+public:
+    PluginWriter(DataWriter && writer) : m_writer(writer) {}
+
+    void AddRecord(uint64_t owningRecord, const RecordObject& rec);
     void AddDependency(uint64_t id);
 
     void RemoveRecord(RecordID id);
