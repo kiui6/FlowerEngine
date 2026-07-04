@@ -14,7 +14,7 @@ if(ENABLE_ENGINE_TESTS)
     )
     FetchContent_MakeAvailable(doctest)
 
-    add_executable(EngineTests "main.cpp" "Records/Test_OffsetsParsing.cpp")
+    add_executable(EngineTests "main.cpp" "Records/Test_DataWriter.cpp")
 
     target_link_libraries(EngineTests PRIVATE SharedModules doctest SDL3::SDL3-static)
     target_compile_definitions(EngineTests PRIVATE ENGINE_TESTS)
