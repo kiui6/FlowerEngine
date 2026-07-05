@@ -27,27 +27,14 @@ class SpriteActor : public Actor
 public:
     SpriteActor(const RecordPtr<ReferenceRecord>& reference);
 
+    // TODO: Remove
     virtual void OnInput(const InputView& input) override {
-        if(input.GetAction("moveU")) {
-            auto loc = GetLocation();
-            loc.y += 1;
-            SetLocation(loc);
-        }
-        if(input.GetAction("moveL")) {
-            auto loc = GetLocation();
-            loc.x -= 1;
-            SetLocation(loc);
-        }
-        if(input.GetAction("moveD")) {
-            auto loc = GetLocation();
-            loc.y -= 1;
-            SetLocation(loc);
-        }
-        if(input.GetAction("moveR")) {
-            auto loc = GetLocation();
-            loc.x += 1;
-            SetLocation(loc);
-        }
+        auto loc = GetLocation();
+        loc.y += input.GetAction("moveU");
+        loc.x -= input.GetAction("moveL");
+        loc.y -= input.GetAction("moveD");
+        loc.x += input.GetAction("moveR");
+        SetLocation(loc);
     }
 
     virtual void RecordRenderView(RenderView& renderView) override;
