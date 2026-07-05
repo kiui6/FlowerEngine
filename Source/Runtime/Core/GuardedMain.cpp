@@ -70,9 +70,10 @@ int GuardedMain(int argc, char* argv[])
     Actor* act1 = myWorld->InstantiateActor(refRec, acinfo1);
 
     ActorCreateInfo acinfo2{};
-    acinfo2.transform.Location = {32, 0};
+    acinfo2.transform.Location = {64, 32};
     acinfo2.base = atlasRec.Get(); 
     acinfo2.displayName = Text("Test.Actor.Name"); 
+    acinfo2.isDynamic = false;
     Actor* act2 = myWorld->SpawnActor(acinfo2);
 
     application.GetEngine().TravelToConstructedWorld(std::move(myWorld));

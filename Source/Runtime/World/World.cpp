@@ -65,7 +65,8 @@ Actor *World::InstantiateActor(const RecordPtr<ReferenceRecord>& ref, const Acto
         LOG(Error, LogWorld, "Failed to instantiate actor from a ReferenceRecord, factory is present, but returned nullptr.");
         return nullptr;
     }
-    
+
+    actor->SetTransform(createInfo.transform);
     actor->PostInit();
 
     if(ref->IsDynamic) {

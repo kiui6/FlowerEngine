@@ -67,6 +67,7 @@ public:
     // Performs final simulation update after input & tick for current frame
     virtual void SimulationUpdate(float deltaTime) {}
 
+    virtual void SetTransform(const Transform2D& transform) { m_transform = transform; }
     virtual Transform2D GetTransform();
     virtual const Transform2D& GetRelativeTransform() const {return m_transform;}
 
