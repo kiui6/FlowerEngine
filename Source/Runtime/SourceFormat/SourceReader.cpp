@@ -1,11 +1,11 @@
-#include "PluginReader.h"
+#include "SourceReader.h"
 
 #include <Log/Log.h>
 #include <Debug/Tracer/Tracer.h>
 
 #include <vector>
 
-void PluginReader::InitializeFileView(FileView &&view)
+SourceReader::SourceReader(DataView &&view)
 {
     m_fileView = std::move(view);
 
@@ -41,7 +41,7 @@ void PluginReader::InitializeFileView(FileView &&view)
     m_LUTView = m_fileView.MakeSubView(header.recordsLutOffset, header.recordsLutCount * sizeof(SerialLUTEntry));
 }
 
-bool PluginReader::FetchRecordInfo(RecordID id, RecordInformation &result)
+bool SourceReader::FetchRecordInfo(RecordID id, RecordInformation &result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -55,7 +55,7 @@ bool PluginReader::FetchRecordInfo(RecordID id, RecordInformation &result)
     return true;
 }
 
-bool PluginReader::PopulateRecordFieldObjectBase(RecordID id, RecordObject &result)
+bool SourceReader::PopulateRecordFieldObjectBase(RecordID id, RecordObject &result)
 {
     SerialLUTEntry lutEntry;
     if(!FindRecordLUTEntry(id, lutEntry)) {
@@ -93,12 +93,12 @@ bool PluginReader::PopulateRecordFieldObjectBase(RecordID id, RecordObject &resu
     return true;
 }
 
-bool PluginReader::PopulateRecordFieldObjectDelta(RecordID id, RecordObject &result)
+bool SourceReader::PopulateRecordFieldObjectDelta(RecordID id, RecordObject &result)
 {
     return false;
 }
 
-bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
+bool SourceReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
 {
     size_t entryOffset = 0;
     DataReader reader(m_LUTView);
@@ -125,7 +125,7 @@ bool PluginReader::FindRecordLUTEntry(RecordID id, SerialLUTEntry& result)
     return false;
 }
 
-DataView PluginReader::FindRecordFromOffset(size_t offset)
+DataView SourceReader::FindRecordFromOffset(size_t offset)
 {
     return m_recordsView.MakeSubView(offset, m_recordsView.size() - offset);
 }

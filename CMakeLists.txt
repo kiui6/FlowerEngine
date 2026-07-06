@@ -122,7 +122,9 @@ set(SrcGC "Source/Runtime/GarbageCollector/GarbageCollector.cpp" "Source/Runtime
 
 set(SrcMixin )
 
-set(SrcPlugin "Source/Runtime/Plugins/PluginManager.cpp" "Source/Runtime/Plugins/PluginReader.cpp")
+set(SrcPlugin "Source/Runtime/Plugins/PluginManager.cpp")
+
+set(SrcSourceFormat "Source/Runtime/SourceFormat/SourceReader.cpp")
 
 set(SrcEntry "Source/Runtime/Entry/EntryRecord.cpp")
 
@@ -168,7 +170,7 @@ set(SrcGameFramework
 
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
-    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin}
+    ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin} ${SrcSourceFormat}
     )
 
 if(WIN32)

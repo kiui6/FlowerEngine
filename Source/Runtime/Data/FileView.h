@@ -7,17 +7,26 @@
 
 #include <Platform/Abstract/Filesystem/FileBase.h>
 
-class FileView : public DataView {
-    friend class DataManager;
+class FileView {
     std::shared_ptr<FileBase> m_file = nullptr;
-
-    FileView(std::shared_ptr<FileBase> file) : m_file(file), DataView(file ? file->GetData() : nullptr, file ? file->GetSize() : 0) {}
-    FileView(std::shared_ptr<FileBase> file, size_t offset) : m_file(file), DataView(file ? file->GetData() : nullptr, file ? file->GetSize() : 0, offset) {}
-    FileView(std::shared_ptr<FileBase> file, size_t offset, size_t size) : m_file(file), DataView(file ? file->GetData() : nullptr, size, offset) {}
 public:
     FileView() = default;
+    FileView(const std::shared_ptr<FileBase>& file) : m_file(file) {}
+    FileView(std::shared_ptr<FileBase> && file) : m_file(std::move(file)) {}
 
-    FileView MakeSubFileView(size_t offset, size_t size) const noexcept {
-        return FileView(m_file, m_offset + offset, size);
+    DataView MakeView(size_t offset = 0) {
+        if(!m_file) {
+            return DataView();
+        }
+        return DataView(m_file->GetData(), m_file->GetSize(), offset);
     } 
+
+    DataView MakeView(size_t offset, size_t size) {
+        if(!m_file) {
+            return DataView();
+        }
+        return DataView(m_file->GetData(), size, offset);
+    }
+
+    operator bool() const {return m_file != nullptr;}
 };

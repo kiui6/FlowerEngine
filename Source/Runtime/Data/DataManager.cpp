@@ -58,7 +58,7 @@ FileView DataManager::OpenDataView(std::string_view relativePath)
 
     if(!file->IsOpen()) {
         LOGF(Error, LogData, "Failed to open data view to file: \"%.*s\"", relativePath.length(), relativePath.data());
-        return FileView(nullptr);
+        return FileView();
     }
 
     FileHandle handle;

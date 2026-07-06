@@ -11,7 +11,7 @@
 
 #include <Data/DataWriter.h>
 
-class PluginWriter {
+class SourceWriter {
     DataWriter m_writer;
 
     struct RecordData {
@@ -24,7 +24,7 @@ class PluginWriter {
 
     std::vector<RecordData> m_recordBlobs;
 public:
-    PluginWriter(DataWriter && writer) : m_writer(writer) {}
+    SourceWriter(DataWriter && writer) : m_writer(writer) {}
 
     void AddRecord(uint64_t owningRecord, const RecordObject& rec);
     void AddDependency(uint64_t id);

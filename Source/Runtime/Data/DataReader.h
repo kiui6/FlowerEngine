@@ -5,6 +5,8 @@
 #include <optional>
 #include <type_traits>
 #include <cstring>
+#include <string>
+#include <vector>
 #include <bit>
 
 class DataReader {

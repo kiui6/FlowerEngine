@@ -3,28 +3,32 @@
 #include <memory>
 #include <cassert>
 
+#include "DataView.h"
+
 /*
- * Read only view into a const data buffer
+ * Read-write view for data inside a resizable buffer container 
  */
-class DataView {
+class DataBuffer {
 protected:
-    const std::byte* m_data = nullptr;
+    std::byte* m_data = nullptr;
     size_t m_offset = 0, m_size = 0;
 public:
-    DataView() = default;
-    DataView(const std::byte* data, size_t size, size_t offset = 0) : m_data(data), m_size(size), m_offset(offset) {}
-    DataView(const DataView& right) {
+    DataBuffer() = default;
+    DataBuffer(std::byte* data, size_t size, size_t offset = 0) : m_data(data), m_size(size), m_offset(offset) {}
+    // Copy constructor
+    DataBuffer(const DataBuffer& right) {
         m_data = right.m_data;
         m_offset = right.m_offset;
         m_size = right.m_size;
     }
 
-    DataView(DataView && right) {
+    // Move constructor
+    DataBuffer(DataBuffer && right) {
         m_data = std::move(right.m_data);
         m_offset = std::exchange(right.m_offset, 0);
         m_size = std::exchange(right.m_size, 0);
     }
-    ~DataView() = default;
+    ~DataBuffer() = default;
 
     const std::byte* begin()    const { return m_data + m_offset; }
     const std::byte* end()      const { return begin() + m_size; }
@@ -32,18 +36,20 @@ public:
     const std::byte* data()     const { return begin(); }
     bool empty()                const { return m_size == 0; }
 
-    DataView MakeSubView(size_t offset, size_t size) const noexcept {
+    DataView MakeView(size_t offset, size_t size) const noexcept {
         return DataView(m_data, size, m_offset + offset);
     } 
 
-    DataView& operator =(const DataView& right) {
+    // Copy assign
+    DataBuffer& operator =(const DataBuffer& right) {
         m_data = right.m_data;
         m_offset = right.m_offset;
         m_size = right.m_size;
         return *this;
     }
 
-    DataView& operator =(DataView && right) {
+    // Move assign
+    DataBuffer& operator =(DataBuffer && right) {
         m_data = std::move(right.m_data);
         m_offset = std::exchange(right.m_offset, 0);
         m_size = std::exchange(right.m_size, 0);
@@ -51,7 +57,7 @@ public:
     }
 
     const std::byte& operator [](size_t idx) const noexcept {
-        assert(idx < m_size && "DataView index out of range");
+        assert(idx < m_size && "DataBuffer index out of range");
         return *(begin() + idx);
     }
 

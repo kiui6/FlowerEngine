@@ -8,20 +8,27 @@
 #include <shared_mutex>
 #include <mutex>
 
-#include "PluginReader.h"
+#include <SourceFormat/SourceReader.h>
+#include <Data/FileView.h>
+
 #include "PluginOrderError.h"
 
 #ifdef EDITOR
-#   include "PluginWriter.h"
+#   include <SourceFormat/SourceWriter.h>
 #endif
 
 class PluginManager : public IService
 {
     static bool bIsInitialized;
 
+    struct LoadedPluginHandle {
+        FileView sourceFile;
+        SourceReader sourceReader;
+    };
+
     // Contains loaded plugins for this session
     // Should not be changed after initialization, unless reinitialization is called (i.e. load order is modified)
-    std::vector<PluginReader> m_loadedPlugins;
+    std::vector<LoadedPluginHandle> m_loadedPlugins;
 public:
     static std::string_view GetStaticName() {return "PluginManager";}
 

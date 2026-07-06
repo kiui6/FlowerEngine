@@ -57,7 +57,7 @@ inline AssetPtr<T> AssetLibrary::LoadAsset(std::string_view path)
     // TODO: Refactor this, too much ambiguity
     FileView view = GetService<DataManager>()->OpenDataView(path);
     
-    std::unique_ptr<T> asset = std::make_unique<T>(path, view);
+    std::unique_ptr<T> asset = std::make_unique<T>(path, view.MakeView());
 
     if(!asset || !asset->IsValid()) {
         LOGF(Error, LogAssetLibrary, "Failed to load Asset[%s] of Type[%c%c%c%c]", path.data(), T::StaticType(), T::StaticType() >> 8, T::StaticType() >> 16, T::StaticType() >> 24);

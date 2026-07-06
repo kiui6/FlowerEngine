@@ -3,7 +3,7 @@
 #include <unordered_map>
 
 #include <Record/IRecordSource.h>
-#include <Data/FileView.h>
+#include <Data/DataView.h>
 #include <Data/DataReader.h>
 
 #include <Log/Log.h>
@@ -48,15 +48,11 @@ private:
     static bool ParseList(DataReader& reader, RecordFieldObject::NodeWrapper& result);
 };
 
-struct is_master_plugin_t {};
-static constexpr is_master_plugin_t is_master_plugin{};
-
-class PluginReader : public IRecordSource {
+class SourceReader : public IRecordSource {
     std::string m_name;
     uint64_t m_uniqueID;
 
-    FileView m_fileView{};
-    bool m_isMaster;
+    DataView m_fileView{};
 
     uint16_t m_dependenciesCount = 0;
     std::unordered_map<uint16_t, uint64_t> m_dependencies;
@@ -66,14 +62,10 @@ class PluginReader : public IRecordSource {
     size_t m_recordsLUTCount = 0;
     DataView m_LUTView{};
 public:
-    PluginReader(std::string_view name) : m_name(name) {}
-    PluginReader(is_master_plugin_t, std::string_view name) : m_name(name), m_isMaster(true) {}
+    SourceReader(DataView&& view);
 
-    bool IsMaster() const {return m_isMaster;}
     bool IsValid() const {return m_fileView;}
     std::string_view GetName() const {return m_name;}
-
-    void InitializeFileView(FileView&& view);
 
     // IRecordSource Interface
     virtual bool ResolveUniquePluginID(uint64_t uniqueID, uint16_t& relativeID) override {return false;}
