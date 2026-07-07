@@ -15,6 +15,7 @@ public:
     Field<FMap<FLong, FRecord>> Chunks = {FIELDID(CHNK)};
     Field<FString> DisplayName = {FIELDID(DISP)};
     Field<FFloat> TimeSpeedMultiplier = {FIELDID(KTIM)};
+    Field<FTuple<TupleField<uint8_t, uint8_t, uint8_t, uint8_t>>> BackgroundColor = {FIELDID(BGCL)};
 
     WorldRecord() {SetType(WorldRecord::StaticType());}
     static ID32 StaticType() {return MakeID32("WRLD");}

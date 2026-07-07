@@ -9,22 +9,23 @@
 
 #include <Record/RecordIR/RecordObject.h>
 
-#include <Data/DataWriter.h>
+#include <Data/DataBuffer.h>
 
 class SourceWriter {
-    DataWriter m_writer;
+    DataBuffer m_buffer;
 
     struct RecordData {
         RecordID id;
         uint32_t type;
         uint16_t flags;
-        std::vector<uint8_t> nodeData;
+        std::vector<SerialLUTEntry> rlutData;
+        std::vector<uint8_t> fieldData;
         std::vector<uint8_t> stringData;
     };
 
     std::vector<RecordData> m_recordBlobs;
 public:
-    SourceWriter(DataWriter && writer) : m_writer(writer) {}
+    SourceWriter(DataBuffer && buffer) : m_buffer(buffer) {}
 
     void AddRecord(uint64_t owningRecord, const RecordObject& rec);
     void AddDependency(uint64_t id);

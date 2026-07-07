@@ -9,9 +9,10 @@
 #include <mutex>
 #include <filesystem>
 
+#include "DataWriter.h"
 #include "DataView.h"
 #include "FileView.h"
-#include "DataWriter.h"
+#include "FileBuffer.h"
 #include "DirectoryView.h"
 
 #include "Formats/MasterFile/MasterFile.h"
@@ -42,16 +43,17 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    FileView OpenDataView(std::string_view relativePath);
-    FileView MapDataView(std::string_view relativePath);
+    FileView OpenFileRead(std::string_view relativePath);
+    FileView MapFileRead(std::string_view relativePath);
 
     /*
-     * Opens a file and provides a writer for it.
+     * Opens a file and provides a buffer for it.
      *
      * @warning
      * Calling with "Game/" prefix in Game build will fail, in Game build writing is only allowed to "Pref/" prefix.
      */
-    DataWriter OpenDataWriter(std::string_view relativePath);
+    FileBuffer OpenFileWrite(std::string_view relativePath);
+    FileBuffer MapFileWrite(std::string_view relativePath);
 
     DirectoryView OpenDirectoryView(std::string_view relativePath);
 protected:

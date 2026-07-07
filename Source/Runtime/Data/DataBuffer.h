@@ -30,6 +30,10 @@ public:
     }
     ~DataBuffer() = default;
 
+    std::byte* begin()    { return m_data + m_offset; }
+    std::byte* end()      { return begin() + m_size; }
+    std::byte* data()     { return begin(); }
+
     const std::byte* begin()    const { return m_data + m_offset; }
     const std::byte* end()      const { return begin() + m_size; }
     size_t size()               const { return m_size; }
@@ -57,6 +61,11 @@ public:
     }
 
     const std::byte& operator [](size_t idx) const noexcept {
+        assert(idx < m_size && "DataBuffer index out of range");
+        return *(begin() + idx);
+    }
+
+    std::byte& operator [](size_t idx) noexcept {
         assert(idx < m_size && "DataBuffer index out of range");
         return *(begin() + idx);
     }

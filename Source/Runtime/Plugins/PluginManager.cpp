@@ -34,7 +34,7 @@ bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
     // Read load order config and fill loaded plugins list
     // Loaded plugins list contains PluginReaders without path prefix, because storing it will be redundant.
     // Plugins can't be contained inside of a Pref: prefix.
-    FileView loadOrderConfigView = dataMgr->OpenDataView("Pref:plugins.txt");
+    FileView loadOrderConfigView = dataMgr->OpenFileRead("Pref:plugins.txt");
     if(loadOrderConfigView) {
         DataView loadOrderConfigDataView = loadOrderConfigView.MakeView();
         TextualDataReader loadOrderConfigReader(loadOrderConfigDataView);
@@ -61,7 +61,7 @@ bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
         
         // Initialize file with a data view
         std::string pluginFilePath = "Game:" + std::string(pluginPath);
-        FileView view = dataMgr->MapDataView(pluginFilePath);
+        FileView view = dataMgr->MapFileRead(pluginFilePath);
         if(!view) {
             LOG(Error, LogPlugin, "Failed to map data view into a plugin file.");
         }

@@ -45,7 +45,7 @@ const std::filesystem::path &DataManager::GetPrefPath()
     return m_prefPath;
 }
 
-FileView DataManager::OpenDataView(std::string_view relativePath)
+FileView DataManager::OpenFileRead(std::string_view relativePath)
 {
     std::string path = CanonicalizePathSandboxed(relativePath);
 
@@ -70,7 +70,7 @@ FileView DataManager::OpenDataView(std::string_view relativePath)
     return FileView(file);
 }
 
-FileView DataManager::MapDataView(std::string_view relativePath)
+FileView DataManager::MapFileRead(std::string_view relativePath)
 {
     std::string path = CanonicalizePathSandboxed(relativePath);
 
@@ -95,7 +95,7 @@ FileView DataManager::MapDataView(std::string_view relativePath)
     return FileView(file);
 }
 
-DataWriter DataManager::OpenDataWriter(std::string_view relativePath)
+FileBuffer DataManager::OpenFileWrite(std::string_view relativePath)
 {
 #ifndef EDITOR
     if(relativePath.starts_with("G")) {
@@ -108,12 +108,12 @@ DataWriter DataManager::OpenDataWriter(std::string_view relativePath)
 
     auto fileHandle = m_fileHandles.find(path);
     if(fileHandle != m_fileHandles.end() && !fileHandle->second.file.expired()) {
-        return DataWriter(fileHandle->second.file.lock());
+        return FileBuffer(fileHandle->second.file.lock());
     }
 
     std::shared_ptr<FileBase> file = GetService<Platform>()->Filesystem()->OpenFile(path, FileAccess::Write | FileAccess::Binary);
 
-    return DataWriter(file);
+    return FileBuffer(file);
 }
 
 DirectoryView DataManager::OpenDirectoryView(std::string_view relativePath)
