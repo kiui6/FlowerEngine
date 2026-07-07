@@ -18,6 +18,7 @@
 #include <mutex>
 #include <array>
 #include <map>
+#include <unordered_set>
 
 class RecordLibrary : public IService
 {
@@ -32,6 +33,7 @@ class RecordLibrary : public IService
     DataManager* m_datamgr = nullptr;
 
     FlatHashMap<RecordID, std::unique_ptr<Record>> m_records;
+    std::unordered_set<Record*> m_unloadedDirtyRecords;
 
     // If editing Master File, should be set outside of bounds of reserved IDs
     std::atomic<RecordID> m_nextLocalID{1};
@@ -203,6 +205,7 @@ inline RecordPtr<T> RecordLibrary::LoadRecord(RecordID recordID)
     auto existingRecord = m_records.Find(recordID);
     if(existingRecord != nullptr) {
         if(existingRecord->get()->GetType() == T::StaticType()) {
+            existingRecord->get()->ClearFlag(RecordFlags::Unload);
             return {recordID, static_cast<T*>(existingRecord->get())};
         }
     }

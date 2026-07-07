@@ -75,7 +75,21 @@ RecordPtr<Record> RecordLibrary::GetRecordOfType(RecordID recordID, ID32 type)
 void RecordLibrary::UnloadRecord(RecordID recordID)
 {
     std::unique_lock lock(m_mtx);
-    m_records.Erase(recordID);
+    auto it = m_records.Find(recordID);
+    if(!it) {
+        return;
+    }
+
+    Record* record = it->get();
+
+    // Don't completely erase dirty records
+    // Dirty records must be marked unloaded and wait for serialization onto disk 
+    if(record && record->IsDirty()) {
+        record->SetFlag(RecordFlags::Unload);
+        m_unloadedDirtyRecords.insert(record);
+    } else {
+        m_records.Erase(recordID);
+    }
 }
 
 bool RecordLibrary::IsValidRecord(RecordID recordID) const
