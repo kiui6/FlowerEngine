@@ -7,10 +7,7 @@
 
 ServiceProvider::~ServiceProvider()
 {
-    for(auto it = m_services.begin(); it != m_services.end(); ++it)
-    {
-        delete it->second;
-    }
+
 }
 
 void ServiceProvider::Initialize()
@@ -47,9 +44,9 @@ void ServiceProvider::Initialize()
 
     while(!sortedArchetypes.empty()) {
         auto archetype = sortedArchetypes.back();
-        IService* service = archetype.instantiatorFunc();
+        std::unique_ptr<IService> service = archetype.instantiatorFunc();
         service->Initialize();
-        AddService(service);
+        AddService(std::move(service));
         sortedArchetypes.pop_back();
     }
 
@@ -74,13 +71,13 @@ IService *ServiceProvider::GetServiceByName(std::string_view name)
         return nullptr;
     }
     
-    return it->second;
+    return it->second.get();
 }
 
-void ServiceProvider::AddService(IService *service)
+void ServiceProvider::AddService(std::unique_ptr<IService> && service)
 {
     assert(service);
 
-    m_services.insert_or_assign(service->GetName(), service);
     m_servicesOrder.push_front(service->GetName());
+    m_services.insert_or_assign(service->GetName(), std::move(service));
 }

@@ -65,8 +65,7 @@ void Engine::Initialize()
 
     // TODO: Plugin order errors shall not crash the game, 
     // instead user should get into a main menu, if EntryRecord is present, where they can change load order
-    PluginOrderError pluginOrderError{};
-    if (!GetService<PluginManager>()->LoadDefaultPlugins(pluginOrderError)) {
+    if (auto loadOrderError = GetService<PluginManager>()->LoadDefaultPlugins()) {
         LOG(Fatal, LogEngine, "Failed to start engine: Critical plugin order error!");
         return;
     }

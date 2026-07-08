@@ -5,6 +5,7 @@
 #include <concepts>
 #include <functional>
 #include <queue>
+#include <memory>
 
 class IService;
 
@@ -37,9 +38,9 @@ public:
 
 template <ServiceClass ServiceType>
 struct ServiceInstantiator {
-    static std::function<IService*()> Get() {
+    static std::function<std::unique_ptr<IService>()> Get() {
         return [](){
-            IService* service = static_cast<IService*>(new ServiceType());
+            std::unique_ptr<IService> service = std::make_unique<ServiceType>();
             service->m_name = ServiceType::GetStaticName();
             return service;
         };
@@ -47,7 +48,7 @@ struct ServiceInstantiator {
 };
 
 struct ServiceArchetype {
-    std::function<IService*()> instantiatorFunc;
+    std::function<std::unique_ptr<IService>()> instantiatorFunc;
     std::string_view serviceName;
     std::vector<std::string_view> dependencyNames;
 };
@@ -56,7 +57,7 @@ class ServiceProvider
 {   
     std::vector<ServiceArchetype> m_serviceArchetypes;
 
-    std::unordered_map<std::string_view, IService*> m_services;
+    std::unordered_map<std::string_view, std::unique_ptr<IService>> m_services;
     std::deque<std::string_view> m_servicesOrder;
 public:
     ~ServiceProvider();
@@ -73,7 +74,7 @@ public:
     bool RegisterServiceArchetype(ServiceArchetype &archetype);
     IService* GetServiceByName(std::string_view name);
 private:
-    void AddService(IService* service);
+    void AddService(std::unique_ptr<IService> && service);
 };
 
 template <ServiceClass ServiceType>
