@@ -35,5 +35,5 @@ public:
     virtual void Initialize() override;
     virtual void Deinitialize() override;
 
-    bool LoadDefaultPlugins(PluginOrderError& error);
+    std::optional<PluginOrderError> LoadDefaultPlugins();
 };

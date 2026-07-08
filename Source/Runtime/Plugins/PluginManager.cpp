@@ -20,7 +20,7 @@ void PluginManager::Deinitialize()
 }
 
 // TODO: Implement proper PluginOrderError returns
-bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
+std::optional<PluginOrderError> PluginManager::LoadDefaultPlugins()
 {
     DataManager* dataMgr = GetService<DataManager>();
     Config* config = GetService<Config>();
@@ -49,7 +49,7 @@ bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
     // Just in case check for load order vector to be smaller than size of uint16_t
     if(loadSourceCandidates.size() >= static_cast<uint16_t>(-1)) {
         LOGF(Fatal, LogPlugin, "Too many plugins enabled, maximum supported is %u", static_cast<uint16_t>(-1));
-        return false;
+        return PluginOrderError();
     }
     
     // TODO: Load order resolution
@@ -86,5 +86,5 @@ bool PluginManager::LoadDefaultPlugins(PluginOrderError &error)
 
     }
 
-    return true;
+    return std::nullopt;
 }

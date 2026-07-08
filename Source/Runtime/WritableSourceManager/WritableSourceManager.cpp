@@ -1,6 +1,8 @@
 #include "WritableSourceManager.h"
 
-bool WritableSourceManager::bIsInitialized = RegisterService<WritableSourceManager>({DataManager::GetStaticName()});
+#include <Record/RecordLibrary.h>
+
+bool WritableSourceManager::bIsInitialized = RegisterService<WritableSourceManager>({DataManager::GetStaticName(), RecordLibrary::GetStaticName()});
 
 void WritableSourceManager::Initialize()
 {
