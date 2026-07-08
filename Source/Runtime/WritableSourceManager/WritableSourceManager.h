@@ -8,13 +8,13 @@
 #include <shared_mutex>
 #include <mutex>
 
-#include <WritableSourceManager/WritableSourceManager.h>
+#include <Data/DataManager.h>
 
-class SaveManager : public IService
+class WritableSourceManager : public IService
 {
     static bool bIsInitialized;
 public:
-    static std::string_view GetStaticName() {return "SaveManager";}
+    static std::string_view GetStaticName() {return "WritableSourceManager";}
 
     virtual void Initialize() override;
     virtual void Deinitialize() override;

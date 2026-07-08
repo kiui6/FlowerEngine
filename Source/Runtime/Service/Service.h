@@ -93,6 +93,26 @@ inline bool RegisterService(std::vector<std::string_view> dependencies = {})
 }
 
 template <ServiceClass ServiceType>
+inline bool RegisterEditorService(std::vector<std::string_view> dependencies = {})
+{
+    #ifdef EDITOR
+        return RegisterService<ServiceType>(dependencies);
+    #else
+        return false;
+    #endif
+}
+
+template <ServiceClass ServiceType>
+inline bool RegisterRuntimeService(std::vector<std::string_view> dependencies = {})
+{
+    #ifndef EDITOR
+        return RegisterService<ServiceType>(dependencies);
+    #else
+        return false;
+    #endif
+}
+
+template <ServiceClass ServiceType>
 inline ServiceType* GetService()
 {
     ServiceProvider &provider = ServiceProvider::Get();

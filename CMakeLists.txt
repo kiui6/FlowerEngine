@@ -128,6 +128,10 @@ set(SrcSourceFormat "Source/Runtime/SourceFormat/SourceReader.cpp")
 
 set(SrcEntry "Source/Runtime/Entry/EntryRecord.cpp")
 
+set(SrcWritableSourceManager "Source/Runtime/WritableSourceManager/WritableSourceManager.cpp")
+
+set(SrcSaveManager "Source/Runtime/Save/SaveManager.cpp")
+
 set(SrcRender  
     # Render Engine
     "Source/Runtime/Graphics/RenderEngine/RenderEngine.cpp"
@@ -171,6 +175,7 @@ set(SrcGameFramework
 set(Sources ${SrcLZ4} ${SrcStbImage} ${SrcApplication} ${SrcRender} ${SrcService} ${SrcLog}
     ${SrcWorld} ${SrcInput} ${SrcEngine} ${SrcRecord} ${SrcAsset} ${SrcConfig} ${SrcBlackboard} ${SrcAsync} ${SrcData}
     ${SrcPlatform} ${SrcLocale} ${SrcUtility} ${SrcGC} ${SrcGameFramework} ${SrcMixin} ${SrcPlugin} ${SrcSourceFormat}
+    ${SrcWritableSourceManager} ${SrcSaveManager}
     )
 
 if(WIN32)
