@@ -97,7 +97,7 @@ template <ServiceClass ServiceType>
 inline bool RegisterEditorService(std::vector<std::string_view> dependencies = {})
 {
     #ifdef EDITOR
-        return RegisterService<ServiceType>(dependencies);
+        return RegisterService<ServiceType>(dependencies);  
     #else
         return false;
     #endif

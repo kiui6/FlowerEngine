@@ -5,14 +5,11 @@ option(ENABLE_ENGINE_TESTS "Enable engine unit tests" OFF)
 if(ENABLE_ENGINE_TESTS)
     message(STATUS "Tests enabled")
 
-    message(STATUS "Fetching doctest")
-    include(FetchContent)
-    FetchContent_Declare(
-        doctest
-        GIT_REPOSITORY https://github.com/doctest/doctest.git
-        GIT_TAG v2.4.11
+    fetch_package(doctest 
+        GIT https://github.com/doctest/doctest.git
+        TAG v2.5.3
+        REQUIRE doctest
     )
-    FetchContent_MakeAvailable(doctest)
 
     add_executable(EngineTests "main.cpp" "Records/Test_DataWriter.cpp")
 

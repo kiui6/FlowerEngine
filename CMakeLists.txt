@@ -15,37 +15,27 @@ include("CMake/EnableLTO.cmake")
 include("CMake/StripSymbols.cmake")
 include("CMake/CompileShaders.cmake")
 include("CMake/MoltenVK.cmake")
+include("CMake/FetchPackage.cmake")
 include(FetchContent)
 
-message(STATUS "Fetching GLM 1.0.1")
-
-FetchContent_Declare(
-  glm
-  GIT_REPOSITORY https://github.com/g-truc/glm.git
-  GIT_TAG        1.0.1
-  )
-  
-FetchContent_MakeAvailable(glm)
-  
-message(STATUS "Fetching JSON 3.12.0")
-
-FetchContent_Declare(
-  json
-  GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG        v3.12.0
-  )
-  
-FetchContent_MakeAvailable(json)
-  
-message(STATUS "Fetching SDL 3.4.4")
-
-FetchContent_Declare(
-  sdl
-  GIT_REPOSITORY https://github.com/libsdl-org/SDL.git 
-  GIT_TAG        release-3.4.4
+fetch_package(glm 
+  LOCAL "glm"
+  GIT https://github.com/g-truc/glm.git 
+  TAG 1.0.2
+  REQUIRE glm-header-only
 )
-
-FetchContent_MakeAvailable(sdl)
+  
+fetch_package(nlohmann_json 
+  GIT https://github.com/nlohmann/json.git 
+  TAG v3.12.0
+  REQUIRE nlohmann_json
+)
+  
+fetch_package(SDL3 
+  GIT https://github.com/libsdl-org/SDL.git 
+  TAG release-3.4.4
+  REQUIRE SDL3::SDL3-static
+)
 
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
